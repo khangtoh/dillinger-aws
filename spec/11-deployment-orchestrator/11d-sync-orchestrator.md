@@ -141,11 +141,16 @@ done — report the output.
 
 ## Definition of done
 
-- [ ] `infra/gateway/deploy-gateway.sh` exists, is executable, passes
-      `bash -n`, follows the existing script style.
-- [ ] `infra/orchestrator/sync.sh` exists, is executable, passes
+- [x] `infra/gateway/deploy-gateway.sh` exists, is executable, passes
+      `bash -n`, follows the existing script style. Correctly mirrors
+      `provision-tenant.sh`'s config-hash tagging and the "omit empty
+      parameter overrides entirely" rule from this sub-spec.
+- [x] `infra/orchestrator/sync.sh` exists, is executable, passes
       `bash -n`.
-- [ ] `sync.test.sh` exists, is executable, and **passes when you run
-      it**.
-- [ ] Commit your changes locally (do not push — the coordinating
-      session will merge and push) with a clear commit message.
+- [x] `sync.test.sh` exists, is executable, and **passes when you run
+      it**. Built by a background sub-agent, merged into
+      `claude/dillinger-aws-lambda-jsfoye`, and re-run independently
+      after merge (18/18 assertions passed) rather than trusting the
+      agent's own report.
+- [x] Committed and merged (commit `6f1dfbf`, merged in `e4aee8f`,
+      pushed).

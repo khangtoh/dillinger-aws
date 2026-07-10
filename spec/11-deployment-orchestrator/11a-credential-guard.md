@@ -115,14 +115,18 @@ this done — paste/report the output.
 
 ## Definition of done
 
-- [ ] `infra/orchestrator/credential-guard.sh` exists, is executable,
+- [x] `infra/orchestrator/credential-guard.sh` exists, is executable,
       passes `bash -n` syntax check.
-- [ ] Both mock `aws` scripts exist and are executable.
-- [ ] `credential-guard.test.sh` exists, is executable, and **passes when
-      you run it**.
-- [ ] Script and tests follow this repo's existing style (see
+- [x] Both mock `aws` scripts exist and are executable.
+- [x] `credential-guard.test.sh` exists, is executable, and **passes when
+      you run it**. Built by a background sub-agent, merged into
+      `claude/dillinger-aws-lambda-jsfoye`, and re-run independently
+      after merge (6/6 passed) rather than trusting the agent's own
+      report. Correctly fixed a wrong `EvalDecision` enum guess in this
+      sub-spec by checking botocore's actual model instead of trusting it.
+- [x] Script and tests follow this repo's existing style (see
       `infra/provision-tenant.sh`, `infra/register-tenant-route.sh` for
       reference: `#!/usr/bin/env bash`, `set -euo pipefail`, usage comment
       block, no unexplained magic).
-- [ ] Commit your changes locally (do not push — the coordinating session
-      will merge and push) with a clear commit message.
+- [x] Committed and merged (commit `86edf1e`, merged in `76ba48a`,
+      pushed).

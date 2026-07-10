@@ -101,14 +101,16 @@ done — report the output.
 
 ## Definition of done
 
-- [ ] `infra/orchestrator/resolve-model.sh` exists, is executable, passes
+- [x] `infra/orchestrator/resolve-model.sh` exists, is executable, passes
       `bash -n`.
-- [ ] `infra/deployment-model.json` committed with the exact default
+- [x] `infra/deployment-model.json` committed with the exact default
       content in step 1 above.
-- [ ] `infra/desired-tenants.json` committed with `{"tenants": []}` — do
-      **not** invent example tenants in the committed file, only in your
-      test fixtures.
-- [ ] `resolve-model.test.sh` exists, is executable, and **passes when
-      you run it**.
-- [ ] Commit your changes locally (do not push — the coordinating
-      session will merge and push) with a clear commit message.
+- [x] `infra/desired-tenants.json` committed with `{"tenants": []}` — no
+      invented example tenants.
+- [x] `resolve-model.test.sh` exists, is executable, and **passes when
+      you run it**. Built by a background sub-agent, merged into
+      `claude/dillinger-aws-lambda-jsfoye`, and re-run independently
+      after merge (6/6 passed) rather than trusting the agent's own
+      report.
+- [x] Committed and merged (commit `669b200`, merged in `f8b4808`,
+      pushed).
