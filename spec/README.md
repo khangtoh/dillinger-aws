@@ -31,11 +31,15 @@ Docker-host/ECS/EC2-style deployment.
 | 6 | [06-execution-pdf-export.md](06-execution-pdf-export.md) | Handle Puppeteer/Chromium PDF export on Lambda | Phase 4 (optional/stretch) |
 | 7 | [07-execution-cicd.md](07-execution-cicd.md) | Automate build+deploy on push | Phase 4 |
 | 8 | [08-testing.md](08-testing.md) | Verify the deployment actually works | Phase 4 |
+| 9 | [09-multi-tenancy.md](09-multi-tenancy.md) | Support multiple users (which model? see file) | Phase 4 |
 
 ## Status
 
 - [ ] **Dillinger is live on AWS Lambda** — Function URL: `TBD`
 - Overall phase progress: see individual files.
+- **Open question blocking full sign-off:** which multi-user model
+  (`spec/09-multi-tenancy.md`) — defaulting to "shared deployment, many
+  concurrent users" until the user confirms otherwise.
 
 ## Non-goals for v1
 
