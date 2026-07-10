@@ -19,15 +19,21 @@ Depends on: Phase 4 (manual deploy already works once).
       `push: branches: [main]`; to keep it automatic but gated, add an
       `environment: production` key to the `deploy` job pointing at a
       GitHub Environment configured with required reviewers.
-- [ ] Create an IAM role trusted for GitHub Actions OIDC
+- [x] Create an IAM role trusted for GitHub Actions OIDC
       (`token.actions.githubusercontent.com`), scoped to this repo, with
       permissions limited to ECR push + Lambda update-function-code +
       `sam deploy`'s CloudFormation needs (same shape as the Phase 1
       least-privilege policy, but with the trust policy scoped to the
-      GitHub OIDC provider instead of an IAM user).
-- [ ] Store the AWS account ID/region/role ARN as GitHub Actions repo
+      GitHub OIDC provider instead of an IAM user). Done 2026-07-10
+      (user-approved root-session action, same bootstrap scope as Phase
+      1): OIDC provider + role `dillinger-ci-deploy`, trust policy
+      pinned to `repo:khangtoh/dillinger-aws:*`, with the **same**
+      `dillinger-deploy-policy` the human deploy user has attached —
+      one permission surface for CI and humans. Design documented in
+      `.github/workflows/README.md`.
+- [x] Store the AWS account ID/region/role ARN as GitHub Actions repo
       variables (`AWS_REGION`, `AWS_DEPLOY_ROLE_ARN`) — not raw access
-      keys.
+      keys. Done via `gh variable set`, 2026-07-10.
 - [ ] Manually run the workflow (`workflow_dispatch`) once and confirm it
       succeeds end-to-end.
 - [ ] Confirm the staging Function URL serves the deployed change after
