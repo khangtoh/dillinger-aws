@@ -15,19 +15,33 @@
 #   infra/orchestrator/state/credential-status.json  (Module A output)
 #   infra/orchestrator/state/deployment-state.json    (Module C output)
 # Calls:
-#   provision-tenant.sh <tenant-id> <region>   (normally infra/provision-tenant.sh)
-#   deploy-gateway.sh <region>                 (normally infra/gateway/deploy-gateway.sh)
+#   provision-tenant.sh <tenant-id> <region>       (normally infra/provision-tenant.sh)
+#   deploy-gateway.sh <region>                     (normally infra/gateway/deploy-gateway.sh)
+#   verify-tenant.sh <tenant-id> <function-url>    (normally infra/orchestrator/verify-tenant.sh)
 #
-# The two scripts above are invoked by bare name, resolved via $PATH, with
-# their real locations appended to $PATH as a fallback (not prepended) -
-# this is deliberate, so tests can put stub replacements earlier in $PATH
-# and have them take priority without editing this script or the real
-# scripts. See infra/orchestrator/test/sync.test.sh.
+# The three scripts above are invoked by bare name, resolved via $PATH,
+# with their real locations appended to $PATH as a fallback (not
+# prepended) - this is deliberate, so tests can put stub replacements
+# earlier in $PATH and have them take priority without editing this
+# script or the real scripts. See infra/orchestrator/test/sync.test.sh.
 #
-# Exit codes: 0 only if every attempted deploy succeeded and no tenant/
-# gateway was skipped due to a pre-existing FAILED status. Non-zero if any
-# deploy attempt failed, any FAILED entry was skipped, or credentials
-# aren't healthy (nothing is attempted in that case).
+# After a tenant deploy succeeds, this script also verifies it: reads the
+# tenant's Function URL back from infra/tenants.json (which
+# provision-tenant.sh just updated) and runs verify-tenant.sh against it -
+# closing the gap between "the deploy command exited 0" (CloudFormation
+# says the stack is complete) and "the tenant is actually serving
+# traffic" (a crash loop or missing env var can complete a stack and
+# still leave the app broken). A verification failure is reported as
+# "deployed, verification failed" in the summary and counts toward a
+# non-zero exit, same as a deploy failure - but does NOT mark the tenant
+# FAILED for future runs the way a CloudFormation failure does, since a
+# plain re-sync might fix a transient issue (e.g. cold start timing).
+#
+# Exit codes: 0 only if every attempted deploy succeeded and verified, and
+# no tenant/gateway was skipped due to a pre-existing FAILED status.
+# Non-zero if any deploy attempt failed, any deployed tenant failed
+# verification, any FAILED entry was skipped, or credentials aren't
+# healthy (nothing is attempted in that case).
 
 set -euo pipefail
 
@@ -35,10 +49,14 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 STATE_DIR="$REPO_ROOT/infra/orchestrator/state"
 CREDENTIAL_STATUS_FILE="$STATE_DIR/credential-status.json"
 DEPLOYMENT_STATE_FILE="$STATE_DIR/deployment-state.json"
+# Overridable for tests only (sync.test.sh points this at a scratch
+# fixture so tests never read/write the real committed tenants.json) -
+# never set this for a normal run.
+TENANTS_FILE="${TENANTS_FILE:-$REPO_ROOT/infra/tenants.json}"
 
 # Fallback PATH entries for the real scripts - appended (not prepended) so
 # a test-provided stub directory earlier in $PATH always wins.
-export PATH="$PATH:$REPO_ROOT/infra:$REPO_ROOT/infra/gateway"
+export PATH="$PATH:$REPO_ROOT/infra:$REPO_ROOT/infra/gateway:$REPO_ROOT/infra/orchestrator"
 
 # --- 1. Defense-in-depth credential check -----------------------------
 # Module C already gated on this, but this script performs real side
@@ -100,7 +118,23 @@ for ((i = 0; i < TENANT_COUNT; i++)); do
       fi
       echo "==> Syncing tenant '${TENANT_ID}' (${TENANT_STATUS}) in region ${TENANT_REGION}"
       if provision-tenant.sh "$TENANT_ID" "$TENANT_REGION"; then
-        SUMMARY_ROWS+=("${TENANT_ID}\t${TENANT_STATUS}\t${ACTION}\tsuccess")
+        TENANT_FUNCTION_URL=""
+        if [[ -f "$TENANTS_FILE" ]]; then
+          TENANT_FUNCTION_URL=$(jq -r --arg tid "$TENANT_ID" \
+            '.tenants[] | select(.tenantId == $tid) | .functionUrl // empty' \
+            "$TENANTS_FILE")
+        fi
+        if [[ -z "$TENANT_FUNCTION_URL" ]]; then
+          echo "sync.sh: deploy succeeded but no functionUrl found for '${TENANT_ID}' in ${TENANTS_FILE} - skipping verification" >&2
+          SUMMARY_ROWS+=("${TENANT_ID}\t${TENANT_STATUS}\t${ACTION}\tdeployed (not verified - no URL on record)")
+          ANY_FAILURE=1
+        elif verify-tenant.sh "$TENANT_ID" "$TENANT_FUNCTION_URL"; then
+          SUMMARY_ROWS+=("${TENANT_ID}\t${TENANT_STATUS}\t${ACTION}\tsuccess (verified)")
+        else
+          echo "sync.sh: tenant '${TENANT_ID}' deployed but failed verification" >&2
+          SUMMARY_ROWS+=("${TENANT_ID}\t${TENANT_STATUS}\t${ACTION}\tdeployed, verification FAILED")
+          ANY_FAILURE=1
+        fi
       else
         echo "sync.sh: deploy failed for tenant '${TENANT_ID}'" >&2
         SUMMARY_ROWS+=("${TENANT_ID}\t${TENANT_STATUS}\t${ACTION}\tfailed")

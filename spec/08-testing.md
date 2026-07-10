@@ -5,15 +5,22 @@ Goal: prove Dillinger actually works when deployed on Lambda, not just that
 
 Depends on: Phase 4 (live Function URL).
 
-- [ ] Smoke test: `curl -I <Function URL>` returns `200`/`3xx`, not a
-      Lambda/API Gateway error payload.
+- [x] Smoke test: `curl -I <Function URL>` returns `200`/`3xx`, not a
+      Lambda/API Gateway error payload. **Automated** as of Phase 11f
+      (`infra/orchestrator/verify-tenant.sh`) — runs automatically after
+      every tenant deploy via `sync.sh`, not just once manually. See
+      `spec/11-deployment-orchestrator/README.md`'s "Post-deploy
+      verification" section. Still needs a real deploy to confirm against
+      actual AWS (blocked on Phase 1 credentials, same as everything
+      else) — mocked-`curl` tests pass (`verify-tenant.test.sh`, 8/8).
 - [ ] Open the Function URL in a real browser; confirm the page loads and
       the Monaco editor renders.
 - [ ] Type markdown in the editor and confirm the live preview updates.
 - [ ] Confirm static assets (`_next/static/*`) load with 200 status and
       reasonable cache headers.
-- [ ] Request an unknown route and confirm a sane 404 (not a raw Lambda
-      error).
+- [x] Request an unknown route and confirm a sane 404 (not a raw Lambda
+      error). **Automated** — same `verify-tenant.sh`, same caveat as
+      above (mocked, not yet run against real AWS).
 - [ ] Measure cold-start latency (first request after ~15 min idle) and
       record it in this file.
 - [ ] Measure warm-request latency and record it in this file.

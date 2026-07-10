@@ -28,6 +28,7 @@ STUB_SUCCESS_DIR="$SCRATCH/stubs-success"
 STUB_FAIL_DIR="$SCRATCH/stubs-fail"
 MARKER_DIR="$SCRATCH/markers"
 LOG_FILE="$SCRATCH/invocations.log"
+SCRATCH_TENANTS_FILE="$SCRATCH/tenants.json"
 
 # Did infra/orchestrator/state/ exist (with files) before this test ran?
 # If so, preserve/restore it rather than clobbering another module's
@@ -66,6 +67,20 @@ cat >"$STUB_SUCCESS_DIR/deploy-gateway.sh" <<'EOF'
 set -euo pipefail
 echo "deploy-gateway.sh $*" >> "$SYNC_TEST_LOG"
 touch "$SYNC_TEST_MARKER_DIR/deployed-gateway"
+EOF
+
+# verify-tenant.sh stub: succeeds for every tenant except one named in
+# SYNC_TEST_VERIFY_FAIL_TENANT (if set), so tests can cover both the
+# "deployed and verified" and "deployed but verification failed" paths
+# without needing a real curl/network call.
+cat >"$STUB_SUCCESS_DIR/verify-tenant.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "verify-tenant.sh $*" >> "$SYNC_TEST_LOG"
+if [[ "${1:-}" == "${SYNC_TEST_VERIFY_FAIL_TENANT:-}" ]]; then
+  exit 1
+fi
+touch "$SYNC_TEST_MARKER_DIR/verified-$1"
 EOF
 
 # Failure stubs: log their invocation, do NOT touch a marker, exit non-zero.
@@ -160,6 +175,22 @@ JSON
 
 export SYNC_TEST_LOG="$LOG_FILE"
 export SYNC_TEST_MARKER_DIR="$MARKER_DIR"
+export TENANTS_FILE="$SCRATCH_TENANTS_FILE"
+
+# Fixture tenants.json covering every tenantId used across the tests below,
+# each with a functionUrl - mimics what the real provision-tenant.sh would
+# have already written via record-tenant.py by the time sync.sh reads it
+# back to hand off to verify-tenant.sh.
+cat >"$SCRATCH_TENANTS_FILE" <<'JSON'
+{
+  "tenants": [
+    { "tenantId": "acme", "stackName": "dillinger-acme", "region": "us-east-1", "functionUrl": "https://acme.lambda-url.us-east-1.on.aws/", "createdAt": "2026-07-10T00:00:00Z", "updatedAt": "2026-07-10T00:00:00Z" },
+    { "tenantId": "gamma", "stackName": "dillinger-gamma", "region": "us-east-1", "functionUrl": "https://gamma.lambda-url.us-east-1.on.aws/", "createdAt": "2026-07-10T00:00:00Z", "updatedAt": "2026-07-10T00:00:00Z" },
+    { "tenantId": "zeta", "stackName": "dillinger-zeta", "region": "us-east-1", "functionUrl": "https://zeta.lambda-url.us-east-1.on.aws/", "createdAt": "2026-07-10T00:00:00Z", "updatedAt": "2026-07-10T00:00:00Z" },
+    { "tenantId": "eta", "stackName": "dillinger-eta", "region": "us-east-1", "functionUrl": "https://eta.lambda-url.us-east-1.on.aws/", "createdAt": "2026-07-10T00:00:00Z", "updatedAt": "2026-07-10T00:00:00Z" }
+  ]
+}
+JSON
 
 # =========================================================================
 # Test 1: mixed statuses + DRIFTED gateway, success stubs.
@@ -189,6 +220,10 @@ assert_file_exists "gamma (DRIFTED) marker created" "$MARKER_DIR/deployed-gamma"
 assert_file_not_exists "beta (IN_SYNC) marker NOT created (correctly skipped)" "$MARKER_DIR/deployed-beta"
 assert_file_not_exists "delta (FAILED) marker NOT created (correctly not auto-retried)" "$MARKER_DIR/deployed-delta"
 assert_file_exists "gateway (DRIFTED) marker created" "$MARKER_DIR/deployed-gateway"
+assert_file_exists "acme was verified after deploy (verify-tenant.sh called with its functionUrl)" "$MARKER_DIR/verified-acme"
+assert_file_exists "gamma was verified after deploy" "$MARKER_DIR/verified-gamma"
+assert_true "verify-tenant.sh was called with acme's functionUrl from tenants.json" \
+  "$(grep -q 'verify-tenant.sh acme https://acme.lambda-url.us-east-1.on.aws/' "$LOG_FILE" && echo true || echo false)"
 assert_exit_code "exit code non-zero (a FAILED tenant was present)" "nonzero" "$TEST1_EXIT"
 
 # =========================================================================
@@ -284,6 +319,64 @@ assert_true "both failing tenants were attempted (log has 2 provision-tenant.sh 
 assert_file_not_exists "acme marker NOT created (deploy failed)" "$MARKER_DIR/deployed-acme"
 assert_file_not_exists "zeta marker NOT created (deploy failed)" "$MARKER_DIR/deployed-zeta"
 assert_file_exists "gateway still attempted and succeeded despite tenant failures" "$MARKER_DIR/deployed-gateway"
+
+# =========================================================================
+# Test 5: deploy succeeds but the tenant fails its post-deploy verification
+# (e.g. the stack completed but the app itself is crash-looping) - this is
+# the specific gap this test file was extended to cover: sync.sh must not
+# report "success" just because provision-tenant.sh exited 0.
+# =========================================================================
+echo "Test 5: deploy succeeds, verification fails - exit non-zero, deployed marker exists but verified marker does not"
+
+cat >"$DEPLOYMENT_STATE_FILE" <<'JSON'
+{
+  "timestamp": "2026-07-10T12:05:00Z",
+  "tenants": [
+    { "tenantId": "eta", "region": "us-east-1", "status": "NOT_DEPLOYED", "functionUrl": null, "reason": null }
+  ]
+}
+JSON
+write_credential_status "true" "true"
+reset_markers_and_log
+
+SYNC_TEST_VERIFY_FAIL_TENANT="eta" PATH="$STUB_SUCCESS_DIR:$PATH" "$SYNC_SH" >"$SCRATCH/test5.out" 2>&1
+TEST5_EXIT=$?
+
+assert_exit_code "exit code non-zero (verification failed even though deploy succeeded)" "nonzero" "$TEST5_EXIT"
+assert_file_exists "eta deploy marker created (provision-tenant.sh did succeed)" "$MARKER_DIR/deployed-eta"
+assert_file_not_exists "eta verified marker NOT created (verify-tenant.sh reported failure)" "$MARKER_DIR/verified-eta"
+assert_true "output calls out the verification failure, not just a generic failure" \
+  "$(grep -qi 'verification FAILED' "$SCRATCH/test5.out" && echo true || echo false)"
+
+# =========================================================================
+# Test 6: deploy succeeds but the tenant has no functionUrl on record
+# (defensive case - e.g. tenants.json wasn't written for some reason).
+# Verification must be skipped gracefully, not crash, and must still
+# surface as a problem via non-zero exit rather than silently reporting
+# success.
+# =========================================================================
+echo "Test 6: deploy succeeds, no functionUrl on record - verification skipped, exit non-zero"
+
+cat >"$DEPLOYMENT_STATE_FILE" <<'JSON'
+{
+  "timestamp": "2026-07-10T12:05:00Z",
+  "tenants": [
+    { "tenantId": "unregistered", "region": "us-east-1", "status": "NOT_DEPLOYED", "functionUrl": null, "reason": null }
+  ]
+}
+JSON
+write_credential_status "true" "true"
+reset_markers_and_log
+
+PATH="$STUB_SUCCESS_DIR:$PATH" "$SYNC_SH" >"$SCRATCH/test6.out" 2>&1
+TEST6_EXIT=$?
+
+assert_exit_code "exit code non-zero (no URL on record, can't verify)" "nonzero" "$TEST6_EXIT"
+assert_file_exists "unregistered deploy marker created (provision-tenant.sh did succeed)" "$MARKER_DIR/deployed-unregistered"
+assert_true "verify-tenant.sh was never called (no URL to verify against)" \
+  "$([[ ! -s "$LOG_FILE" ]] || ! grep -q '^verify-tenant.sh' "$LOG_FILE" && echo true || echo false)"
+assert_true "output explains why verification was skipped" \
+  "$(grep -qi 'no functionUrl found' "$SCRATCH/test6.out" && echo true || echo false)"
 
 # =========================================================================
 # Summary

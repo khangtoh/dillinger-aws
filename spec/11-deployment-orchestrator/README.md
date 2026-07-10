@@ -56,8 +56,10 @@ run.sh
   │
   └─▶ sync.sh                (Module D)
         reads: state/deployment-state.json, state/credential-status.json
-        calls: ../provision-tenant.sh, ../gateway/deploy-gateway.sh
-        "make actual state match desired state"
+        calls: ../provision-tenant.sh, ../gateway/deploy-gateway.sh,
+               verify-tenant.sh (post-deploy smoke test, added after
+               initial build - see "Post-deploy verification" below)
+        "make actual state match desired state, and confirm it's real"
 ```
 
 Modules A and B have no dependency on each other and can be built/tested
@@ -78,6 +80,46 @@ without touching each other's files.
 | 11c (Module C) | `infra/orchestrator/check-state.sh`, `infra/orchestrator/test/check-state.test.sh` | everything else |
 | 11d (Module D) | `infra/orchestrator/sync.sh`, `infra/gateway/deploy-gateway.sh`, `infra/orchestrator/test/sync.test.sh` | everything else |
 | 11e (integration, done after A-D land) | `infra/orchestrator/run.sh`, spec cross-links, `infra/orchestrator/lib/config-hash.sh` consumers | — |
+| 11f (post-deploy verification, added after 11a-11e) | `infra/orchestrator/verify-tenant.sh`, `infra/orchestrator/test/verify-tenant.test.sh`, plus wiring into `sync.sh`/`sync.test.sh` | — |
+
+## Post-deploy verification (11f)
+
+A gap identified after the initial four-module build: `sync.sh` only
+proved the deploy *command* exited 0 (CloudFormation says the stack
+completed) — nothing confirmed the resulting Function URL was actually
+serving Dillinger. A stack can finish "successfully" while the app itself
+is crash-looping, missing an env var, or timing out on cold start.
+
+`infra/orchestrator/verify-tenant.sh <tenant-id> <function-url>` closes
+this: after `sync.sh` successfully deploys/redeploys a tenant, it looks
+up that tenant's Function URL from `infra/tenants.json` (written by
+`provision-tenant.sh`/`record-tenant.py`) and runs two checks —
+`GET /` expects 2xx, `GET /<unknown-route>` expects 404 — reporting
+`success (verified)` vs `deployed, verification FAILED` in the sync
+summary. A verification failure counts toward `sync.sh`'s non-zero exit,
+same as a deploy failure, but does **not** mark the tenant `FAILED` the
+way a CloudFormation failure does (a plain re-sync might fix a transient
+issue like cold-start timing) — it's `check-state.sh`'s config-hash
+comparison, not verification status, that ever sets `FAILED`.
+
+This is a lightweight smoke test, not the full `spec/08-testing.md`
+checklist (browser rendering, editor interactivity, OAuth flows still
+need a human or Playwright) — it only proves the Lambda function is
+reachable and responding sanely, automating the first bullet of Phase 8
+("Smoke test: `curl -I <Function URL>` returns 200") and part of Phase
+9's "confirming... the Function URL serves that tenant" tenant-
+provisioning check, for every tenant, every sync, not just the first one.
+
+Tested with a mocked `curl` (`verify-tenant.test.sh`, 8 tests covering
+pass, each individual check's failure mode, and a simulated connection
+failure) and through `sync.sh`'s own control-flow tests (`sync.test.sh`,
+extended with 11 new assertions covering: verified success, verification
+failure after a successful deploy, and the defensive case where a tenant
+has no recorded Function URL). Also re-verified the full `run.sh` chain
+end-to-end with one tenant (not just the zero-tenant case from the
+original 11e verification) — the sync summary correctly showed
+`success (verified)` and the mock call log confirmed `verify-tenant.sh`
+fired with the correct URL immediately after the deploy succeeded.
 
 `infra/orchestrator/lib/config-hash.sh` (the shared hashing helper) and
 the `--tags DillingerConfigHash=...` addition to `provision-tenant.sh`

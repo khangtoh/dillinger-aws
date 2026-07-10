@@ -38,6 +38,12 @@ stays intentionally simple because each instance only ever has one user:
 - [ ] Provision a first real tenant end-to-end once Phase 1 credentials
       exist, confirming: the stack deploys standalone, `tenants.json`
       gets the correct entry, and the Function URL serves that tenant.
+      Use `infra/orchestrator/run.sh` (add the tenant to
+      `infra/desired-tenants.json` first) rather than calling
+      `provision-tenant.sh` directly — as of Phase 11f, `run.sh`
+      automatically verifies "the Function URL serves that tenant" as
+      part of the sync (see `spec/11-deployment-orchestrator/README.md`),
+      so this box and the verification are the same action now.
 - [ ] Provision a second tenant and confirm total isolation from the
       first: different Function URL, different log group, and (once
       Phase 5 OAuth is configured per-tenant) no shared cookies/secrets.
