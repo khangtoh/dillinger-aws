@@ -22,6 +22,11 @@ if ! [[ "$TENANT_ID" =~ ^[a-z0-9-]+$ ]]; then
   exit 1
 fi
 
+# shellcheck source=orchestrator/lib/config-hash.sh
+source "$REPO_ROOT/infra/orchestrator/lib/config-hash.sh"
+CONFIG_HASH=$(compute_config_hash "$REPO_ROOT/infra/template.yaml" "TenantId=${TENANT_ID}")
+TAGS=("DillingerConfigHash=${CONFIG_HASH}" "Project=dillinger-aws" "TenantId=${TENANT_ID}")
+
 echo "==> Building ${STACK_NAME} (tenant: ${TENANT_ID}, region: ${REGION})"
 cd "$REPO_ROOT/infra"
 sam build --template-file template.yaml
@@ -33,6 +38,7 @@ sam deploy \
   --resolve-image-repos \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides "TenantId=${TENANT_ID}" \
+  --tags "${TAGS[@]}" \
   --no-confirm-changeset \
   --no-fail-on-empty-changeset
 
@@ -49,6 +55,7 @@ sam deploy \
   --resolve-image-repos \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides "TenantId=${TENANT_ID}" "NextPublicBaseUrl=${FUNCTION_URL}" \
+  --tags "${TAGS[@]}" \
   --no-confirm-changeset \
   --no-fail-on-empty-changeset
 

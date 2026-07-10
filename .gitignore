@@ -41,3 +41,6 @@ __pycache__/
 
 # AWS SAM build cache
 .aws-sam/
+
+# Orchestrator runtime output (Phase 11) - not source, regenerated each run
+infra/orchestrator/state/*.json
