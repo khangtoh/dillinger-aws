@@ -77,6 +77,14 @@ further than the recommendation above.
         resource-scoped, so the key can read all CloudFront config in
         the account, and can write to any KeyValueStore in the account
         (only dillinger's exists).
+      - **v4**: added
+        `arn:aws:cloudformation:*:aws:transform/Serverless-2016-10-31`
+        to the CloudFormation statement's resources — any template using
+        the SAM Serverless transform needs `CreateChangeSet` on the
+        transform's pseudo-resource ARN. The gateway template never hit
+        this (plain CloudFormation, no transform); the tenant template
+        does, so the first CI deploy of `dillinger-staging` failed at
+        SAM's managed companion stack. No new actions.
 - [x] User creates an access key for that IAM user and provides
       `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` to this environment
       (never commit them to the repo). Done 2026-07-10 — access key
