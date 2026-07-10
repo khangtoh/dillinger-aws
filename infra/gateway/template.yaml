@@ -144,13 +144,27 @@ Resources:
           AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           CachedMethods: [GET, HEAD]
           # Dynamic, per-session/per-cookie responses - do not cache by
-          # default. Revisit with a second, path-scoped cache behavior for
-          # /_next/static/* once base routing is verified (see spec/10).
+          # default, so CloudFront never serves one tenant's/user's
+          # response to another.
           CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # Managed-CachingDisabled
           OriginRequestPolicyId: 216adef6-5c7f-47e4-b989-5492eafa07d3 # Managed-AllViewer
           FunctionAssociations:
             - EventType: viewer-request
               FunctionARN: !GetAtt RouterFunction.FunctionARN
+        CacheBehaviors:
+          # Next.js content-hashes _next/static/* filenames, so these are
+          # immutable and safe to cache aggressively - still needs the
+          # same per-tenant origin routing, hence the same function.
+          - PathPattern: "_next/static/*"
+            TargetOriginId: placeholder-origin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD, OPTIONS]
+            CachedMethods: [GET, HEAD]
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
+            OriginRequestPolicyId: 216adef6-5c7f-47e4-b989-5492eafa07d3 # Managed-AllViewer
+            FunctionAssociations:
+              - EventType: viewer-request
+                FunctionARN: !GetAtt RouterFunction.FunctionARN
 
 Outputs:
   DistributionDomainName:

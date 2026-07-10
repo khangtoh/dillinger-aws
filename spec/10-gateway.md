@@ -103,10 +103,15 @@ concept of a base path) and gives users a clean, memorable per-tenant URL.
 - [ ] Test that two tenants' subdomains resolve to two different
       instances through the same gateway (proves the "one entry point,
       isolated backends" property this phase exists for).
-- [ ] Decide caching behavior: Dillinger's HTML responses are dynamic
-      per-session (cookies) — confirm `CachePolicyId` is set to
-      `CACHING_DISABLED` (or a policy that respects `Vary`/cookies) so
-      CloudFront doesn't serve one tenant's/user's cached response to
-      another. Static `_next/static/*` assets are content-hashed and safe
-      to cache aggressively — consider a second cache behavior for that
-      path pattern once the base routing is verified working.
+- [x] Decide caching behavior: `DefaultCacheBehavior` uses the AWS managed
+      `CachingDisabled` policy so dynamic, per-session HTML responses are
+      never cached across tenants/users. Added a second `CacheBehaviors`
+      entry for `_next/static/*` using the managed `CachingOptimized`
+      policy, since Next.js content-hashes those filenames and they're
+      safe to cache aggressively — both behaviors keep the same
+      `RouterFunction` association so static assets still resolve to the
+      correct tenant's origin. `sam validate --lint` passes. Real-world
+      caching behavior (hit rates, whether `Vary`/cookies need explicit
+      handling beyond what `CachingDisabled` already does) still needs
+      confirming once the gateway is actually deployed and tested (see
+      the end-to-end test tasks above).

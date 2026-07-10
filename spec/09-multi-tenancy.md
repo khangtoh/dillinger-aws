@@ -45,11 +45,14 @@ stays intentionally simple because each instance only ever has one user:
       should move from `NONE` (public-but-unguessable URL, current v1
       default) to `AWS_IAM` per-tenant for stricter access control —
       tracked here, not blocking initial rollout.
-- [ ] Update `spec/07-execution-cicd.md` to either (a) keep CI deploying
+- [x] Update `spec/07-execution-cicd.md` to either (a) keep CI deploying
       only a single default/staging tenant automatically and treat new
       real tenants as a manual `provision-tenant.sh` run, or (b) loop CI
-      over all entries in `tenants.json` — decide once there's more than
-      one real tenant to see which is actually useful.
+      over all entries in `tenants.json`. **Went with (a)**:
+      `.github/workflows/deploy-lambda.yml` deploys only a fixed
+      `staging` tenant; real user tenants stay a manual
+      `provision-tenant.sh` run. Revisit (b) only if there end up being
+      enough real tenants that manual provisioning becomes a bottleneck.
 
 ### Superseded options (kept for reference)
 
