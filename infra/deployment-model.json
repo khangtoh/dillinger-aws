@@ -1,0 +1,4 @@
+{
+  "model": "isolated-single-tenant-per-instance",
+  "gateway": { "enabled": true, "domain": "", "acmCertificateArn": "" }
+}
