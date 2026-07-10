@@ -10,19 +10,24 @@ Depends on: Phase 1 (credentials) + Phase 3 (image builds locally).
       its own ECR repo automatically on `sam deploy` — no separate
       `AWS::ECR::Repository` resource needed) and a Function URL
       (`AuthType: NONE` for a public editor, revisit if auth is desired
-      later). **Not yet validated** — the SAM CLI isn't installed in the
-      authoring sandbox and validation needs either AWS credentials
-      (`sam validate` calls CloudFormation) or a Docker build (`sam
-      build`), both blocked/pending here; validate for real during the
-      first `sam build`/`sam deploy` once Phase 1 is unblocked.
+      later). **Validated**: `sam validate --lint` passes (SAM CLI now
+      installed via pip, see Phase 1). `sam build` correctly resolves the
+      template/Dockerfile and only fails at the known Docker-registry
+      network restriction (see Phase 3) — full deploy still needs Phase 1
+      credentials and an unrestricted-network environment for the actual
+      image build.
 - [x] Set sensible defaults in the template: `MemorySize: 1024`,
       `Timeout: 15`, architecture `x86_64`. (arm64 could shrink cost
       further but Lambda Web Adapter + `@sparticuz/chromium` compatibility
       on arm64 isn't verified — stick with x86_64 for v1.)
 - [x] Add a `CloudWatch LogGroup` resource with an explicit retention
       period (14 days) so logs don't accumulate indefinitely.
-- [ ] `sam build` — confirm the template + Dockerfile validate and build
-      (this is also exercised by `infra/provision-tenant.sh`, see Phase 9).
+- [x] `sam build` — confirm the template + Dockerfile validate and build.
+      Validated as far as this sandbox allows: `sam build` resolves the
+      template and Dockerfile correctly and fails only at the Docker Hub
+      pull restriction (see Phase 3/Phase 1 notes) — a real build needs to
+      run where that's not blocked (this is also exercised by
+      `infra/provision-tenant.sh`, see Phase 9).
 - [ ] Deploy the **first tenant** via
       `infra/provision-tenant.sh <first-tenant-id>` (per the single-user-
       per-instance model in `spec/09-multi-tenancy.md` — there is no
@@ -37,8 +42,7 @@ Depends on: Phase 1 (credentials) + Phase 3 (image builds locally).
       `TenantId=<tenant-id>` for cost tracking (already set in
       `infra/template.yaml`).
 - [ ] Record the live Function URL in `spec/README.md`'s Status section.
-- [ ] **Stretch (optional):** add ACM cert + Route53 record + CloudFront
-      (or API Gateway custom domain) in front of a tenant's Function URL
-      for a stable custom domain. Only do this after the base deployment
-      in this file is verified working, and decide whether it's per-tenant
-      or shared before building it.
+- [ ] A shared custom domain in front of every tenant's Function URL is
+      now handled by `spec/10-gateway.md` (one CloudFront distribution +
+      subdomain routing) rather than a per-tenant stretch goal here — see
+      that file once the base deployment above is verified working.

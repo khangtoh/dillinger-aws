@@ -7,6 +7,16 @@ Description: >
   stack, only a new entry in the CloudFront KeyValueStore (see
   infra/register-tenant-route.sh).
 
+Metadata:
+  cfn-lint:
+    config:
+      # AcmCertificateArn defaults to "" (no custom domain configured yet)
+      # so it can never match the ACM ARN pattern until a real cert ARN is
+      # supplied at deploy time - that's intentional (see HasCustomDomain
+      # condition), not a template bug.
+      ignore_checks:
+        - W1030
+
 Parameters:
   GatewayDomain:
     Type: String

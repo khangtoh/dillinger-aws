@@ -83,6 +83,10 @@ concept of a base path) and gives users a clean, memorable per-tenant URL.
       `register-tenant-route.sh` after a tenant deploy, gated on the
       gateway stack actually existing (so Phase 4/9 tenant provisioning
       still works standalone before the gateway is deployed).
+- [x] Validate `infra/gateway/template.yaml` — `sam validate --lint`
+      passes (added a `cfn-lint` `ignore_checks: [W1030]` for the
+      intentional-empty-default `AcmCertificateArn` parameter, documented
+      inline in the template). Real deploy still needs Phase 1 credentials.
 - [ ] Once a domain is known: request an ACM certificate in `us-east-1`
       for `*.dillinger.<domain>` (DNS validation), add it to the
       CloudFront distribution's `ViewerCertificate`, and create a Route53

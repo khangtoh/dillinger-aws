@@ -18,8 +18,18 @@ This phase still requires a human action (only the user can create the IAM
 user/key in their own AWS account) — flag it and wait rather than guessing
 further than the recommendation above.
 
-- [ ] Check whether the AWS CLI is installed (`aws --version`); install it
-      if missing.
+- [x] Check whether the AWS CLI is installed (`aws --version`); install it
+      if missing. Installed via `pip3 install --break-system-packages
+      awscli` (`aws-cli/1.45.45`) since the official installer's download
+      host is behind the same CDN restriction blocking Docker pulls in
+      this sandbox, but PyPI is allowlisted. Also installed
+      `aws-sam-cli` (1.163.0) the same way, needed for Phase 4/9/10
+      deploys. Both templates now pass `sam validate --lint` for real
+      (not just YAML parsing) — `infra/template.yaml` and
+      `infra/gateway/template.yaml` are confirmed valid SAM/CloudFormation.
+      `sam build` on `infra/template.yaml` gets past template resolution
+      and fails only at the known-blocked Docker Hub pull (same as Phase
+      3), confirming the SAM build pipeline itself is wired correctly.
 - [ ] User creates a dedicated IAM user (e.g. `dillinger-aws-deploy`) in
       their AWS account with this least-privilege policy (draft — refine
       once real ARNs/resource names are known):

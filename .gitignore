@@ -38,3 +38,6 @@ next-env.d.ts
 
 # python bytecode cache
 __pycache__/
+
+# AWS SAM build cache
+.aws-sam/
