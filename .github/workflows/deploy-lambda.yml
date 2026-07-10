@@ -1,0 +1,76 @@
+name: Deploy Dillinger (staging tenant)
+
+# Verifies the build+deploy pipeline against a fixed "staging" tenant.
+# Real user tenants are provisioned manually via infra/provision-tenant.sh
+# (see spec/09-multi-tenancy.md) - CI does not auto-provision new tenants,
+# only keeps the one staging instance current so the pipeline itself is
+# proven working.
+#
+# Auth: GitHub OIDC assuming an IAM role (see spec/07-execution-cicd.md)
+# - no long-lived AWS access keys stored in GitHub.
+#
+# Trigger is intentionally manual-only (workflow_dispatch) for now: this
+# job runs real `sam deploy` calls against real AWS infra, and nobody has
+# confirmed yet whether pushes to main should trigger that automatically
+# with no approval step. Once that's decided, either:
+#   - switch to `on: push: branches: [main]` for fully automatic deploys, or
+#   - keep push-triggered but add a `environment: production` block on the
+#     `deploy` job referencing a GitHub Environment with required reviewers,
+#     for a manual-approval gate before each deploy.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  STAGING_TENANT_ID: staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up Python (for AWS SAM CLI)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install AWS SAM CLI
+        run: pip install aws-sam-cli
+
+      - name: Deploy staging tenant
+        run: infra/provision-tenant.sh "${STAGING_TENANT_ID}" "${AWS_REGION}"
+
+      - name: Smoke test
+        run: |
+          FUNCTION_URL=$(python3 -c "
+          import json
+          data = json.load(open('infra/tenants.json'))
+          tenant = next(t for t in data['tenants'] if t['tenantId'] == '${STAGING_TENANT_ID}')
+          print(tenant['functionUrl'])
+          ")
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$FUNCTION_URL")
+          echo "Staging tenant responded with HTTP $status"
+          if [ "$status" -lt 200 ] || [ "$status" -ge 400 ]; then
+            echo "Smoke test failed" >&2
+            exit 1
+          fi
+
+      - name: Commit updated tenant registry
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infra/tenants.json
+          git diff --cached --quiet || git commit -m "Update staging tenant registry [skip ci]"
+          git push origin HEAD:main || true
