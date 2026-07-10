@@ -36,6 +36,7 @@ sam deploy \
   --stack-name "$STACK_NAME" \
   --region "$REGION" \
   --resolve-image-repos \
+  --resolve-s3 \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides "TenantId=${TENANT_ID}" \
   --tags "${TAGS[@]}" \
@@ -53,6 +54,7 @@ sam deploy \
   --stack-name "$STACK_NAME" \
   --region "$REGION" \
   --resolve-image-repos \
+  --resolve-s3 \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides "TenantId=${TENANT_ID}" "NextPublicBaseUrl=${FUNCTION_URL}" \
   --tags "${TAGS[@]}" \
