@@ -91,8 +91,18 @@ concept of a base path) and gives users a clean, memorable per-tenant URL.
       for `*.dillinger.<domain>` (DNS validation), add it to the
       CloudFront distribution's `ViewerCertificate`, and create a Route53
       wildcard `A`/`ALIAS` record pointing at the distribution.
-- [ ] Deploy the gateway stack (`sam deploy` /
+- [x] Deploy the gateway stack (`sam deploy` /
       `aws cloudformation deploy` against `infra/gateway/template.yaml`).
+      Done 2026-07-10 via `infra/orchestrator/run.sh` (first real deploy
+      of this project): stack `dillinger-gateway` in us-east-1, live at
+      `dy1136w4wv8qd.cloudfront.net` (no custom domain yet). Took three
+      attempts — two IAM policy widenings were needed (v2: CloudFormation
+      region, v3: CloudFront read wildcards; see
+      `spec/01-aws-account-onboarding.md`). Verified live: an
+      unregistered subdomain returns the router's own
+      `404 Unknown tenant`, proving the function + KVS wiring works at
+      the edge. Full request-path documentation added at
+      `infra/gateway/README.md`.
 - [ ] Register the existing tenant(s) from `infra/tenants.json` into the
       KVS (re-run `register-tenant-route.sh` for each, or re-run
       `provision-tenant.sh` which now does it automatically).

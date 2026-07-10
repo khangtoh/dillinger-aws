@@ -48,9 +48,12 @@ Docker-host/ECS/EC2-style deployment.
 - Multi-user model (`spec/09-multi-tenancy.md`): **resolved** — one
   isolated Lambda deployment per user (`infra/provision-tenant.sh`), never
   shared. First real tenant provisioning has not been run yet.
-- Single entry gateway (`spec/10-gateway.md`): CloudFront + CloudFront
-  Function + KeyValueStore router built and wired into the provisioning
-  script. Still blocked on a domain name (for the wildcard cert/DNS).
+- Single entry gateway (`spec/10-gateway.md`): **deployed and live**
+  (2026-07-10, the project's first real AWS deploy) — stack
+  `dillinger-gateway` in us-east-1, serving at
+  `dy1136w4wv8qd.cloudfront.net`; unknown-tenant 404 verified at the
+  edge. Custom domain still blocked on a domain name (wildcard
+  cert/DNS). Request-path docs: `infra/gateway/README.md`.
 - Deployment orchestrator (`spec/11-deployment-orchestrator/`): **built
   and end-to-end verified with mocks** — `infra/orchestrator/run.sh` is
   now the one command to validate credentials, resolve desired state,
