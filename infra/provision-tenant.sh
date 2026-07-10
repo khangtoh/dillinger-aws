@@ -55,5 +55,8 @@ sam deploy \
 echo "==> Recording tenant in infra/tenants.json"
 python3 "$REPO_ROOT/infra/record-tenant.py" "$TENANT_ID" "$REGION" "$FUNCTION_URL"
 
+echo "==> Registering route with the shared gateway (if deployed; see spec/10-gateway.md)"
+"$REPO_ROOT/infra/register-tenant-route.sh" "$TENANT_ID" "$FUNCTION_URL"
+
 echo
 echo "Tenant '${TENANT_ID}' is live at: ${FUNCTION_URL}"

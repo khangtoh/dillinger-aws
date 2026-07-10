@@ -1,0 +1,149 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Shared single entry gateway (CloudFront) fronting multiple isolated
+  single-tenant Dillinger Lambda instances (see spec/10-gateway.md).
+  Deployed once per environment, independent of per-tenant stacks
+  (infra/template.yaml) — a new tenant does NOT require redeploying this
+  stack, only a new entry in the CloudFront KeyValueStore (see
+  infra/register-tenant-route.sh).
+
+Parameters:
+  GatewayDomain:
+    Type: String
+    Default: ""
+    Description: >
+      Wildcard apex for tenant subdomains, e.g. "dillinger.example.com"
+      (tenants are served at "<tenant-id>.dillinger.example.com"). Leave
+      blank to deploy without a custom domain/cert for initial testing
+      against the CloudFront-assigned domain name.
+  AcmCertificateArn:
+    Type: String
+    Default: ""
+    Description: >
+      ACM certificate ARN (must be in us-east-1) covering
+      "*.<GatewayDomain>". Required if GatewayDomain is set.
+
+Conditions:
+  HasCustomDomain: !Not [!Equals [!Ref GatewayDomain, ""]]
+
+Resources:
+  TenantRoutingStore:
+    Type: AWS::CloudFront::KeyValueStore
+    Properties:
+      Name: dillinger-tenant-routing
+      Comment: "Maps tenant-id -> that tenant's Lambda Function URL domain"
+
+  RouterFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: dillinger-tenant-router
+      FunctionConfig:
+        Comment: "Routes each tenant subdomain to its isolated Lambda origin"
+        Runtime: cloudfront-js-2.0
+        KeyValueStoreAssociations:
+          - KeyValueStoreARN: !GetAtt TenantRoutingStore.Arn
+      AutoPublish: true
+      # Inline copy of infra/gateway/router.js - AWS::CloudFront::Function
+      # requires literal code, it can't reference an external file the way
+      # SAM's CodeUri does for Lambda. Keep these two files in sync; Phase
+      # 10's deploy task should diff them before deploying as a guard.
+      FunctionCode: |
+        import cf from "cloudfront";
+
+        const kvsHandle = cf.kvs();
+
+        function notFound(message) {
+          return {
+            statusCode: 404,
+            statusDescription: "Not Found",
+            headers: {
+              "content-type": { value: "text/plain" },
+            },
+            body: {
+              encoding: "text",
+              data: message,
+            },
+          };
+        }
+
+        async function handler(event) {
+          const request = event.request;
+          const hostHeader = request.headers.host;
+
+          if (!hostHeader || !hostHeader.value) {
+            return notFound("Missing Host header");
+          }
+
+          const tenantId = hostHeader.value.split(".")[0];
+          if (!tenantId) {
+            return notFound("Could not determine tenant from Host header");
+          }
+
+          let tenantOrigin;
+          try {
+            tenantOrigin = await kvsHandle.get(tenantId);
+          } catch (err) {
+            return notFound(`Unknown tenant: ${tenantId}`);
+          }
+
+          request.origin = {
+            custom: {
+              domainName: tenantOrigin,
+              port: 443,
+              protocol: "https",
+              path: "",
+              sslProtocols: ["TLSv1.2"],
+              readTimeout: 30,
+              keepaliveTimeout: 5,
+              customHeaders: {},
+            },
+          };
+          request.headers.host = { value: tenantOrigin };
+
+          return request;
+        }
+
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: "Dillinger single entry gateway - routes tenants by subdomain"
+        Aliases: !If
+          - HasCustomDomain
+          - [!Sub "*.${GatewayDomain}"]
+          - !Ref AWS::NoValue
+        ViewerCertificate: !If
+          - HasCustomDomain
+          - AcmCertificateArn: !Ref AcmCertificateArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - CloudFrontDefaultCertificate: true
+        # Placeholder default origin - every real request's origin is
+        # overridden per-tenant by RouterFunction at viewer-request time.
+        # CloudFormation still requires at least one Origin to be declared.
+        Origins:
+          - Id: placeholder-origin
+            DomainName: example.com
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: [TLSv1.2]
+        DefaultCacheBehavior:
+          TargetOriginId: placeholder-origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+          CachedMethods: [GET, HEAD]
+          # Dynamic, per-session/per-cookie responses - do not cache by
+          # default. Revisit with a second, path-scoped cache behavior for
+          # /_next/static/* once base routing is verified (see spec/10).
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # Managed-CachingDisabled
+          OriginRequestPolicyId: 216adef6-5c7f-47e4-b989-5492eafa07d3 # Managed-AllViewer
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt RouterFunction.FunctionARN
+
+Outputs:
+  DistributionDomainName:
+    Value: !GetAtt Distribution.DomainName
+  KeyValueStoreArn:
+    Value: !GetAtt TenantRoutingStore.Arn
