@@ -54,12 +54,29 @@ further than the recommendation above.
       - `s3:*` scoped to the SAM deployment artifacts bucket
       No wildcard `*:*` / `AdministratorAccess` — this key should not be
       able to touch anything outside this project.
-      Refined once (policy v2, same day): the CloudFormation statement's
-      region is wildcarded (still account- and `dillinger-*`-scoped)
-      because the first real `run.sh` attempt failed with `AccessDenied`
-      — the gateway stack deploys to `us-east-1` (CloudFront
-      requirement, see `infra/gateway/deploy-gateway.sh`) while v1 had
-      scoped CloudFormation to the tenant region only.
+      Refined twice, same day, each time because a real `run.sh` gateway
+      deploy hit `AccessDenied` (user approved each widening after
+      seeing the diff):
+      - **v2**: the CloudFormation statement's region is wildcarded
+        (still account- and `dillinger-*`-scoped) — the gateway stack
+        deploys to `us-east-1` (CloudFront requirement, see
+        `infra/gateway/deploy-gateway.sh`) while v1 had scoped
+        CloudFormation to the tenant region only.
+      - **v3**: CloudFront reads are now wildcards
+        (`cloudfront:Get*/List*/Describe*`) instead of five enumerated
+        actions — CloudFormation probes many read calls during resource
+        creation (`cloudfront:ListTagsForResource` was the one that
+        actually failed and rolled the stack back), and enumerating them
+        one failure at a time is whack-a-mole. All mutating CloudFront
+        actions remain individually enumerated (plus two additions:
+        `TestFunction`, `UntagResource`); no `cloudfront:*`. Also added
+        `cloudfront-keyvaluestore:*` scoped to this account's
+        key-value stores — the separate data-plane API
+        `infra/register-tenant-route.sh` uses to register tenant routes.
+        Known risk delta accepted by the user: CloudFront reads can't be
+        resource-scoped, so the key can read all CloudFront config in
+        the account, and can write to any KeyValueStore in the account
+        (only dillinger's exists).
 - [x] User creates an access key for that IAM user and provides
       `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` to this environment
       (never commit them to the repo). Done 2026-07-10 — access key
