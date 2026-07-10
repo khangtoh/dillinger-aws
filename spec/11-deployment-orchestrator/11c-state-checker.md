@@ -140,9 +140,15 @@ done — report the output.
 
 ## Definition of done
 
-- [ ] `infra/orchestrator/check-state.sh` exists, is executable, passes
+- [x] `infra/orchestrator/check-state.sh` exists, is executable, passes
       `bash -n`.
-- [ ] Mock `aws` script and `check-state.test.sh` exist, are executable,
-      and the test **passes when you run it**.
-- [ ] Commit your changes locally (do not push — the coordinating
-      session will merge and push) with a clear commit message.
+- [x] Mock `aws` script and `check-state.test.sh` exist, are executable,
+      and the test **passes when you run it**. Built by a background
+      sub-agent, merged into `claude/dillinger-aws-lambda-jsfoye`, and
+      re-run independently after merge (13/13 passed) rather than
+      trusting the agent's own report. Correctly read
+      `infra/gateway/template.yaml`'s actual `Outputs:` key
+      (`DistributionDomainName`) instead of assuming it, per this
+      sub-spec's instruction.
+- [x] Committed and merged (commit `247ade1`, merged in `77ed8c3`,
+      pushed).

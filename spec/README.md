@@ -33,6 +33,7 @@ Docker-host/ECS/EC2-style deployment.
 | 8 | [08-testing.md](08-testing.md) | Verify the deployment actually works | Phase 4 |
 | 9 | [09-multi-tenancy.md](09-multi-tenancy.md) | Multi-user: isolated single-tenant instance per user | Phase 4 |
 | 10 | [10-gateway.md](10-gateway.md) | Single entry gateway routing to each tenant | Phase 9 |
+| 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | Phase 9 + 10 |
 
 ## Status
 
@@ -46,6 +47,14 @@ Docker-host/ECS/EC2-style deployment.
   Function + KeyValueStore router built and wired into the provisioning
   script. Blocked on a domain name (for the wildcard cert/DNS) and, like
   everything else that deploys, on Phase 1 credentials.
+- Deployment orchestrator (`spec/11-deployment-orchestrator/`): **built
+  and end-to-end verified with mocks** — `infra/orchestrator/run.sh` is
+  now the one command to validate credentials, resolve desired state,
+  check actual AWS state, and sync the difference. Built by four parallel
+  background sub-agents (one per module), each merged and independently
+  re-verified rather than trusted on report alone. Not yet run against
+  real AWS — blocked on Phase 1 credentials, same as everything else that
+  deploys.
 
 ## Non-goals for v1
 

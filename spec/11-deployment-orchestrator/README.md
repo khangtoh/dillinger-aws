@@ -233,10 +233,56 @@ standing rule of testing real behavior, not just marking boxes done.
 
 ## Sub-specs
 
-| File | Module | Can start immediately? |
+| File | Module | Status |
 |---|---|---|
-| [11a-credential-guard.md](11a-credential-guard.md) | A | Yes |
-| [11b-model-resolver.md](11b-model-resolver.md) | B | Yes |
-| [11c-state-checker.md](11c-state-checker.md) | C | Yes (codes against A/B's JSON schemas above, doesn't need their actual scripts to exist) |
-| [11d-sync-orchestrator.md](11d-sync-orchestrator.md) | D | Yes (codes against C's JSON schema above) |
-| 11e (integration) | run.sh + doc cross-links | After A-D land (done directly, not as a separate sub-agent) |
+| [11a-credential-guard.md](11a-credential-guard.md) | A | **Done** — built by a background sub-agent, merged, independently re-verified (6/6 tests) |
+| [11b-model-resolver.md](11b-model-resolver.md) | B | **Done** — built by a background sub-agent, merged, independently re-verified (6/6 tests) |
+| [11c-state-checker.md](11c-state-checker.md) | C | **Done** — built by a background sub-agent, merged, independently re-verified (13/13 tests) |
+| [11d-sync-orchestrator.md](11d-sync-orchestrator.md) | D | **Done** — built by a background sub-agent, merged, independently re-verified (18/18 tests) |
+| 11e (integration) | `run.sh` + doc cross-links | **Done** — see below |
+
+## Integration (11e)
+
+`infra/orchestrator/run.sh` chains all four modules
+(`credential-guard.sh` → `resolve-model.sh` → `check-state.sh` →
+`sync.sh`), stopping early with a specific message if any stage isn't
+healthy, otherwise exiting with `sync.sh`'s own exit code. Also checks
+`jq` and `aws` are on `PATH` up front, since three of the four modules
+depend on `jq` (a project-wide dependency this phase introduced —
+confirmed present in this environment, `jq-1.7`).
+
+Verified end-to-end with a comprehensive mock (`aws` + stub
+`provision-tenant.sh`/`deploy-gateway.sh`), against the real committed
+`infra/deployment-model.json`/`infra/desired-tenants.json` (0 tenants,
+gateway enabled) — not a synthetic fixture:
+
+- **Happy path**: all 4 stages ran, correctly detected the gateway as
+  `NOT_DEPLOYED`, and `sync.sh` correctly invoked the stub
+  `deploy-gateway.sh` → exit `0`.
+- **No credentials**: stopped after stage 1 with a clear message → exit
+  `1`, stages 2-4 never ran.
+- **Credentials present, one permission denied**: stopped after stage 1
+  → exit `2`, stages 2-4 never ran.
+
+One real bug was caught by this end-to-end test (not by `bash -n`, which
+passed on the buggy version): `run.sh`'s original `REPO_ROOT`
+computation used `/..` (one level up), correct for scripts living
+directly in `infra/`, but `run.sh` itself lives one level deeper in
+`infra/orchestrator/`, so it resolved to a doubled, nonexistent
+`infra/infra/orchestrator/` path and every stage failed with "No such
+file or directory." Fixed by computing `ORCH_DIR` directly from the
+script's own location instead of going through an unnecessary
+`REPO_ROOT` indirection. Left as a reminder in this doc that "passes
+`bash -n`" only proves syntax validity, never correctness — the
+mandatory testing rule above applies to integration code too, not just
+the four modules.
+
+**Not yet run against real AWS** — no credentials exist yet (Phase 1).
+The moment they do, `infra/orchestrator/run.sh` is the one command to
+run; it supersedes manually running `provision-tenant.sh` per tenant
+(Phase 4/9) or `deploy-gateway.sh` by hand (Phase 10) for anything
+already captured in `infra/desired-tenants.json` /
+`infra/deployment-model.json` — those manual scripts still work
+standalone (e.g. for a one-off tenant not yet added to desired state),
+`run.sh` just makes "keep everything declared in sync" a single safe,
+repeatable command.
