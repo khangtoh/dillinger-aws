@@ -44,3 +44,6 @@ __pycache__/
 
 # Orchestrator runtime output (Phase 11) - not source, regenerated each run
 infra/orchestrator/state/*.json
+
+# Claude Code agent tooling (isolated worktrees for background sub-agents)
+.claude/
