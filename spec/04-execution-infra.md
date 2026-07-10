@@ -21,17 +21,24 @@ Depends on: Phase 1 (credentials) + Phase 3 (image builds locally).
       on arm64 isn't verified — stick with x86_64 for v1.)
 - [x] Add a `CloudWatch LogGroup` resource with an explicit retention
       period (14 days) so logs don't accumulate indefinitely.
-- [ ] `sam build` — confirm the template + Dockerfile validate and build.
-- [ ] `sam deploy --guided` for the first deploy; capture the stack name,
-      region, and the resulting Function URL.
+- [ ] `sam build` — confirm the template + Dockerfile validate and build
+      (this is also exercised by `infra/provision-tenant.sh`, see Phase 9).
+- [ ] Deploy the **first tenant** via
+      `infra/provision-tenant.sh <first-tenant-id>` (per the single-user-
+      per-instance model in `spec/09-multi-tenancy.md` — there is no
+      "shared" deploy target, every deploy is a named tenant, ask the user
+      what to call the first one if unclear); capture the stack name,
+      region, and the resulting Function URL from `infra/tenants.json`.
 - [ ] Verify the function exists and is `Active`:
       `aws lambda get-function --function-name <name>`.
 - [ ] Hit the Function URL with `curl -I` and confirm a `200 OK` /
       `3xx` response (not a Lambda error payload).
-- [ ] Tag all created resources (`Project=dillinger-aws`) for cost
-      tracking.
+- [ ] Confirm resources are tagged `Project=dillinger-aws` and
+      `TenantId=<tenant-id>` for cost tracking (already set in
+      `infra/template.yaml`).
 - [ ] Record the live Function URL in `spec/README.md`'s Status section.
 - [ ] **Stretch (optional):** add ACM cert + Route53 record + CloudFront
-      (or API Gateway custom domain) in front of the Function URL for a
-      stable custom domain. Only do this after the base deployment in this
-      file is verified working.
+      (or API Gateway custom domain) in front of a tenant's Function URL
+      for a stable custom domain. Only do this after the base deployment
+      in this file is verified working, and decide whether it's per-tenant
+      or shared before building it.

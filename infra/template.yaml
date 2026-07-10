@@ -5,6 +5,17 @@ Description: >
   the AWS Lambda Web Adapter, exposed via a public Function URL.
 
 Parameters:
+  TenantId:
+    Type: String
+    Default: default
+    AllowedPattern: "[a-z0-9-]+"
+    Description: >
+      Short slug identifying which single-tenant instance this stack is.
+      Each tenant gets their own stack (deploy with
+      `--stack-name dillinger-<TenantId>`) and therefore their own
+      isolated Lambda function, Function URL, and logs — there is no
+      shared state between tenants. One instance is always exactly one
+      user.
   NextPublicBaseUrl:
     Type: String
     Default: ""
@@ -38,6 +49,7 @@ Resources:
         InvokeMode: BUFFERED
       Tags:
         Project: dillinger-aws
+        TenantId: !Ref TenantId
 
   DillingerFunctionLogGroup:
     Type: AWS::Logs::LogGroup
@@ -46,6 +58,8 @@ Resources:
       RetentionInDays: !Ref LogRetentionInDays
 
 Outputs:
+  TenantId:
+    Value: !Ref TenantId
   FunctionUrl:
     Description: Public HTTPS URL Dillinger is served from.
     Value: !GetAtt DillingerFunctionUrl.FunctionUrl

@@ -3,16 +3,59 @@
 Requirement (added by user): the architecture should enable running
 Dillinger for multiple users, not just a single personal deployment.
 
-**"Multiple instances" is ambiguous between three real architectures with
-very different scope.** Asked the user to pick via `AskUserQuestion` twice
-(2026-07-10); the tool errored both times (transient issue, not a denial).
-Defaulting to Option A below since it's the lowest-risk, lowest-cost path
-and is a strict subset of what Options B/C would also need — proceeding
-with it now rather than blocking the whole migration on this one open
-question. **This default is not final — swap it out the moment the user
-confirms which model they actually want.**
+**Resolved (2026-07-10):** user confirmed **Option B — isolated deployment
+per user/tenant, where each instance is single-user (single
+tenant = single user, never shared)**. Implemented below.
 
-## Option A — Shared deployment, many concurrent users (default, in progress)
+## Option B — Isolated deployment per user/tenant (chosen, in progress)
+
+Each user gets their own fully isolated Lambda function + Function URL,
+provisioned from the same `infra/template.yaml`, parameterized by a
+`TenantId`. Nothing is shared between tenants — separate function, separate
+Function URL, separate log group, separate CloudFormation stack. This
+stays intentionally simple because each instance only ever has one user:
+
+- [x] Parameterize `infra/template.yaml` with a `TenantId` parameter, used
+      to tag resources (`TenantId` tag). Multiple isolated stacks already
+      fall out of CloudFormation's per-stack physical-resource naming just
+      by deploying the same template under different `--stack-name`
+      values (`dillinger-<tenant-id>`) — no per-resource name templating
+      was needed beyond the tag.
+- [x] Add `infra/provision-tenant.sh <tenant-id> [region]` — builds,
+      deploys a stack named `dillinger-<tenant-id>`, then redeploys once
+      more with `NEXT_PUBLIC_BASE_URL` set to the resulting Function URL
+      (needed for that tenant's OAuth callbacks to resolve correctly).
+      Wraps `sam build` + `sam deploy`; requires the Phase 1 credentials
+      and SAM CLI. **Not yet run for real** — blocked on Phase 1
+      credentials and the sandbox's Docker registry restriction (same
+      blocker as Phase 3/4).
+- [x] Add a lightweight tenant registry: `infra/tenants.json` (updated
+      automatically by `infra/record-tenant.py`, called from
+      `provision-tenant.sh` after each deploy) — no database needed since
+      tenants are provisioned by an admin running the script, not via
+      self-serve signup. Seeded empty; will fill in as tenants are
+      provisioned.
+- [ ] Provision a first real tenant end-to-end once Phase 1 credentials
+      exist, confirming: the stack deploys standalone, `tenants.json`
+      gets the correct entry, and the Function URL serves that tenant.
+- [ ] Provision a second tenant and confirm total isolation from the
+      first: different Function URL, different log group, and (once
+      Phase 5 OAuth is configured per-tenant) no shared cookies/secrets.
+- [ ] Decide, once real usage exists, whether `FunctionUrlConfig.AuthType`
+      should move from `NONE` (public-but-unguessable URL, current v1
+      default) to `AWS_IAM` per-tenant for stricter access control —
+      tracked here, not blocking initial rollout.
+- [ ] Update `spec/07-execution-cicd.md` to either (a) keep CI deploying
+      only a single default/staging tenant automatically and treat new
+      real tenants as a manual `provision-tenant.sh` run, or (b) loop CI
+      over all entries in `tenants.json` — decide once there's more than
+      one real tenant to see which is actually useful.
+
+### Superseded options (kept for reference)
+
+The two alternatives considered before the user's decision:
+
+#### Option A — Shared deployment, many concurrent users (not chosen)
 
 One Lambda deployment serves everyone concurrently. This requires almost
 no extra work on top of Phases 1–8, because:
@@ -36,23 +79,7 @@ Tasks:
 - [ ] Document in `spec/README.md` that "multi-user" is satisfied by this
       option, once confirmed by the user.
 
-## Option B — Isolated deployment per user/tenant (not started)
-
-Each user/org gets their own Lambda function + Function URL (and possibly
-own custom domain, own data). This is a small SaaS control-plane, not a
-port:
-- A provisioning API/service that can create a new stack (via the same
-  `infra/template.yaml`, parameterized per tenant) on signup.
-- A tenant registry (e.g. DynamoDB) mapping user → their stack/URL.
-- Some routing layer (e.g. `<tenant>.dillinger.example.com` via
-  CloudFront + Route53 wildcard) so each tenant gets a stable URL.
-- Teardown/cost-management story for idle tenants.
-
-Only pursue this if the user explicitly wants tenant-level isolation
-(e.g. compliance/data-residency requirements) — it multiplies the scope
-of this project.
-
-## Option C — Shared deployment with server-side per-user workspaces (not started)
+#### Option C — Shared deployment with server-side per-user workspaces (not chosen)
 
 One deployment, but documents are no longer purely client-side —
 add lightweight auth + a persistence layer (S3 or DynamoDB) so the same
@@ -64,7 +91,3 @@ still not needing full per-tenant infrastructure. Needs:
       supplementing localStorage.
 - [ ] Migrate `stores/store.ts` persistence to sync with the backend
       instead of (or in addition to) localStorage.
-
-## Resolution
-
-_(fill in once the user confirms A, B, or C — or a variant)_
