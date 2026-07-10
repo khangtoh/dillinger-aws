@@ -30,9 +30,19 @@ further than the recommendation above.
       `sam build` on `infra/template.yaml` gets past template resolution
       and fails only at the known-blocked Docker Hub pull (same as Phase
       3), confirming the SAM build pipeline itself is wired correctly.
-- [ ] User creates a dedicated IAM user (e.g. `dillinger-aws-deploy`) in
+- [x] User creates a dedicated IAM user (e.g. `dillinger-aws-deploy`) in
       their AWS account with this least-privilege policy (draft — refine
-      once real ARNs/resource names are known):
+      once real ARNs/resource names are known). Done 2026-07-10: a
+      temporary root session was already present in this environment
+      (`~/.aws/login`, not a static root key); with the user's explicit
+      approval, that session was used one time to create the IAM user,
+      a customer-managed policy `dillinger-deploy-policy`, and an access
+      key, then never touched again. The policy mirrors this draft
+      exactly for the four resource-scoped groups below, plus the
+      additional actions a real `sam deploy` needs beyond pre-flight
+      checks (CloudFormation change-set lifecycle, the SAM-managed S3
+      bucket, ECR image-push actions, CloudFront for the gateway — see
+      `spec/.aws-context.md` for the full breakdown):
       - `lambda:*` scoped to `arn:aws:lambda:<region>:<account-id>:function:dillinger-*`
       - `ecr:*` scoped to a repo named `dillinger*`
       - `iam:CreateRole`, `iam:AttachRolePolicy`, `iam:PassRole`,
@@ -44,19 +54,37 @@ further than the recommendation above.
       - `s3:*` scoped to the SAM deployment artifacts bucket
       No wildcard `*:*` / `AdministratorAccess` — this key should not be
       able to touch anything outside this project.
-- [ ] User creates an access key for that IAM user and provides
+      Refined once (policy v2, same day): the CloudFormation statement's
+      region is wildcarded (still account- and `dillinger-*`-scoped)
+      because the first real `run.sh` attempt failed with `AccessDenied`
+      — the gateway stack deploys to `us-east-1` (CloudFront
+      requirement, see `infra/gateway/deploy-gateway.sh`) while v1 had
+      scoped CloudFormation to the tenant region only.
+- [x] User creates an access key for that IAM user and provides
       `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` to this environment
-      (never commit them to the repo).
-- [ ] Confirm with the user: target AWS account ID and preferred AWS
-      region (e.g. `us-east-1`).
-- [ ] Run `aws configure` (or set `AWS_ACCESS_KEY_ID` /
+      (never commit them to the repo). Done 2026-07-10 — access key
+      created via the IAM API and written directly into
+      `~/.aws/credentials` (`[default]` profile); the secret was never
+      printed to any command output or committed anywhere.
+- [x] Confirm with the user: target AWS account ID and preferred AWS
+      region (e.g. `us-east-1`). Recorded in `spec/.aws-context.md`
+      (gitignored, not here) — this was the account/region the
+      pre-existing root session in this environment was already scoped
+      to; flag to the user if this isn't the intended target.
+- [x] Run `aws configure` (or set `AWS_ACCESS_KEY_ID` /
       `AWS_SECRET_ACCESS_KEY` / `AWS_DEFAULT_REGION` env vars) to populate
-      credentials for this session.
-- [ ] Verify credentials work: `aws sts get-caller-identity` succeeds and
-      returns the expected account ID.
-- [ ] Record the confirmed account ID, region, and credential method in
+      credentials for this session. Done — `~/.aws/credentials`
+      `[default]` now holds the `dillinger-aws-deploy` access key.
+- [x] Verify credentials work: `aws sts get-caller-identity` succeeds and
+      returns the expected account ID. Confirmed — resolves to the
+      `dillinger-aws-deploy` IAM user (full ARN in
+      `spec/.aws-context.md`, gitignored). Also ran
+      `infra/orchestrator/credential-guard.sh` for real (not mocked) —
+      all 7 permission groups passed
+      (`infra/orchestrator/state/credential-status.json`).
+- [x] Record the confirmed account ID, region, and credential method in
       `spec/.aws-context.md` (create it, and make sure it's gitignored —
       it must never contain the actual secret key) for later phases to
-      reuse.
+      reuse. Done, gitignored.
 - [ ] Confirm with the user whether a budget/billing alarm should be set up
       before deploying (recommended, not blocking).

@@ -47,3 +47,7 @@ infra/orchestrator/state/*.json
 
 # Claude Code agent tooling (isolated worktrees for background sub-agents)
 .claude/
+
+# Local AWS account/credential context (Phase 1) - never commit account IDs
+# or credential material
+spec/.aws-context.md

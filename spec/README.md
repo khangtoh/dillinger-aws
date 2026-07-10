@@ -39,22 +39,27 @@ Docker-host/ECS/EC2-style deployment.
 
 - [ ] **Dillinger is live on AWS Lambda** — Function URL: `TBD`
 - Overall phase progress: see individual files.
+- Phase 1 AWS credentials (`spec/01-aws-account-onboarding.md`):
+  **resolved 2026-07-10** — the `dillinger-aws-deploy` IAM user exists
+  with a scoped policy; `credential-guard.sh` passes all 7 permission
+  groups against real AWS, not mocks. See `spec/.aws-context.md`
+  (gitignored — account ID/region live there, not here) for details.
+  Everything below is now unblocked to actually run.
 - Multi-user model (`spec/09-multi-tenancy.md`): **resolved** — one
   isolated Lambda deployment per user (`infra/provision-tenant.sh`), never
-  shared. First real tenant provisioning is still pending Phase 1
-  credentials.
+  shared. First real tenant provisioning has not been run yet.
 - Single entry gateway (`spec/10-gateway.md`): CloudFront + CloudFront
   Function + KeyValueStore router built and wired into the provisioning
-  script. Blocked on a domain name (for the wildcard cert/DNS) and, like
-  everything else that deploys, on Phase 1 credentials.
+  script. Still blocked on a domain name (for the wildcard cert/DNS).
 - Deployment orchestrator (`spec/11-deployment-orchestrator/`): **built
   and end-to-end verified with mocks** — `infra/orchestrator/run.sh` is
   now the one command to validate credentials, resolve desired state,
   check actual AWS state, and sync the difference. Built by four parallel
   background sub-agents (one per module), each merged and independently
-  re-verified rather than trusted on report alone. Not yet run against
-  real AWS — blocked on Phase 1 credentials, same as everything else that
-  deploys.
+  re-verified rather than trusted on report alone. **Not yet run against
+  real AWS end-to-end** (only mocked so far) — now that Phase 1 is
+  resolved, that's the next concrete milestone towards a live Function
+  URL.
 
 ## Non-goals for v1
 
