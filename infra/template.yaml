@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Dillinger (Next.js) running on AWS Lambda as a container image, behind
+  the AWS Lambda Web Adapter, exposed via a public Function URL.
+
+Parameters:
+  NextPublicBaseUrl:
+    Type: String
+    Default: ""
+    Description: >
+      Set after the first deploy to the resulting Function URL (or custom
+      domain), then redeploy so OAuth callbacks use the correct base URL.
+  LogRetentionInDays:
+    Type: Number
+    Default: 14
+
+Resources:
+  DillingerFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      DockerContext: ..
+      Dockerfile: Dockerfile
+    Properties:
+      PackageType: Image
+      MemorySize: 1024
+      Timeout: 15
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          NEXT_PUBLIC_BASE_URL: !Ref NextPublicBaseUrl
+          PORT: "3000"
+          AWS_LWA_PORT: "3000"
+          NODE_ENV: production
+      FunctionUrlConfig:
+        AuthType: NONE
+        InvokeMode: BUFFERED
+      Tags:
+        Project: dillinger-aws
+
+  DillingerFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${DillingerFunction}
+      RetentionInDays: !Ref LogRetentionInDays
+
+Outputs:
+  FunctionUrl:
+    Description: Public HTTPS URL Dillinger is served from.
+    Value: !GetAtt DillingerFunctionUrl.FunctionUrl
+  FunctionName:
+    Value: !Ref DillingerFunction

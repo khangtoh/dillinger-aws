@@ -5,15 +5,22 @@ in the user's AWS account, reachable over HTTPS.
 
 Depends on: Phase 1 (credentials) + Phase 3 (image builds locally).
 
-- [ ] Create `infra/template.yaml` (AWS SAM) defining: an
-      `AWS::ECR::Repository`, an `AWS::Serverless::Function` with
-      `PackageType: Image`, and a Function URL resource (`AuthType: NONE`
-      for a public editor, revisit if auth is desired later).
-- [ ] Set sensible defaults in the template: `MemorySize: 1024`,
-      `Timeout: 15`, architecture `x86_64` (or `arm64` if the base images
-      support it — record the choice).
-- [ ] Add a `CloudWatch LogGroup` resource with an explicit retention
-      period (e.g. 14 days) so logs don't accumulate indefinitely.
+- [x] Create `infra/template.yaml` (AWS SAM) defining an
+      `AWS::Serverless::Function` with `PackageType: Image` (SAM manages
+      its own ECR repo automatically on `sam deploy` — no separate
+      `AWS::ECR::Repository` resource needed) and a Function URL
+      (`AuthType: NONE` for a public editor, revisit if auth is desired
+      later). **Not yet validated** — the SAM CLI isn't installed in the
+      authoring sandbox and validation needs either AWS credentials
+      (`sam validate` calls CloudFormation) or a Docker build (`sam
+      build`), both blocked/pending here; validate for real during the
+      first `sam build`/`sam deploy` once Phase 1 is unblocked.
+- [x] Set sensible defaults in the template: `MemorySize: 1024`,
+      `Timeout: 15`, architecture `x86_64`. (arm64 could shrink cost
+      further but Lambda Web Adapter + `@sparticuz/chromium` compatibility
+      on arm64 isn't verified — stick with x86_64 for v1.)
+- [x] Add a `CloudWatch LogGroup` resource with an explicit retention
+      period (14 days) so logs don't accumulate indefinitely.
 - [ ] `sam build` — confirm the template + Dockerfile validate and build.
 - [ ] `sam deploy --guided` for the first deploy; capture the stack name,
       region, and the resulting Function URL.
