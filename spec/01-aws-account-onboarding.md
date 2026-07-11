@@ -96,6 +96,15 @@ further than the recommendation above.
         not the action list. See `infra/README.md` for what S3 is (and
         deliberately isn't) used for. Also: v1 was pruned (IAM caps a
         policy at 5 versions).
+      - **v6** (v2 pruned to make room): `logs:Describe*/List*/Get*`
+        read wildcards on the dillinger log groups plus
+        `ecr:ListTagsForResource` on the dillinger repos. First *update*
+        of an existing stack (the PDF-export redeploy) hit
+        `logs:ListTagsForResource` during CloudFormation's tag-sync
+        probe — creates never exercise that path, updates do — and the
+        denial broke both the update *and* its rollback
+        (`UPDATE_ROLLBACK_FAILED`, recovered via root
+        `continue-update-rollback`). Same read-wildcard pattern as v3.
 - [x] User creates an access key for that IAM user and provides
       `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` to this environment
       (never commit them to the repo). Done 2026-07-10 — access key
