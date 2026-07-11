@@ -34,8 +34,11 @@ Resources:
       Dockerfile: Dockerfile
     Properties:
       PackageType: Image
-      MemorySize: 1024
-      Timeout: 15
+      # 2048MB (not 1024): Lambda CPU scales with memory, and the PDF
+      # export path launches Chromium in-process - at 1024MB it ran
+      # ~13s against the old 15s timeout. See spec/06-execution-pdf-export.md.
+      MemorySize: 2048
+      Timeout: 30
       Architectures:
         - x86_64
       Environment:
