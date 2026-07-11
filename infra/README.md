@@ -1,5 +1,9 @@
 # infra/ — what deploys what
 
+> For the runtime story these pieces add up to (Docker image →
+> Firecracker microVM, cold starts, isolation), see
+> [`ARCHITECTURE.md`](../ARCHITECTURE.md).
+
 | Piece | Purpose |
 |---|---|
 | `template.yaml` | Per-tenant SAM stack: one container-image Lambda + Function URL + log group. Deployed once per tenant as `dillinger-<tenant-id>`. |

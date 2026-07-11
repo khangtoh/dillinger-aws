@@ -19,6 +19,11 @@ Docker-host/ECS/EC2-style deployment.
   `spec/08-testing.md` is fully checked and a live Function URL is recorded
   below.
 
+**Architecture deep dive:** [`ARCHITECTURE.md`](../ARCHITECTURE.md) —
+how the Docker image becomes a Firecracker microVM, cold-start anatomy
+with real measurements, and why per-tenant functions are the isolation
+model.
+
 ## Phases
 
 | # | File | Purpose | Blocking dependency |

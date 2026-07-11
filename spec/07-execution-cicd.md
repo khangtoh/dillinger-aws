@@ -34,7 +34,13 @@ Depends on: Phase 4 (manual deploy already works once).
 - [x] Store the AWS account ID/region/role ARN as GitHub Actions repo
       variables (`AWS_REGION`, `AWS_DEPLOY_ROLE_ARN`) — not raw access
       keys. Done via `gh variable set`, 2026-07-10.
-- [ ] Manually run the workflow (`workflow_dispatch`) once and confirm it
-      succeeds end-to-end.
-- [ ] Confirm the staging Function URL serves the deployed change after
-      the workflow completes.
+- [x] Manually run the workflow (`workflow_dispatch`) once and confirm it
+      succeeds end-to-end. Done 2026-07-11 (run 29151981462; took six
+      attempts total — the failures drove IAM policy v4–v6 and the
+      `--resolve-s3` fix, all documented in spec/01 and the commit log).
+      Also fixed: registry push-back was silently failing (hardcoded
+      `main` before main existed + read-only token).
+- [x] Confirm the staging Function URL serves the deployed change after
+      the workflow completes. Confirmed — the PDF-export fix (NSS libs,
+      2048MB) deployed by that run is observably live: `/api/export/pdf`
+      went from 500 to returning a valid PDF.

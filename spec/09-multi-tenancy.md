@@ -89,7 +89,7 @@ Tasks:
       Phase 8 deploys, confirming no server-side state leaks between them
       (e.g. one session's OAuth cookie never appears in another's
       response).
-- [ ] Document in `spec/README.md` that "multi-user" is satisfied by this
+- [x] Document in `spec/README.md` that "multi-user" is satisfied by this
       option, once confirmed by the user.
 
 #### Option C — Shared deployment with server-side per-user workspaces (not chosen)
@@ -98,6 +98,9 @@ One deployment, but documents are no longer purely client-side —
 add lightweight auth + a persistence layer (S3 or DynamoDB) so the same
 user can reach their documents from a different device/browser, while
 still not needing full per-tenant infrastructure. Needs:
+      Done — `spec/README.md`'s Status section documents the model and
+      the live first tenant; the deep-dive rationale (Firecracker
+      boundary as the tenant boundary) is in `ARCHITECTURE.md`.
 - [ ] Pick an auth mechanism (e.g. reuse one of the existing OAuth
       providers as "login," or add a dedicated one).
 - [ ] Add a storage backend (S3/DynamoDB) keyed by user ID, replacing or
