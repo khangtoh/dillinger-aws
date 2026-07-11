@@ -37,7 +37,11 @@ Docker-host/ECS/EC2-style deployment.
 
 ## Status
 
-- [ ] **Dillinger is live on AWS Lambda** — Function URL: `TBD`
+- [x] **Dillinger is live on AWS Lambda** — Function URL:
+  `https://iepu7ka2gyaxnyhhnldynzgxgy0yonzr.lambda-url.ap-southeast-1.on.aws/`
+  (tenant `staging`, stack `dillinger-staging`, ap-southeast-1; deployed
+  2026-07-11 via CI, browser-verified end-to-end incl. live preview and
+  PDF export — see `spec/08-testing.md` results log).
 - Overall phase progress: see individual files.
 - Phase 1 AWS credentials (`spec/01-aws-account-onboarding.md`):
   **resolved 2026-07-10** — the `dillinger-aws-deploy` IAM user exists
@@ -47,7 +51,8 @@ Docker-host/ECS/EC2-style deployment.
   Everything below is now unblocked to actually run.
 - Multi-user model (`spec/09-multi-tenancy.md`): **resolved** — one
   isolated Lambda deployment per user (`infra/provision-tenant.sh`), never
-  shared. First real tenant provisioning has not been run yet.
+  shared. First real tenant (`staging`) provisioned 2026-07-11 via CI;
+  a second tenant (isolation proof) is the next multi-tenancy milestone.
 - Single entry gateway (`spec/10-gateway.md`): **deployed and live**
   (2026-07-10, the project's first real AWS deploy) — stack
   `dillinger-gateway` in us-east-1, serving at
@@ -59,10 +64,12 @@ Docker-host/ECS/EC2-style deployment.
   now the one command to validate credentials, resolve desired state,
   check actual AWS state, and sync the difference. Built by four parallel
   background sub-agents (one per module), each merged and independently
-  re-verified rather than trusted on report alone. **Not yet run against
-  real AWS end-to-end** (only mocked so far) — now that Phase 1 is
-  resolved, that's the next concrete milestone towards a live Function
-  URL.
+  re-verified rather than trusted on report alone. **Now proven against
+  real AWS**: `run.sh` deployed the gateway (2026-07-10), and with
+  `staging` declared in `desired-tenants.json` it reports everything
+  IN_SYNC and no-ops on re-run (2026-07-11). Three region-assumption
+  bugs found and fixed during first real multi-region use (gateway is
+  always us-east-1; tenants elsewhere).
 
 ## Non-goals for v1
 

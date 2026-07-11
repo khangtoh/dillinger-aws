@@ -131,5 +131,7 @@ further than the recommendation above.
       `spec/.aws-context.md` (create it, and make sure it's gitignored —
       it must never contain the actual secret key) for later phases to
       reuse. Done, gitignored.
-- [ ] Confirm with the user whether a budget/billing alarm should be set up
-      before deploying (recommended, not blocking).
+- [x] Confirm with the user whether a budget/billing alarm should be set up
+      before deploying (recommended, not blocking). Asked 2026-07-10
+      (offered a $10/month AWS Budget email alert); user chose **skip
+      for now**. Revisit if spend becomes a concern.

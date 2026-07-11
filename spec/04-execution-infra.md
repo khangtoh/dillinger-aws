@@ -28,20 +28,31 @@ Depends on: Phase 1 (credentials) + Phase 3 (image builds locally).
       pull restriction (see Phase 3/Phase 1 notes) — a real build needs to
       run where that's not blocked (this is also exercised by
       `infra/provision-tenant.sh`, see Phase 9).
-- [ ] Deploy the **first tenant** via
+- [x] Deploy the **first tenant** via
       `infra/provision-tenant.sh <first-tenant-id>` (per the single-user-
       per-instance model in `spec/09-multi-tenancy.md` — there is no
       "shared" deploy target, every deploy is a named tenant, ask the user
       what to call the first one if unclear); capture the stack name,
       region, and the resulting Function URL from `infra/tenants.json`.
-- [ ] Verify the function exists and is `Active`:
-      `aws lambda get-function --function-name <name>`.
-- [ ] Hit the Function URL with `curl -I` and confirm a `200 OK` /
-      `3xx` response (not a Lambda error payload).
-- [ ] Confirm resources are tagged `Project=dillinger-aws` and
+      Done 2026-07-11 via CI (`deploy-lambda.yml` run 29151981462, the
+      only Docker-capable path — see `.github/workflows/README.md`):
+      tenant `staging`, stack `dillinger-staging`, region
+      `ap-southeast-1`, recorded in `infra/tenants.json`.
+- [x] Verify the function exists and is `Active`:
+      `aws lambda get-function --function-name <name>`. Confirmed —
+      `dillinger-staging-DillingerFunction-HiT4f8SrLrFQ`, State
+      `Active`, PackageType `Image`, 2048MB/30s (raised from 1024/15
+      for PDF export, see Phase 6).
+- [x] Hit the Function URL with `curl -I` and confirm a `200 OK` /
+      `3xx` response (not a Lambda error payload). Confirmed HTTP 200
+      with the real page title; warm latency ~0.6s, cold-start Init
+      Duration 1437ms (from CloudWatch REPORT lines).
+- [x] Confirm resources are tagged `Project=dillinger-aws` and
       `TenantId=<tenant-id>` for cost tracking (already set in
-      `infra/template.yaml`).
-- [ ] Record the live Function URL in `spec/README.md`'s Status section.
+      `infra/template.yaml`). Confirmed via `aws lambda list-tags`
+      (plus `DillingerConfigHash` for orchestrator drift detection).
+- [x] Record the live Function URL in `spec/README.md`'s Status section.
+      Done 2026-07-11.
 - [ ] A shared custom domain in front of every tenant's Function URL is
       now handled by `spec/10-gateway.md` (one CloudFront distribution +
       subdomain routing) rather than a per-tenant stretch goal here — see

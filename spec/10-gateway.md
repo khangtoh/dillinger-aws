@@ -103,9 +103,13 @@ concept of a base path) and gives users a clean, memorable per-tenant URL.
       `404 Unknown tenant`, proving the function + KVS wiring works at
       the edge. Full request-path documentation added at
       `infra/gateway/README.md`.
-- [ ] Register the existing tenant(s) from `infra/tenants.json` into the
+- [x] Register the existing tenant(s) from `infra/tenants.json` into the
       KVS (re-run `register-tenant-route.sh` for each, or re-run
-      `provision-tenant.sh` which now does it automatically).
+      `provision-tenant.sh` which now does it automatically). Done
+      2026-07-11: `staging -> <its Function URL domain>` is in the KVS.
+      (Found + fixed: the script's gateway-exists gate didn't pin
+      `--region us-east-1`, so CI's automatic registration had silently
+      skipped.)
 - [ ] End-to-end test: hit `https://<tenant-id>.dillinger.<domain>` and
       confirm it serves that tenant's Dillinger instance; hit an unknown
       subdomain and confirm a clean 404, not a CloudFront/origin error

@@ -35,9 +35,13 @@ stays intentionally simple because each instance only ever has one user:
       tenants are provisioned by an admin running the script, not via
       self-serve signup. Seeded empty; will fill in as tenants are
       provisioned.
-- [ ] Provision a first real tenant end-to-end once Phase 1 credentials
+- [x] Provision a first real tenant end-to-end once Phase 1 credentials
       exist, confirming: the stack deploys standalone, `tenants.json`
       gets the correct entry, and the Function URL serves that tenant.
+      Done 2026-07-11: tenant `staging` deployed via CI (the sandbox
+      can't build the image — see `.github/workflows/README.md`),
+      registered in `tenants.json` and `desired-tenants.json`, browser-
+      verified serving (Phase 8). `run.sh` confirms IN_SYNC and no-ops.
       Use `infra/orchestrator/run.sh` (add the tenant to
       `infra/desired-tenants.json` first) rather than calling
       `provision-tenant.sh` directly — as of Phase 11f, `run.sh`
