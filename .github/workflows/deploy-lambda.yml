@@ -73,8 +73,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infra/tenants.json
           git diff --cached --quiet || git commit -m "Update staging tenant registry [skip ci]"
-          # Push back to the branch the workflow ran from - NOT a
-          # hardcoded "main" (this repo's default branch isn't named
-          # main, so the original push silently failed under `|| true`
-          # and registry updates never landed).
+          # Push back to the branch the workflow ran from rather than a
+          # hardcoded branch name (a hardcoded "main" once silently
+          # failed under `|| true` while the default branch was named
+          # differently, and registry updates never landed).
           git push origin "HEAD:${GITHUB_REF_NAME}"
