@@ -11,6 +11,7 @@
 | `gateway/` | Shared CloudFront single-entry gateway (see `gateway/README.md`). |
 | `register-tenant-route.sh` | Writes `tenant-id → Function URL` into the gateway's KeyValueStore. |
 | `orchestrator/` | Phase 11 pipeline: credentials → desired state → actual state → sync (see `spec/11-deployment-orchestrator/`). |
+| `bootstrap/` | Stand up / drift-sync / tear down an entire AWS account (IAM templates + scripts — see `bootstrap/README.md` for the account-switch runbook). |
 | `deployment-model.json`, `desired-tenants.json` | Human-edited desired state the orchestrator resolves. |
 | `tenants.json` | Registry of actually-provisioned tenants (written by `provision-tenant.sh`). |
 

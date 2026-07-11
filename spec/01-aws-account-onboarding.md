@@ -18,6 +18,13 @@ This phase still requires a human action (only the user can create the IAM
 user/key in their own AWS account) — flag it and wait rather than guessing
 further than the recommendation above.
 
+> **Recreating this in a new account is now automated:** the policy that
+> the checklist below converged on (after six refinements) is committed
+> as `infra/bootstrap/deploy-policy.template.json`, and
+> `infra/bootstrap/bootstrap-account.sh` stands up the user, policy,
+> OIDC provider, and CI role idempotently — see
+> `infra/bootstrap/README.md` for the full account-switch runbook.
+
 - [x] Check whether the AWS CLI is installed (`aws --version`); install it
       if missing. Installed via `pip3 install --break-system-packages
       awscli` (`aws-cli/1.45.45`) since the official installer's download
