@@ -85,6 +85,17 @@ further than the recommendation above.
         this (plain CloudFormation, no transform); the tenant template
         does, so the first CI deploy of `dillinger-staging` failed at
         SAM's managed companion stack. No new actions.
+      - **v5**: the two S3 statements collapsed to `s3:*` on the
+        SAM-managed artifact bucket pattern only
+        (`aws-sam-cli-managed-default-samclisourcebucket-*` and its
+        objects) — exactly what this draft prescribed. v4's enumerated
+        S3 actions failed twice in one deploy (`s3:TagResource` on
+        create, then `s3:DeleteBucket` on the rollback, leaving the
+        companion stack `ROLLBACK_FAILED`); SAM owns that bucket's full
+        lifecycle, so the bucket-name pattern is the security boundary,
+        not the action list. See `infra/README.md` for what S3 is (and
+        deliberately isn't) used for. Also: v1 was pruned (IAM caps a
+        policy at 5 versions).
 - [x] User creates an access key for that IAM user and provides
       `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` to this environment
       (never commit them to the repo). Done 2026-07-10 — access key
