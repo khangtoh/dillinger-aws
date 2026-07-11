@@ -18,7 +18,13 @@ GATEWAY_STACK_NAME="${3:-dillinger-gateway}"
 # since RouterFunction uses it directly as request.origin.custom.domainName.
 ORIGIN_DOMAIN="$(echo "$FUNCTION_URL" | sed -E 's#^https?://##; s#/$##')"
 
+# The gateway stack is always in us-east-1 (CloudFront/ACM requirement -
+# same fixed constant as check-state.sh/sync.sh). Without an explicit
+# --region this silently skipped registration whenever the ambient region
+# was the tenant's (found in real use: CI provisioning staging in
+# ap-southeast-1 never registered its route).
 KVS_ARN=$(aws cloudformation describe-stacks \
+  --region us-east-1 \
   --stack-name "$GATEWAY_STACK_NAME" \
   --query "Stacks[0].Outputs[?OutputKey=='KeyValueStoreArn'].OutputValue" \
   --output text 2>/dev/null || true)

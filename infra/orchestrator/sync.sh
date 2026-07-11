@@ -156,10 +156,13 @@ HAS_GATEWAY=$(jq 'has("gateway")' "$DEPLOYMENT_STATE_FILE")
 if [[ "$HAS_GATEWAY" == "true" ]]; then
   GATEWAY_STATUS=$(jq -r '.gateway.status' "$DEPLOYMENT_STATE_FILE")
 
-  # Gateway region: any tenant's region if one exists, else a sensible
-  # default. Documented choice: fall back to AWS_DEFAULT_REGION, then
-  # us-east-1, matching provision-tenant.sh's own region-default pattern.
-  GATEWAY_REGION="${FIRST_TENANT_REGION:-${AWS_DEFAULT_REGION:-us-east-1}}"
+  # Gateway region is FIXED at us-east-1: the ACM cert for a CloudFront
+  # distribution must live there, and the stack was first deployed there
+  # (2026-07-10). Deriving it from tenant regions (as this originally
+  # did) would deploy a SECOND gateway stack the moment the first tenant
+  # lands in any other region - found in real use, staging is in
+  # ap-southeast-1. Must stay consistent with check-state.sh.
+  GATEWAY_REGION="us-east-1"
 
   case "$GATEWAY_STATUS" in
     IN_SYNC)

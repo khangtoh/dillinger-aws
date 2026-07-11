@@ -1,3 +1,12 @@
 {
-  "tenants": []
+  "tenants": [
+    {
+      "tenantId": "staging",
+      "stackName": "dillinger-staging",
+      "region": "ap-southeast-1",
+      "functionUrl": "https://iepu7ka2gyaxnyhhnldynzgxgy0yonzr.lambda-url.ap-southeast-1.on.aws/",
+      "createdAt": "2026-07-11T12:10:44.214338+00:00",
+      "updatedAt": "2026-07-11T12:10:44.214338+00:00"
+    }
+  ]
 }

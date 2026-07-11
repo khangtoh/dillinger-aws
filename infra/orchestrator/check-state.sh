@@ -185,7 +185,11 @@ fi
 
 GATEWAY_JSON=""
 if [[ "$GATEWAY_ENABLED" == "true" ]]; then
-  GW_REGION="$(jq -r '.region // empty' "$CREDENTIAL_STATUS_FILE")"
+  # Gateway stack is always in us-east-1 (CloudFront/ACM requirement,
+  # same constant as sync.sh) - NOT the credential/tenant region, which
+  # is where this originally looked and why a live gateway showed as
+  # NOT_DEPLOYED.
+  GW_REGION="us-east-1"
   OUT_FILE="$(mktemp)"
   ERR_FILE="$(mktemp)"
   run_describe_stacks "dillinger-gateway" "$GW_REGION" "$OUT_FILE" "$ERR_FILE"

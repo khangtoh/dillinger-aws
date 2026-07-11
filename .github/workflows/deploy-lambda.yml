@@ -22,7 +22,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write # push the updated infra/tenants.json registry back
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
@@ -73,4 +73,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infra/tenants.json
           git diff --cached --quiet || git commit -m "Update staging tenant registry [skip ci]"
-          git push origin HEAD:main || true
+          # Push back to the branch the workflow ran from - NOT a
+          # hardcoded "main" (this repo's default branch isn't named
+          # main, so the original push silently failed under `|| true`
+          # and registry updates never landed).
+          git push origin "HEAD:${GITHUB_REF_NAME}"
