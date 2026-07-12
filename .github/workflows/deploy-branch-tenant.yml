@@ -1,0 +1,161 @@
+name: Deploy Dillinger (per-branch tenant)
+
+# Gives any branch its own persistent Lambda tenant, separate from the
+# "staging" tenant that deploy-lambda.yml owns for main. Unlike
+# tenant-lifecycle.yml (which always deprovisions at the end, even on
+# failure), the tenant this workflow creates is NOT torn down
+# automatically — it's meant to stay up for the life of the branch, the
+# same way "staging" stays up for main. Clean it up manually when the
+# branch is done:
+#   infra/deprovision-tenant.sh <tenant-id> <region> --yes
+#
+# Tenant id defaults to a sanitized form of the branch name
+# (branch-<ref-name>, lowercased, non [a-z0-9-] chars collapsed to '-')
+# so re-running this workflow on the same branch updates the same
+# tenant instead of creating a new one each time. Override with the
+# tenant_id input if you want a different name.
+#
+# Trigger is manual-only (workflow_dispatch), same reasoning as
+# deploy-lambda.yml: this runs real `sam deploy` against real AWS infra,
+# and every persistent tenant it creates has an ongoing (small but
+# non-zero) footprint - see spec/12-security-hardening.md's tenant/
+# credential lifecycle discussion. Auto-deploying every push to every
+# branch is not in scope here.
+#
+# Auth: GitHub OIDC assuming an IAM role (see spec/07-execution-cicd.md)
+# - no long-lived AWS access keys stored in GitHub. Same OIDC trust
+# policy as deploy-lambda.yml / tenant-lifecycle.yml, which is why the
+# job below still runs in the "staging" GitHub *Environment* even though
+# the AWS tenant it deploys is not named "staging" - that Environment
+# name is fixed by infra/bootstrap/ci-trust-policy.template.json's
+# subject pin, unrelated to the tenant id chosen here.
+on:
+  workflow_dispatch:
+    inputs:
+      tenant_id:
+        description: "Tenant id override (default: sanitized branch name, e.g. branch-claude-modern-dillinger-aws)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Generate CycloneDX SBOM
+        run: npm sbom --sbom-format cyclonedx > sbom.cdx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: dillinger-sbom-branch-tenant
+          path: sbom.cdx.json
+          if-no-files-found: error
+
+  deploy:
+    needs: security
+    runs-on: ubuntu-latest
+    environment: staging
+    concurrency:
+      group: dillinger-branch-tenant-${{ github.ref_name }}
+      cancel-in-progress: false
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve tenant id
+        id: tenant
+        run: |
+          set -euo pipefail
+          TENANT_ID="${{ inputs.tenant_id }}"
+          if [[ -z "$TENANT_ID" ]]; then
+            RAW="branch-${GITHUB_REF_NAME}"
+            SANITIZED=$(echo "$RAW" | tr '[:upper:]' '[:lower:]' \
+              | sed -E 's/[^a-z0-9-]+/-/g; s/-+/-/g; s/^-//; s/-$//')
+            TENANT_ID="${SANITIZED:0:40}"
+          fi
+          if [[ "$TENANT_ID" == "staging" ]]; then
+            echo "Refusing to deploy the per-branch workflow against the staging tenant - that's deploy-lambda.yml's job (main only)." >&2
+            exit 1
+          fi
+          if ! [[ "$TENANT_ID" =~ ^[a-z0-9-]+$ ]]; then
+            echo "Resolved tenant id '${TENANT_ID}' does not match [a-z0-9-]+ - fix the branch name or pass tenant_id explicitly." >&2
+            exit 1
+          fi
+          echo "id=${TENANT_ID}" >> "$GITHUB_OUTPUT"
+          echo "Resolved tenant: ${TENANT_ID} (branch: ${GITHUB_REF_NAME})"
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up Python (for AWS SAM CLI)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install AWS SAM CLI
+        run: pip install aws-sam-cli
+
+      - name: Deploy branch tenant
+        run: infra/provision-tenant.sh "${{ steps.tenant.outputs.id }}" "${AWS_REGION}"
+
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          TENANT_ID="${{ steps.tenant.outputs.id }}"
+          FUNCTION_URL=$(python3 -c "
+          import json
+          data = json.load(open('infra/tenants.json'))
+          tenant = next(t for t in data['tenants'] if t['tenantId'] == '${TENANT_ID}')
+          print(tenant['functionUrl'])
+          ")
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$FUNCTION_URL")
+          echo "Tenant '${TENANT_ID}' responded with HTTP $status at ${FUNCTION_URL}"
+          if [ "$status" -lt 200 ] || [ "$status" -ge 400 ]; then
+            echo "Smoke test failed" >&2
+            exit 1
+          fi
+
+      - name: Commit updated tenant registry
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infra/tenants.json
+          git diff --cached --quiet || git commit -m "Update tenant registry: ${{ steps.tenant.outputs.id }} [skip ci]"
+          # Push back to the branch the workflow ran from, same reasoning
+          # as deploy-lambda.yml: never hardcode a branch name here.
+          git push origin "HEAD:${GITHUB_REF_NAME}"
