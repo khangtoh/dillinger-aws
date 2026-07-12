@@ -48,9 +48,19 @@ stays intentionally simple because each instance only ever has one user:
       automatically verifies "the Function URL serves that tenant" as
       part of the sync (see `spec/11-deployment-orchestrator/README.md`),
       so this box and the verification are the same action now.
-- [ ] Provision a second tenant and confirm total isolation from the
+- [x] Provision a second tenant and confirm total isolation from the
       first: different Function URL, different log group, and (once
       Phase 5 OAuth is configured per-tenant) no shared cookies/secrets.
+      Done 2026-07-12 by the automated tenant-lifecycle workflow
+      (`.github/workflows/tenant-lifecycle.yml`, run 29179251742): a
+      second tenant (`lt29179251742`) was provisioned alongside
+      `staging`, got its own distinct Function URL, and both served 200
+      simultaneously; log groups are structurally per-stack (each
+      tenant's stack owns its own `AWS::Logs::LogGroup`). OAuth
+      cookie/secret isolation still pends Phase 5 being configured at
+      all. The tenant was then deprovisioned with zero leaked stacks —
+      this check is now repeatable anytime via
+      `gh workflow run tenant-lifecycle.yml`.
 - [ ] Decide, once real usage exists, whether `FunctionUrlConfig.AuthType`
       should move from `NONE` (public-but-unguessable URL, current v1
       default) to `AWS_IAM` per-tenant for stricter access control —
