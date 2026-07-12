@@ -68,7 +68,9 @@ describe("Toast", () => {
     expect(screen.getByText("Temporary")).toBeVisible();
 
     act(() => {
-      vi.advanceTimersByTime(2000);
+      // duration elapses, then dismiss()'s own 150ms exit-transition
+      // delay before the toast actually leaves the DOM
+      vi.advanceTimersByTime(2000 + 150);
     });
 
     expect(screen.queryByText("Temporary")).not.toBeInTheDocument();
@@ -89,6 +91,12 @@ describe("Toast", () => {
 
     act(() => {
       vi.advanceTimersByTime(1);
+    });
+    expect(screen.getByText("Default timing")).toBeVisible();
+
+    act(() => {
+      // dismiss()'s own 150ms exit-transition delay before removal
+      vi.advanceTimersByTime(150);
     });
     expect(screen.queryByText("Default timing")).not.toBeInTheDocument();
   });
@@ -117,6 +125,10 @@ describe("Toast", () => {
 
     await act(async () => {
       screen.getByRole("button", { name: "Dismiss notification" }).click();
+    });
+    act(() => {
+      // dismiss()'s own 150ms exit-transition delay before removal
+      vi.advanceTimersByTime(150);
     });
     expect(screen.queryByText("Dismissible")).not.toBeInTheDocument();
   });

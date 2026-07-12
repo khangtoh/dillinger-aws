@@ -2,6 +2,9 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+// jsdom's global Blob lacks .stream(), which the native Response
+// constructor (also global in this test env) requires - use Node's Blob.
+import { Blob } from "node:buffer";
 import { Navbar } from "@/components/navbar/Navbar";
 import { useStore } from "@/stores/store";
 
@@ -217,7 +220,10 @@ describe("Navbar", () => {
       if (filename) {
         headers.set("Content-Disposition", `attachment; filename="${filename}"`);
       }
-      const response = new Response(blob, { status: 200, headers });
+      // node:buffer's Blob type isn't structurally identical to lib.dom's
+      // Blob type (differing ArrayBuffer/ArrayBufferLike generics on
+      // bytes()) even though it works correctly with Response at runtime.
+      const response = new Response(blob as unknown as globalThis.Blob, { status: 200, headers });
       vi.spyOn(globalThis, "fetch").mockResolvedValue(response);
       return response;
     }

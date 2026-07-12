@@ -55,9 +55,12 @@ describe("SettingsModal", () => {
     expect(nightModeSwitch).toHaveAttribute("aria-checked", "true");
   });
 
-  it("does not render when settingsOpen is false", () => {
+  it("is hidden (but stays mounted for its transition) when settingsOpen is false", () => {
     render(<SettingsModal />);
-    expect(screen.queryByRole("dialog")).toBeNull();
+    // SettingsModal always mounts (same pattern as Sidebar) and toggles
+    // visibility via CSS classes for the slide/fade transition, rather
+    // than conditionally unmounting.
+    expect(screen.getByRole("dialog")).toHaveClass("opacity-0", "pointer-events-none");
   });
 
   it("toggles auto-save setting", async () => {

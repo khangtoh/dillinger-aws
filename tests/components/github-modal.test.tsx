@@ -4,6 +4,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GitHubModal } from "@/components/modals/GitHubModal";
 import { useStore } from "@/stores/store";
+import type { useGitHub } from "@/hooks/useGitHub";
 
 const mockFetchOrgs = vi.fn();
 const mockFetchRepos = vi.fn();
@@ -16,7 +17,7 @@ const mockSetCurrent = vi.fn();
 const mockReset = vi.fn();
 const mockDisconnect = vi.fn();
 
-const connectedDefaults = {
+const connectedDefaults: ReturnType<typeof useGitHub> = {
   isConnected: true,
   isLoading: false,
   user: { login: "testuser", name: "Test User", avatar_url: "" },
@@ -44,7 +45,7 @@ vi.mock("@/hooks/useGitHub", () => ({
 }));
 
 vi.mock("@/components/ui/Toast", () => ({
-  useToast: () => ({ notify: vi.fn() }),
+  useToast: vi.fn(() => ({ notify: vi.fn() })),
   ToastProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
@@ -268,7 +269,8 @@ describe("GitHubModal", () => {
       const user = userEvent.setup();
       const mockNotify = vi.fn();
 
-      vi.mocked(await import("@/components/ui/Toast")).useToast = () => ({ notify: mockNotify }) as any;
+      const toastModule = await import("@/components/ui/Toast");
+      vi.mocked(toastModule.useToast).mockReturnValue({ notify: mockNotify });
 
       mockFetchFileContent.mockResolvedValue({ content: "# Imported content", sha: "abc" });
 
@@ -469,7 +471,7 @@ describe("GitHubModal", () => {
     it("does not save when no current document exists", async () => {
       const user = userEvent.setup();
 
-      useStore.setState({ currentDocument: null }, true);
+      useStore.setState({ currentDocument: null });
 
       githubOverrides = {
         repos: [{ name: "my-repo", full_name: "testuser/my-repo", private: false, default_branch: "main" }],
