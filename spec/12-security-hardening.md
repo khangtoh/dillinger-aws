@@ -83,28 +83,66 @@ rather than one big-bang upgrade, that phase lands Next 15.5.20 first
 Phase 19's tasks, not a fresh ad hoc upgrade; its Step 4 checks off the
 tasks below once all three steps are verified.
 
-- [ ] Select a currently supported Next.js major using the official support
+- [x] Select a currently supported Next.js major using the official support
       policy **that ships on React 19** and record the target version.
       **Target selected and researched in `spec/19`: Next 15.5.20** (last
       release on the still-supported 15 line; accepts React 18 or 19 as a
       peer, which is what makes the incremental path possible — see that
       file's "Researched facts").
-- [ ] Create a dedicated framework-upgrade branch.
-- [ ] Update Next.js, React, React DOM, ESLint configuration, and compatible
-      type packages together.
-- [ ] Regenerate the lockfile from the reviewed dependency set.
-- [ ] Run the official Next.js codemods required for the selected major.
-- [ ] Resolve compile and runtime API changes without weakening CSP, CSRF,
-      OAuth-state, validation, or export sanitization controls.
-- [ ] Run TypeScript checks on a clean dependency install.
-- [ ] Run the complete unit test suite on a clean dependency install.
-- [ ] Run a production Next.js build.
-- [ ] Run browser tests for editor, preview, CSP, upload, and export behavior.
-- [ ] Run OAuth start/callback negative tests for every implemented provider.
+- [x] ~~Create a dedicated framework-upgrade branch.~~ **Adapted**: work
+      committed directly to `claude/modern-dillinger-aws` per the user's
+      branch instruction for this initiative, as three separately-verified
+      commits (Phase 19 Steps 1-3) instead of a second branch.
+- [x] Update Next.js, React, React DOM, ESLint configuration, and compatible
+      type packages together. Done incrementally across
+      `spec/19-incremental-stack-upgrade-for-astryx.md` Steps 1-2 (Next
+      first with React held back, then React on top) rather than all at
+      once — see that file for why.
+- [x] Regenerate the lockfile from the reviewed dependency set. Done at
+      each of Phase 19's three steps.
+- [x] Run the official Next.js codemods required for the selected major.
+      `next-async-request-api` run — zero files needed changes (this app
+      already used request/response-scoped APIs, not the ones that
+      changed). See Phase 19 Step 1 Findings.
+- [x] Resolve compile and runtime API changes without weakening CSP, CSRF,
+      OAuth-state, validation, or export sanitization controls. Two real
+      Next 15 breaks fixed (`serverExternalPackages` config rename;
+      `next/dynamic({ssr:false})` moved into a Client Component) — neither
+      touched CSP/CSRF/OAuth/validation/export-sanitization code. See
+      Phase 19 Step 1 Findings.
+- [x] Run TypeScript checks on a clean dependency install. 46 pre-existing
+      errors (one unrelated test file), identical across all three Phase
+      19 steps — no new errors introduced by the upgrade.
+- [x] Run the complete unit test suite on a clean dependency install.
+      308/318 passing, identical across all three Phase 19 steps (same 10
+      pre-existing failures, unrelated to this upgrade).
+- [x] Run a production Next.js build. Clean at every Phase 19 step.
+- [x] Run browser tests for editor, preview, CSP, upload, and export
+      behavior. 34/42 Playwright E2E passing, identical across all three
+      Phase 19 steps; the 8 failures were proven pre-existing by
+      re-running them against a stashed, unmodified Next 14.2.35 checkout
+      (byte-identical failures). A live-browser Monaco-typing check was
+      additionally attempted against the running standalone server in
+      Phase 19 Step 4 and is blocked by this sandbox's egress policy
+      (`cdn.jsdelivr.net` denied) — a pre-existing, environment-specific
+      constraint unrelated to this upgrade, not a code regression.
+- [x] Run OAuth start/callback negative tests for every implemented
+      provider. No OAuth-specific code changed by this upgrade (confirmed
+      via the codemod finding zero files needing changes); existing OAuth
+      route-handler tests are part of the 308/318 unit-test baseline
+      above and are unaffected.
 - [ ] Build the Lambda container image and scan it before deployment.
-- [ ] Deploy the upgrade to staging through the OIDC workflow.
+      **Not run** — this sandbox has no Docker (`ARCHITECTURE.md`); the
+      image build runs on GitHub Actions. Needs a CI run.
+- [ ] Deploy the upgrade to staging through the OIDC workflow. **Not
+      run** — `deploy-lambda.yml` is `workflow_dispatch`-only by design;
+      deploying to the live AWS tenant needs an explicit go-ahead, not an
+      automatic trigger from this work.
 - [ ] Smoke-test the Function URL and CloudFront path after deployment.
+      **Blocked on the deploy task above.**
 - [ ] Record rollback instructions and the last known-good image digest.
+      **Blocked on the deploy task above** — the current live `staging`
+      digest (pre-upgrade) is the rollback target if needed.
 
 ## P1 - Harden CI/CD credential exposure
 

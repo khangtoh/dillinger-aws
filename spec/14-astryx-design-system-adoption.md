@@ -1,19 +1,19 @@
 # Phase 14 — Astryx Design-System Adoption Spike
 
 Goal: prove, on a throwaway branch, that Astryx can coexist with this
-app's Next.js 14 + Tailwind 3.4.1 stack without regressing anything, then
-make an explicit go/no-go call before any real component migrates
-(Phase 15).
+app's Next.js 15.5.20 + React 19.2.7 + Tailwind 3.4.1 stack without
+regressing anything, then make an explicit go/no-go call before any real
+component migrates (Phase 15).
 
 Depends on: Phase 13 decisions (design system = Astryx, coexists with
-Tailwind, matches current plum brand unless told otherwise). **As of
-2026-07-12, also depends on `spec/19-incremental-stack-upgrade-for-
-astryx.md`** (the concrete, incremental execution plan for landing React
-19 — see this file's Findings below and Phase 13's Decisions for why).
-Do not resume the clarification pass or any spike task in this file
-until Phase 19's Step 4 is checked off; that step re-runs the
-`npm install --dry-run` check below to confirm the blocker is actually
-cleared before this phase resumes.
+Tailwind, matches current plum brand unless told otherwise). **UNBLOCKED
+2026-07-12**: `spec/19-incremental-stack-upgrade-for-astryx.md` Step 4
+confirmed `npm install @astryxdesign/core@0.1.4
+@astryxdesign/theme-neutral@0.1.4 --dry-run` now resolves cleanly against
+this repo's real `package.json` — the React ≥19 blocker below is
+cleared. This phase is **no longer paused**; its clarification-pass and
+spike tasks can resume, including the bundle-size baseline task that was
+previously moot.
 
 ## Working rules
 
@@ -210,3 +210,11 @@ unchecked until Phase 13's decision is revised (see that file's new
   section for why that specific path is lower-risk than a single
   big-bang upgrade. This phase stays paused until Phase 19's Step 4
   confirms the `npm install --dry-run` check above passes clean.
+- **2026-07-12: Unblocked.** All three of Phase 19's steps landed and
+  were verified (typecheck/unit/build/lint/E2E identical to a captured
+  pre-upgrade baseline at every step, zero new regressions): Next
+  15.5.20, React 19.2.7, `@stylexjs/stylex@0.18.3`. Phase 19 Step 4
+  re-ran this exact dry-run check and it now resolves cleanly. This
+  phase's clarification pass and spike can resume from the top —
+  everything below this point in the file reflects the original,
+  now-resolved blocker and stays as a historical record.

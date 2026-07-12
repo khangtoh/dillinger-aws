@@ -41,7 +41,7 @@ model.
 | 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | Phase 9 + 10 |
 | 12 | [12-security-hardening.md](12-security-hardening.md) | Close repository, AWS, credential, and operational security findings | Phase 7 + 8 + 10 + 11 |
 | 13 | [13-ui-refresh-requirements.md](13-ui-refresh-requirements.md) | UI-refresh requirements and evaluations: current UI audit, Astryx evaluation, StackEdit gap analysis, product-direction decision, AI-native scope (design only) | None (builds on the live Phase 1-12 milestone) |
-| 14 | [14-astryx-design-system-adoption.md](14-astryx-design-system-adoption.md) | Spike Astryx alongside Tailwind; explicit go/no-go gate | Phase 13 + **Phase 12's React 19 upgrade** (paused 2026-07-12: Astryx requires React ≥19, see Findings) |
+| 14 | [14-astryx-design-system-adoption.md](14-astryx-design-system-adoption.md) | Spike Astryx alongside Tailwind; explicit go/no-go gate | Phase 13 (unblocked 2026-07-12 — Phase 19 landed Next 15.5.20/React 19.2.7/StyleX 0.18.3, dry-run install confirmed clean) |
 | 15 | [15-ui-component-migration.md](15-ui-component-migration.md) | Migrate components to Astryx; ship toolbar, scroll-sync, diagrams, command palette, theming | Phase 14 (Go) |
 | 16 | [16-notes-information-architecture.md](16-notes-information-architecture.md) | Folders/tags/search on top of the client-only document model | Phase 13 (data model); Phase 15 (sidebar surface) |
 | 17 | [17-ai-agent-native-features.md](17-ai-agent-native-features.md) | Real AI-native product features: document API contract, in-editor AI actions, follow-on MCP server | Phase 13; AI-3 needs Phase 15's command palette |
@@ -109,14 +109,20 @@ full notes-management-app pivot — that's deferred as a separately-scoped
 v2. None of Phases 14-18 touch `infra/`, the Lambda packaging, or the
 multi-tenancy/gateway model from Phases 1-12.
 
-- [ ] **UI refresh live** — not yet started. Phase 13 decisions recorded
-      (2026-07-12). Phase 14's clarification pass found Astryx requires
-      React ≥19 (this app is on React 18/Next 14.2.35) — **paused on
-      `spec/19-incremental-stack-upgrade-for-astryx.md`**, a 3-step
-      incremental plan (Next 15.5.20 → React 19.2.7 → StyleX 0.18.3) that
-      also executes `spec/12`'s "P0 - Move to a supported application
-      stack" item. Work Phase 19 to unblock Phase 14. Update this line
-      with the tenant URL and date once Phase 18 closes out.
+- [ ] **UI refresh live** — not yet started (Phase 15-18 unstarted).
+      Phase 13 decisions recorded (2026-07-12). **Phase 19 complete**
+      (2026-07-12): incrementally landed Next 15.5.20 → React 19.2.7 →
+      `@stylexjs/stylex@0.18.3`, each step fully verified (typecheck,
+      unit, build, lint, E2E — all identical to a captured pre-upgrade
+      baseline, zero regressions found at any step) and the app confirmed
+      running via its actual Lambda-equivalent entrypoint
+      (`node .next/standalone/server.js`). **Phase 14 is unblocked** —
+      the original Astryx `ERESOLVE` blocker is confirmed cleared. Not
+      yet done: the Lambda container build and staging deploy for this
+      upgraded stack (no Docker in the dev sandbox; deploy workflow is
+      manual-dispatch-only) — needs a CI run before this upgrade reaches
+      the live tenant. Update this line with the tenant URL and date once
+      Phase 18 closes out.
 
 ## Non-goals for the UI-refresh initiative (Phase 13-18)
 

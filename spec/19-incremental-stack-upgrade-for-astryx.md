@@ -224,17 +224,41 @@ Checked directly against npm metadata and this repo's real
 
 ## Step 4 — Confirm the Astryx blocker is actually cleared
 
-- [ ] Re-run the exact check that found the original blocker:
+- [x] Re-run the exact check that found the original blocker:
       `npm install @astryxdesign/core@0.1.4 @astryxdesign/theme-neutral@0.1.4 --dry-run`
       against the now-upgraded `package.json`, and confirm it resolves
-      cleanly (no `ERESOLVE`).
-- [ ] Record the result in this file's Findings.
-- [ ] Update `spec/14-astryx-design-system-adoption.md`: remove its
+      cleanly (no `ERESOLVE`). **Cleared** — resolves 100 packages to add,
+      zero `ERESOLVE`. Nothing was actually installed (dry-run only);
+      real installation is Phase 14's job.
+- [x] Boot the app the same way the Lambda container actually runs it
+      (`node .next/standalone/server.js`, not `next start`/`next dev`) and
+      confirm it serves real HTTP traffic: homepage 200 with the correct
+      `<title>`, a `/_next/static/*` JS chunk 200, an unknown route 404
+      (not a raw framework error), and two content pages (`/ai`,
+      `/compare`) 200. **All passed.**
+- [x] Attempt a full real-browser check (load the page, wait for Monaco,
+      type markdown, read the live preview, capture console errors).
+      **Blocked by this sandbox's egress policy, not a code regression**:
+      `@monaco-editor/react` loads Monaco from `cdn.jsdelivr.net` by
+      default (confirmed — no local/self-hosted loader config exists
+      anywhere in this codebase), and this sandbox's proxy explicitly
+      denies that host (`403`, logged as a policy `connect_rejected`, not
+      a timeout or DNS failure). Per this environment's own operating
+      rule, a 403 policy denial is reported, not retried or routed
+      around. This is identical to what Phase 8 already established:
+      full live-editor verification needs an environment with real
+      internet egress (the deployed Lambda Function URL has it; this dev
+      sandbox does not) — not something this upgrade changed. The
+      earlier E2E suite's "passing" tests (Steps 1-2, 34/42) don't
+      actually depend on Monaco visually initializing — they drive the
+      store/preview/sidebar directly — so that result stands unaffected.
+- [x] Record the result in this file's Findings.
+- [x] Update `spec/14-astryx-design-system-adoption.md`: remove its
       "paused" note, confirm its "Depends on" is satisfied, and resume
       that phase's clarification pass items that were previously marked
       "moot until the blocker is resolved" (the bundle-size baseline
       task in particular).
-- [ ] Check off `spec/12-security-hardening.md`'s "P0 - Move to a
+- [x] Check off `spec/12-security-hardening.md`'s "P0 - Move to a
       supported application stack" section (all of its tasks are now
       satisfied by Steps 1-2's verification work above) and update
       `spec/README.md`'s Phase 14 blocking-dependency note to remove the
@@ -278,3 +302,27 @@ Checked directly against npm metadata and this repo's real
   `^0.18.3` peer range exactly as researched. Typecheck/unit/build all
   identical to baseline — adding the unwired dependency had zero impact,
   as expected.
+- **2026-07-12: Step 4 complete — blocker cleared, app verified running.**
+  The original blocking check now resolves cleanly: `npm install
+  @astryxdesign/core@0.1.4 @astryxdesign/theme-neutral@0.1.4 --dry-run`
+  adds 100 packages with zero `ERESOLVE` (was a hard failure at the
+  start of this phase). Booted the app exactly as the Lambda container
+  runs it (`node .next/standalone/server.js`, matching
+  `ARCHITECTURE.md`'s documented `CMD`) and confirmed real HTTP traffic:
+  homepage 200 with correct title, a `/_next/static/*` chunk 200, an
+  unknown route 404, two content pages 200. A full real-browser
+  Monaco-typing check was attempted and is blocked by this sandbox's
+  egress policy (`cdn.jsdelivr.net` explicitly denied, 403, logged as a
+  policy `connect_rejected`) — reported per this environment's own rule
+  against retrying policy denials, not worked around. This is a
+  pre-existing product/environment fact (Monaco has no self-hosted
+  fallback anywhere in this codebase; the deployed Lambda Function URL
+  has real internet egress and doesn't hit this) unrelated to the
+  Next/React/StyleX upgrade — the 34/42 E2E baseline already established
+  at Steps 1-2 doesn't depend on Monaco visually initializing and stands
+  unaffected. **All three steps now verified**: typecheck, unit tests,
+  production build, lint, and E2E are identical across the pre-upgrade
+  baseline and all three post-upgrade states, with zero new regressions
+  found at any step. Container build and staging deploy remain the one
+  outstanding item, deferred to CI pending an explicit go-ahead (see
+  each step's notes above).
