@@ -1,26 +1,39 @@
 name: Deploy Dillinger (per-branch tenant)
 
-# Gives any branch its own persistent Lambda tenant, separate from the
+# Gives every branch its own persistent Lambda tenant, separate from the
 # "staging" tenant that deploy-lambda.yml owns for main. Unlike
 # tenant-lifecycle.yml (which always deprovisions at the end, even on
 # failure), the tenant this workflow creates is NOT torn down
-# automatically — it's meant to stay up for the life of the branch, the
+# automatically - it's meant to stay up for the life of the branch, the
 # same way "staging" stays up for main. Clean it up manually when the
 # branch is done:
 #   infra/deprovision-tenant.sh <tenant-id> <region> --yes
 #
-# Tenant id defaults to a sanitized form of the branch name
+# Tenant id is always derived from the branch name
 # (branch-<ref-name>, lowercased, non [a-z0-9-] chars collapsed to '-')
-# so re-running this workflow on the same branch updates the same
-# tenant instead of creating a new one each time. Override with the
-# tenant_id input if you want a different name.
+# so re-pushing to the same branch updates that same tenant instead of
+# creating a new one each time.
 #
-# Trigger is manual-only (workflow_dispatch), same reasoning as
-# deploy-lambda.yml: this runs real `sam deploy` against real AWS infra,
-# and every persistent tenant it creates has an ongoing (small but
-# non-zero) footprint - see spec/12-security-hardening.md's tenant/
-# credential lifecycle discussion. Auto-deploying every push to every
-# branch is not in scope here.
+# Trigger: push, deliberately NOT workflow_dispatch. GitHub only lets you
+# workflow_dispatch a workflow that's already registered on the default
+# branch (main) - this workflow exists to let *other* branches deploy
+# their own tenant without ever touching main, so workflow_dispatch
+# would defeat the point. push-triggered workflows have no such
+# requirement: GitHub evaluates the workflow file as it exists on the
+# branch that received the push, independent of main.
+#
+# Scope is a deliberate, explicit allowlist (`branches:`), not "every
+# branch except main" - every push to a listed branch triggers a real
+# `sam deploy` against real AWS infra, so this is opt-in per branch, not
+# a standing repo-wide policy. main is deliberately absent from this
+# list: it's handled by deploy-lambda.yml's separate, existing
+# "staging" tenant, unchanged by this workflow. To give another branch
+# its own persistent tenant, add its exact name to the `branches:` list
+# below.
+#
+# There is no automatic teardown when a listed branch is deleted or
+# retired - see the cleanup command above; remove the branch from this
+# list too so it stops redeploying.
 #
 # Auth: GitHub OIDC assuming an IAM role (see spec/07-execution-cicd.md)
 # - no long-lived AWS access keys stored in GitHub. Same OIDC trust
@@ -30,12 +43,12 @@ name: Deploy Dillinger (per-branch tenant)
 # name is fixed by infra/bootstrap/ci-trust-policy.template.json's
 # subject pin, unrelated to the tenant id chosen here.
 on:
-  workflow_dispatch:
-    inputs:
-      tenant_id:
-        description: "Tenant id override (default: sanitized branch name, e.g. branch-claude-modern-dillinger-aws)"
-        required: false
-        default: ""
+  push:
+    branches:
+      # Explicit allowlist - add a branch name here to give it its own
+      # persistent tenant on push. main is intentionally not listed;
+      # deploy-lambda.yml owns main's "staging" tenant separately.
+      - claude/modern-dillinger-aws
 
 permissions:
   contents: read
@@ -98,19 +111,16 @@ jobs:
         id: tenant
         run: |
           set -euo pipefail
-          TENANT_ID="${{ inputs.tenant_id }}"
-          if [[ -z "$TENANT_ID" ]]; then
-            RAW="branch-${GITHUB_REF_NAME}"
-            SANITIZED=$(echo "$RAW" | tr '[:upper:]' '[:lower:]' \
-              | sed -E 's/[^a-z0-9-]+/-/g; s/-+/-/g; s/^-//; s/-$//')
-            TENANT_ID="${SANITIZED:0:40}"
-          fi
+          RAW="branch-${GITHUB_REF_NAME}"
+          SANITIZED=$(echo "$RAW" | tr '[:upper:]' '[:lower:]' \
+            | sed -E 's/[^a-z0-9-]+/-/g; s/-+/-/g; s/^-//; s/-$//')
+          TENANT_ID="${SANITIZED:0:40}"
           if [[ "$TENANT_ID" == "staging" ]]; then
             echo "Refusing to deploy the per-branch workflow against the staging tenant - that's deploy-lambda.yml's job (main only)." >&2
             exit 1
           fi
           if ! [[ "$TENANT_ID" =~ ^[a-z0-9-]+$ ]]; then
-            echo "Resolved tenant id '${TENANT_ID}' does not match [a-z0-9-]+ - fix the branch name or pass tenant_id explicitly." >&2
+            echo "Resolved tenant id '${TENANT_ID}' does not match [a-z0-9-]+ - fix the branch name." >&2
             exit 1
           fi
           echo "id=${TENANT_ID}" >> "$GITHUB_OUTPUT"
@@ -156,6 +166,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add infra/tenants.json
           git diff --cached --quiet || git commit -m "Update tenant registry: ${{ steps.tenant.outputs.id }} [skip ci]"
-          # Push back to the branch the workflow ran from, same reasoning
-          # as deploy-lambda.yml: never hardcode a branch name here.
+          # Push back to the branch that triggered this run - never
+          # hardcode a branch name here.
           git push origin "HEAD:${GITHUB_REF_NAME}"

@@ -2,13 +2,14 @@
 
 `deploy-lambda.yml` rebuilds and redeploys the fixed **staging** tenant
 (main only) on demand. `deploy-branch-tenant.yml` (added 2026-07-12)
-does the same thing for any other branch, deploying to that branch's own
-persistent tenant instead of touching staging — see "Per-branch tenants"
-below. `tenant-lifecycle.yml` is a third, unrelated workflow: a
-throwaway provision→verify→deprovision proof that always tears its
-tenant down, never used for a persistent deploy. For the decision
-history see [spec/07-execution-cicd.md](../../spec/07-execution-cicd.md);
-this file documents the as-built design.
+does the same thing for an explicit allowlist of other branches, each
+deploying to its own persistent tenant instead of touching staging — see
+"Per-branch tenants" below. `tenant-lifecycle.yml` is a third, unrelated
+workflow: a throwaway provision→verify→deprovision proof that always
+tears its tenant down, never used for a persistent deploy. For the
+decision history see
+[spec/07-execution-cicd.md](../../spec/07-execution-cicd.md); this file
+documents the as-built design.
 
 ## Why CI is the build path at all
 
@@ -92,45 +93,54 @@ Environment with required reviewers for an approval gate.
 ## Per-branch tenants: `deploy-branch-tenant.yml`
 
 Same security gate, same OIDC auth, same `infra/provision-tenant.sh`
-script as `deploy-lambda.yml` — the only difference is which tenant id
-gets deployed and that its `deploy` job carries no `github.ref ==
-'refs/heads/main'` restriction. Default tenant id is a sanitized form of
-the triggering branch name (`branch-<ref-name>`); re-running it on the
-same branch updates that same tenant rather than creating a new one.
-Explicitly refuses to run against `tenant_id: staging` — that's
-`deploy-lambda.yml`'s job, main-only.
+script as `deploy-lambda.yml` — the differences are the trigger type and
+which tenant id gets deployed.
+
+**Trigger: `push`, scoped to an explicit branch allowlist — not
+`workflow_dispatch`, and not "every branch."** `workflow_dispatch` only
+works for workflows GitHub has already indexed from the default branch
+(`main`); since the whole point of this workflow is letting *other*
+branches deploy without ever touching `main`, `workflow_dispatch` isn't
+usable here (confirmed by trying it: a 404 on a workflow that only
+existed on a feature branch). `push`-triggered workflows don't have that
+requirement — GitHub evaluates the workflow file as it exists on the
+branch that received the push. The tradeoff is real, so the scope is
+deliberately narrow: `on.push.branches` is an **explicit allowlist**,
+not `branches-ignore` on everything-but-main. Every push to a listed
+branch is a real `sam deploy` against real AWS infra, so a branch is
+opt-in, one name at a time — add it to the `branches:` list in the
+workflow file to give it its own tenant.
+
+Tenant id is always derived from the branch name
+(`branch-<ref-name>`, sanitized); re-pushing to the same branch updates
+that same tenant rather than creating a new one. Explicitly refuses to
+resolve to `tenant_id: staging` — that's `deploy-lambda.yml`'s job,
+main-only, and main is intentionally never in this workflow's allowlist.
 
 **Not ephemeral.** Unlike `tenant-lifecycle.yml`, this workflow never
-deprovisions what it creates — the tenant is meant to persist for the
-life of the branch, the same way `staging` persists for `main`. Whoever
-triggers it owns cleaning it up when the branch is done:
+deprovisions what it creates — the tenant persists for the life of the
+branch, the same way `staging` persists for `main`. Nothing deletes it
+when the branch itself is deleted. Clean it up manually, and remove the
+branch from the allowlist so it stops redeploying:
 
 ```bash
 infra/deprovision-tenant.sh <tenant-id> <region> --yes
 ```
 
-Still `workflow_dispatch`-only, same reasoning as below: every run is a
-real, persistent AWS resource, not something to spin up on every push
-without a deliberate trigger.
+## Scope boundary: CI touches staging (main, on demand) and an explicit allowlist of per-branch tenants (on push)
 
-```bash
-gh workflow run deploy-branch-tenant.yml --ref <branch>
-```
-
-## Scope boundary: CI touches staging (main) and per-branch tenants (any branch), both by explicit trigger only
-
-CI redeploys the fixed `staging` tenant from `main`
-(`deploy-lambda.yml`), and can deploy a persistent per-branch tenant
-from any other branch (`deploy-branch-tenant.yml`) — both only when a
-human explicitly runs `workflow_dispatch`, never automatically on push.
-CI does not provision arbitrary named tenants beyond what these two
-workflows resolve to; declaring a curated tenant in
-`infra/desired-tenants.json` and running `infra/orchestrator/run.sh`
-remains the separate, explicit path for real user tenants (see
-`spec/09-multi-tenancy.md` and `spec/11-deployment-orchestrator/`) — the
-orchestrator's reconciliation never touches tenants outside that file,
-so branch tenants created here are invisible to it and won't be torn
-down by a future `run.sh` sync.
+CI redeploys the fixed `staging` tenant from `main` on manual
+`workflow_dispatch` (`deploy-lambda.yml`), and deploys a persistent
+per-branch tenant on every push to each branch explicitly listed in
+`deploy-branch-tenant.yml`'s `on.push.branches`. It does not deploy
+anything for a branch that isn't on that list, and does not provision
+arbitrary named tenants beyond what these two workflows resolve to;
+declaring a curated tenant in `infra/desired-tenants.json` and running
+`infra/orchestrator/run.sh` remains the separate, explicit path for real
+user tenants (see `spec/09-multi-tenancy.md` and
+`spec/11-deployment-orchestrator/`) — the orchestrator's reconciliation
+never touches tenants outside that file, so branch tenants created here
+are invisible to it and won't be torn down by a future `run.sh` sync.
 
 ## Recreating this in another account
 
