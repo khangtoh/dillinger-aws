@@ -40,6 +40,12 @@ model.
 | 10 | [10-gateway.md](10-gateway.md) | Single entry gateway routing to each tenant | Phase 9 |
 | 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | Phase 9 + 10 |
 | 12 | [12-security-hardening.md](12-security-hardening.md) | Close repository, AWS, credential, and operational security findings | Phase 7 + 8 + 10 + 11 |
+| 13 | [13-ui-refresh-requirements.md](13-ui-refresh-requirements.md) | UI-refresh requirements and evaluations: current UI audit, Astryx evaluation, StackEdit gap analysis, product-direction decision, AI-native scope (design only) | None (builds on the live Phase 1-12 milestone) |
+| 14 | [14-astryx-design-system-adoption.md](14-astryx-design-system-adoption.md) | Spike Astryx alongside Tailwind; explicit go/no-go gate | Phase 13 |
+| 15 | [15-ui-component-migration.md](15-ui-component-migration.md) | Migrate components to Astryx; ship toolbar, scroll-sync, diagrams, command palette, theming | Phase 14 (Go) |
+| 16 | [16-notes-information-architecture.md](16-notes-information-architecture.md) | Folders/tags/search on top of the client-only document model | Phase 13 (data model); Phase 15 (sidebar surface) |
+| 17 | [17-ai-agent-native-features.md](17-ai-agent-native-features.md) | Real AI-native product features: document API contract, in-editor AI actions, follow-on MCP server | Phase 13; AI-3 needs Phase 15's command palette |
+| 18 | [18-ui-verification-and-testing.md](18-ui-verification-and-testing.md) | Prove the UI refresh works live and closes the StackEdit gap | Phase 15 + 16 + 17 (AI-1/AI-3) |
 
 ## Status
 
@@ -86,3 +92,34 @@ model.
 - OAuth cloud-storage sync (GitHub/Dropbox/Google Drive/OneDrive/Bitbucket)
   and PDF export are **optional** features layered on top of a working
   editor; they must not block the "app is running on Lambda" milestone.
+
+## Phase 13-18: UI refresh and product direction
+
+With the app live on Lambda, Phase 13 opens a second initiative: a UI
+refresh built on the [Astryx](https://github.com/facebook/astryx) design
+system, new editor UX intended to beat StackEdit's UI (folders, toolbar,
+scroll-sync, diagrams, command palette, real theming), and real AI-native
+product features (a stable document API contract, in-editor AI actions,
+a follow-on MCP server) replacing what today is only marketing copy on
+`/ai`. See [13-ui-refresh-requirements.md](13-ui-refresh-requirements.md)
+for the full evaluation and recorded decisions, including the explicit
+call to scope this as a multi-document manager (StackEdit-class), not a
+full notes-management-app pivot — that's deferred as a separately-scoped
+v2. None of Phases 14-18 touch `infra/`, the Lambda packaging, or the
+multi-tenancy/gateway model from Phases 1-12.
+
+- [ ] **UI refresh live** — not yet started; Phase 13 is the current
+      phase. Update this line with the tenant URL and date once Phase 18
+      closes out.
+
+## Non-goals for the UI-refresh initiative (Phase 13-18)
+
+- Full notes-management-app depth (backlinks, graph view, full-text body
+  search, daily notes) — deferred to a separately-scoped v2 per Phase 13
+  Section D; this initiative ships folders + tags + title/tag search only.
+- Real-time collaborative editing — structurally in tension with the
+  stateless, per-tenant-isolated Lambda architecture; flagged as an open
+  question for the user in Phase 13, not assumed in scope.
+- Any change to `infra/`, the Lambda container packaging, the gateway, or
+  the multi-tenancy model — this initiative is UI/product-surface only,
+  built on top of the Phase 1-12 runtime unchanged.
