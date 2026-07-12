@@ -71,8 +71,19 @@ Source reviews:
 
 ## P0 - Move to a supported application stack
 
+**Cross-reference (added 2026-07-12):** `spec/13-ui-refresh-requirements.md`
+Phase 14 (Astryx design-system adoption) is now also blocked on this item
+— `@astryxdesign/core` requires `react >=19.0.0`, confirmed via
+`npm view`/dry-run install (see `spec/14-astryx-design-system-adoption.md`
+Findings). This adds a hard constraint to the first task below: the
+selected target must land **React 19**, not merely "a currently supported
+Next.js major" in the abstract — record that explicitly when this task is
+picked up, and treat Phase 14 as a dependent phase that resumes only once
+every box in this section is checked and Phase 8-style verification has
+passed on the upgraded stack.
+
 - [ ] Select a currently supported Next.js major using the official support
-      policy and record the target version.
+      policy **that ships on React 19** and record the target version.
 - [ ] Create a dedicated framework-upgrade branch.
 - [ ] Update Next.js, React, React DOM, ESLint configuration, and compatible
       type packages together.

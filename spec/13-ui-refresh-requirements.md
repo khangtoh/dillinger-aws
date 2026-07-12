@@ -416,15 +416,17 @@ above pending a choice among:
    Section A's actual complaint (duplicated bespoke interactive
    patterns) and Section E's agent-consistency goal.
 
-**Recommendation:** Option 2. It preserves everything Phase 13 Section E
-actually established as load-bearing (typed API + swizzle-style
-ownership + real theming), doesn't gate a UI-refresh initiative behind a
-separately-scoped, independently risky major framework upgrade, and
-doesn't leave Section A's bespoke-pattern-duplication problem unaddressed
-the way option 3 would. This is a real product/sequencing call, not a
-technical fact, so it's left for explicit user confirmation rather than
-silently decided — see the first item under "Open questions for the
-user," now updated to reflect this.
+**Recommendation:** Option 2 (see reasoning above).
+
+**Decision (user, 2026-07-12): Option 1.** Sequence
+`spec/12-security-hardening.md`'s "P0 - Move to a supported application
+stack" ahead of Phase 14, explicitly targeting React 19 (that file's
+first task is now cross-referenced and updated accordingly), then resume
+Astryx adoption once it's fully checked off and verified. Phase 14 is
+paused, not abandoned — see its Findings for the resequencing note. This
+overrides the recommendation above; the astryx choice itself (Phase 13
+Decisions' "Design system" line) stands unchanged as "adopt Astryx behind
+a go/no-go gate," only the sequencing changed.
 
 
 
@@ -432,13 +434,12 @@ These are business/product calls, not technical facts — recorded here so
 they aren't silently decided, per this phase's own convention of not
 letting a scheduled agent guess on genuinely ambiguous items:
 
-- **[BLOCKING, new 2026-07-12] Which path from the "Revision" section
-  above** — sequence a React 19/Next 15 upgrade first (option 1), drop
-  Astryx for a React-18-compatible primitive layer reaching the same
-  goals a different way (option 2, recommended), or stay hand-rolled and
-  just formalize conventions (option 3)? Phase 14 and everything
-  downstream that assumes "Astryx" by name (Phase 15's swizzle tasks,
-  Phase 13 Decisions' "Design system" line) is paused on this answer.
+- ~~[BLOCKING] Which path from the "Revision" section above?~~
+  **Resolved 2026-07-12: option 1** — sequence the React 19/Next 15
+  upgrade (`spec/12-security-hardening.md` P0) ahead of Phase 14, then
+  resume Astryx adoption. Phase 12's stack-upgrade item is now the
+  active blocking dependency for Phase 14; work on that item to unblock
+  the UI refresh.
 - Should the eventual component-layer theme deliberately match the
   current plum (`#35D7BB`) brand, or is a broader rebrand in scope for
   this UI refresh? (Assumed "match current brand" unless told otherwise
