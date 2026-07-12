@@ -10,6 +10,7 @@
 | `provision-tenant.sh` | The one deploy path for a tenant (used identically by humans and CI): `sam build` → `sam deploy` → second deploy pass to set `NEXT_PUBLIC_BASE_URL` → records the tenant in `tenants.json` → registers its gateway route if the gateway exists. |
 | `gateway/` | Shared CloudFront single-entry gateway (see `gateway/README.md`). |
 | `register-tenant-route.sh` | Writes `tenant-id → Function URL` into the gateway's KeyValueStore. |
+| `deprovision-tenant.sh` | The inverse of `provision-tenant.sh`: removes one tenant's gateway route, ECR repo, stack + SAM companion stack, leftover log groups, and its entries in **both** registries (a tenant left in `desired-tenants.json` would just be redeployed by the next orchestrator run). Confirmation-gated; `--yes` to skip. |
 | `orchestrator/` | Phase 11 pipeline: credentials → desired state → actual state → sync (see `spec/11-deployment-orchestrator/`). |
 | `bootstrap/` | Stand up / drift-sync / tear down an entire AWS account (IAM templates + scripts — see `bootstrap/README.md` for the account-switch runbook). |
 | `deployment-model.json`, `desired-tenants.json` | Human-edited desired state the orchestrator resolves. |
