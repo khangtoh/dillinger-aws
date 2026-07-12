@@ -2,6 +2,13 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { enforceSameOrigin } from "@/lib/csrf";
+import {
+  isObject,
+  providerContent,
+  providerFilename,
+  providerIdentifier,
+} from "@/lib/validation";
 
 async function getAccessToken(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -14,6 +21,9 @@ async function getAccessToken(): Promise<string | null> {
 }
 
 export async function POST(request: NextRequest) {
+  const forbidden = enforceSameOrigin(request);
+  if (forbidden) return forbidden;
+
   const accessToken = await getAccessToken();
 
   if (!accessToken) {
@@ -21,7 +31,18 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { name, content, folderId, fileId } = await request.json();
+    const body: unknown = await request.json();
+    if (!isObject(body)) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+
+    const name = providerFilename(body.name);
+    const content = providerContent(body.content);
+    const folderId = body.folderId ? providerIdentifier(body.folderId) : undefined;
+    const fileId = body.fileId ? providerIdentifier(body.fileId) : undefined;
+    if (!name || content === null || folderId === null || fileId === null) {
+      return NextResponse.json({ error: "Invalid file fields" }, { status: 400 });
+    }
 
     const fileName = name.endsWith(".md") ? name : `${name}.md`;
     let targetFileId = fileId;
@@ -74,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     // If targetFileId exists (either provided or found), update existing file
     if (targetFileId) {
-      url = `https://www.googleapis.com/upload/drive/v3/files/${targetFileId}?uploadType=multipart`;
+      url = `https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(targetFileId)}?uploadType=multipart`;
       method = "PATCH";
     }
 

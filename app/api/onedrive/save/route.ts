@@ -2,6 +2,13 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { enforceSameOrigin } from "@/lib/csrf";
+import {
+  boundedString,
+  isObject,
+  providerContent,
+  providerFilename,
+} from "@/lib/validation";
 
 async function getAccessToken(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -14,6 +21,9 @@ async function getAccessToken(): Promise<string | null> {
 }
 
 export async function POST(request: NextRequest) {
+  const forbidden = enforceSameOrigin(request);
+  if (forbidden) return forbidden;
+
   const accessToken = await getAccessToken();
 
   if (!accessToken) {
@@ -21,21 +31,32 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { name, content, folderId, fileId } = await request.json();
+    const body: unknown = await request.json();
+    if (!isObject(body)) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+    const name = providerFilename(body.name);
+    const content = providerContent(body.content);
+    const folderId = body.folderId ? boundedString(body.folderId, 512) : undefined;
+    const fileId = body.fileId ? boundedString(body.fileId, 512) : undefined;
+    if (!name || content === null || folderId === null || fileId === null) {
+      return NextResponse.json({ error: "Invalid file fields" }, { status: 400 });
+    }
 
     const fileName = name.endsWith(".md") ? name : `${name}.md`;
+    const encodedFileName = encodeURIComponent(fileName);
 
     let url: string;
 
     if (fileId) {
       // Update existing file
-      url = `https://graph.microsoft.com/v1.0/me/drive/items/${fileId}/content`;
+      url = `https://graph.microsoft.com/v1.0/me/drive/items/${encodeURIComponent(fileId)}/content`;
     } else if (folderId && folderId !== "root") {
       // Create in specific folder
-      url = `https://graph.microsoft.com/v1.0/me/drive/items/${folderId}:/${fileName}:/content`;
+      url = `https://graph.microsoft.com/v1.0/me/drive/items/${encodeURIComponent(folderId)}:/${encodedFileName}:/content`;
     } else {
       // Create in root
-      url = `https://graph.microsoft.com/v1.0/me/drive/root:/${fileName}:/content`;
+      url = `https://graph.microsoft.com/v1.0/me/drive/root:/${encodedFileName}:/content`;
     }
 
     const response = await fetch(url, {

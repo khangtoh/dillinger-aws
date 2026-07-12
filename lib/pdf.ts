@@ -2,7 +2,7 @@ import fs from "node:fs";
 import chromium from "@sparticuz/chromium";
 import puppeteer from "puppeteer-core";
 import { renderHtmlDocument } from "@/lib/export";
-import { renderMarkdown } from "@/lib/markdown";
+import { renderMarkdownSafe } from "@/lib/markdown";
 
 const PDF_OPTIONS = {
   format: "A4" as const,
@@ -78,7 +78,7 @@ export async function renderPdfBuffer({
   markdown: string;
   title?: string;
 }) {
-  const renderedMarkdown = await renderMarkdown(markdown);
+  const renderedMarkdown = await renderMarkdownSafe(markdown);
   const html = renderHtmlDocument({
     title,
     html: renderedMarkdown,
@@ -90,7 +90,18 @@ export async function renderPdfBuffer({
 
   try {
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
+    await page.setJavaScriptEnabled(false);
+    await page.setRequestInterception(true);
+    page.on("request", (resourceRequest) => {
+      const url = resourceRequest.url();
+      if (url === "about:blank" || url.startsWith("data:")) {
+        void resourceRequest.continue();
+      } else {
+        void resourceRequest.abort();
+      }
+    });
+    page.setDefaultTimeout(10_000);
+    await page.setContent(html, { waitUntil: "domcontentloaded", timeout: 10_000 });
     await page.emulateMediaType("screen");
     const pdf = await page.pdf(PDF_OPTIONS);
 

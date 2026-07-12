@@ -2,7 +2,8 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getCached, setCache, tokenPrefix } from "@/lib/cache";
+import { getCached, setCache, tokenFingerprint } from "@/lib/cache";
+import { providerIdentifier } from "@/lib/validation";
 
 export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
@@ -13,14 +14,14 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
-  const owner = searchParams.get("owner");
-  const repo = searchParams.get("repo");
+  const owner = providerIdentifier(searchParams.get("owner"));
+  const repo = providerIdentifier(searchParams.get("repo"));
 
   if (!owner || !repo) {
     return NextResponse.json({ error: "Owner and repo are required" }, { status: 400 });
   }
 
-  const cacheKey = `gh:branches:${tokenPrefix(token)}:${owner}:${repo}`;
+  const cacheKey = `gh:branches:${tokenFingerprint(token)}:${owner}:${repo}`;
   const cached = getCached<unknown[]>(cacheKey);
   if (cached) {
     return NextResponse.json(cached);
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/branches`,
+      `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/branches`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

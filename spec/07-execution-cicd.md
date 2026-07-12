@@ -27,10 +27,12 @@ Depends on: Phase 4 (manual deploy already works once).
       GitHub OIDC provider instead of an IAM user). Done 2026-07-10
       (user-approved root-session action, same bootstrap scope as Phase
       1): OIDC provider + role `dillinger-ci-deploy`, trust policy
-      pinned to `repo:khangtoh/dillinger-aws:*`, with the **same**
+      pinned to `repo:khangtoh/dillinger-aws:environment:staging` and
+      audience `sts.amazonaws.com`, with the **same**
       `dillinger-deploy-policy` the human deploy user has attached —
       one permission surface for CI and humans. Design documented in
-      `.github/workflows/README.md`.
+      `.github/workflows/README.md`. The live trust conditions were
+      verified read-only during the 2026-07-12 credential review.
 - [x] Store the AWS account ID/region/role ARN as GitHub Actions repo
       variables (`AWS_REGION`, `AWS_DEPLOY_ROLE_ARN`) — not raw access
       keys. Done via `gh variable set`, 2026-07-10.

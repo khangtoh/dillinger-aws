@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 interface CacheEntry {
   value: unknown;
   expires: number;
@@ -38,6 +40,6 @@ export function setCache(key: string, value: unknown, ttl = DEFAULT_TTL): void {
   cache.set(key, { value, expires: Date.now() + ttl });
 }
 
-export function tokenPrefix(token: string): string {
-  return token.slice(0, 8);
+export function tokenFingerprint(token: string): string {
+  return createHash("sha256").update(token, "utf8").digest("hex");
 }

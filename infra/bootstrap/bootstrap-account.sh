@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Stands up (or drift-syncs) everything one AWS account needs before this
 # project can deploy into it: the least-privilege managed policy, the
-# human deploy user, the GitHub OIDC provider, and the CI deploy role.
+# GitHub OIDC provider and CI deploy role. A legacy IAM deploy user is
+# created only when --create-access-key is explicitly requested.
 # The committed templates in this directory are the source of truth -
 # spec/01-aws-account-onboarding.md records how their content was derived
 # (six AccessDenied-driven refinements against real deploys).
@@ -12,7 +13,7 @@
 #
 # Usage:
 #   infra/bootstrap/bootstrap-account.sh <region> [--profile <admin-profile>]
-#       [--repo <owner/name>] [--create-access-key [credentials-profile]]
+#       [--repo <owner/name>] [--create-access-key <credentials-profile>]
 #
 #   <region>              tenant deploy region for the new account
 #                         (the gateway is always us-east-1, independent
@@ -23,11 +24,12 @@
 #                         only thing that should ever use it.
 #   --repo                GitHub repo the CI role trusts
 #                         (default: khangtoh/dillinger-aws)
-#   --create-access-key   also mint an access key for the deploy user and
-#                         write it into ~/.aws/credentials under the given
-#                         profile name (default profile name: "default").
+#   --create-access-key   legacy escape hatch for environments that cannot
+#                         use federation: create a deploy user and write its
+#                         key to a required, non-default named profile.
 #                         Refuses to overwrite an existing profile. The
-#                         secret is never printed.
+#                         secret is never printed. Prefer GitHub OIDC for CI
+#                         and IAM Identity Center for human access.
 #
 # After a successful run it prints the exact follow-up commands (gh
 # variable set, credential-guard verification). See README.md here for
@@ -45,12 +47,12 @@ OIDC_URL="token.actions.githubusercontent.com"
 # requires one at provider-creation time.
 OIDC_THUMBPRINT="6938fd4d98bab03faadb97b34396831e3780aea1"
 
-REGION="${1:?Usage: bootstrap-account.sh <region> [--profile <admin>] [--repo <owner/name>] [--create-access-key [profile]]}"
+REGION="${1:?Usage: bootstrap-account.sh <region> [--profile <admin>] [--repo <owner/name>] [--create-access-key <profile>]}"
 shift
 
 REPO="khangtoh/dillinger-aws"
 CREATE_KEY=0
-KEY_PROFILE="default"
+KEY_PROFILE=""
 AWSP=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -58,8 +60,16 @@ while [[ $# -gt 0 ]]; do
     --repo) REPO="$2"; shift 2 ;;
     --create-access-key)
       CREATE_KEY=1
-      if [[ $# -gt 1 && "$2" != --* ]]; then KEY_PROFILE="$2"; shift; fi
-      shift ;;
+      if [[ $# -lt 2 || "$2" == --* ]]; then
+        echo "bootstrap-account.sh: --create-access-key requires a non-default profile name" >&2
+        exit 1
+      fi
+      KEY_PROFILE="$2"
+      if [[ "$KEY_PROFILE" == "default" ]]; then
+        echo "bootstrap-account.sh: refusing to store a long-lived key in the default profile" >&2
+        exit 1
+      fi
+      shift 2 ;;
     *) echo "bootstrap-account.sh: unknown argument: $1" >&2; exit 1 ;;
   esac
 done
@@ -134,28 +144,29 @@ else
   CHANGES=1
 fi
 
-# --- Deploy user -------------------------------------------------------------
-
-if aws "${AWSP[@]+"${AWSP[@]}"}" iam get-user --user-name "$USER_NAME" >/dev/null 2>&1; then
-  echo "    user ${USER_NAME}: exists"
-else
-  aws "${AWSP[@]+"${AWSP[@]}"}" iam create-user --user-name "$USER_NAME" \
-    --tags Key=Project,Value=dillinger-aws >/dev/null
-  echo "    user ${USER_NAME}: created"
-  CHANGES=1
-fi
-
-if aws "${AWSP[@]+"${AWSP[@]}"}" iam list-attached-user-policies --user-name "$USER_NAME" \
-    --query 'AttachedPolicies[].PolicyArn' --output text | grep -q "$POLICY_ARN"; then
-  echo "    user ${USER_NAME}: policy already attached"
-else
-  aws "${AWSP[@]+"${AWSP[@]}"}" iam attach-user-policy \
-    --user-name "$USER_NAME" --policy-arn "$POLICY_ARN"
-  echo "    user ${USER_NAME}: policy attached"
-  CHANGES=1
-fi
+# --- Legacy deploy user ------------------------------------------------------
 
 if [[ "$CREATE_KEY" -eq 1 ]]; then
+  echo "    WARNING: creating a long-lived IAM user key; temporary credentials are preferred" >&2
+  if aws "${AWSP[@]+"${AWSP[@]}"}" iam get-user --user-name "$USER_NAME" >/dev/null 2>&1; then
+    echo "    user ${USER_NAME}: exists"
+  else
+    aws "${AWSP[@]+"${AWSP[@]}"}" iam create-user --user-name "$USER_NAME" \
+      --tags Key=Project,Value=dillinger-aws >/dev/null
+    echo "    user ${USER_NAME}: created"
+    CHANGES=1
+  fi
+
+  if aws "${AWSP[@]+"${AWSP[@]}"}" iam list-attached-user-policies --user-name "$USER_NAME" \
+      --query 'AttachedPolicies[].PolicyArn' --output text | grep -q "$POLICY_ARN"; then
+    echo "    user ${USER_NAME}: policy already attached"
+  else
+    aws "${AWSP[@]+"${AWSP[@]}"}" iam attach-user-policy \
+      --user-name "$USER_NAME" --policy-arn "$POLICY_ARN"
+    echo "    user ${USER_NAME}: policy attached"
+    CHANGES=1
+  fi
+
   if [[ -f "$HOME/.aws/credentials" ]] && grep -q "^\[${KEY_PROFILE}\]" "$HOME/.aws/credentials"; then
     echo "    access key: profile '${KEY_PROFILE}' already exists in ~/.aws/credentials - refusing to overwrite (remove it first or pass a different profile name)" >&2
     exit 1
@@ -234,4 +245,8 @@ echo
 echo "Next steps (see infra/bootstrap/README.md for the full runbook):"
 echo "  gh variable set AWS_REGION --body \"${REGION}\""
 echo "  gh variable set AWS_DEPLOY_ROLE_ARN --body \"arn:aws:iam::${ACCOUNT}:role/${ROLE_NAME}\""
-echo "  infra/orchestrator/credential-guard.sh   # verify deploy-user permissions"
+if [[ "$CREATE_KEY" -eq 1 ]]; then
+  echo "  AWS_PROFILE=${KEY_PROFILE} infra/orchestrator/credential-guard.sh"
+else
+  echo "  gh workflow run deploy-lambda.yml   # verify OIDC deployment"
+fi

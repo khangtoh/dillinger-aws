@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { getAppUrl } from "@/lib/env";
+import { createOAuthState, setOAuthStateCookie } from "@/lib/oauth-state";
 
 export async function GET() {
   const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -14,6 +15,7 @@ export async function GET() {
   }
 
   const redirectUri = `${getAppUrl()}/api/google-drive/callback`;
+  const state = createOAuthState();
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -22,9 +24,12 @@ export async function GET() {
     scope: "openid email https://www.googleapis.com/auth/drive",
     access_type: "offline",
     prompt: "consent",
+    state,
   });
 
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 
-  return NextResponse.redirect(authUrl);
+  const response = NextResponse.redirect(authUrl);
+  setOAuthStateCookie(response, "google-drive", state);
+  return response;
 }

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Tests bootstrap-account.sh against the mocked `aws` CLI (mock-aws.sh).
-# Three scenarios: fresh account (everything created), fully-bootstrapped
-# account (complete no-op), and drifted documents (policy version bump
-# with 5-version pruning + trust policy update).
+# Four scenarios: fresh account (federated entities only), fully-bootstrapped
+# account (complete no-op), drifted documents (policy version bump), and
+# explicit legacy key creation.
 
 set -euo pipefail
 
@@ -37,7 +37,7 @@ render() { # render a template with this test's account/region/repo
 
 called() { grep -q "$1" "$MOCK_CALL_LOG"; }
 
-# --- Scenario 1: fresh account - everything gets created --------------------
+# --- Scenario 1: fresh account - federated entities only --------------------
 
 setup
 if OUT="$("$BOOTSTRAP" "$REGION" --repo "$REPO" 2>&1)"; then
@@ -45,14 +45,19 @@ if OUT="$("$BOOTSTRAP" "$REGION" --repo "$REPO" 2>&1)"; then
 else
   fail "fresh account: exited non-zero: $OUT"
 fi
-for expected in "iam create-policy " "iam create-user" "iam attach-user-policy" \
-    "iam create-open-id-connect-provider" "iam create-role" "iam attach-role-policy"; do
+for expected in "iam create-policy " "iam create-open-id-connect-provider" \
+    "iam create-role" "iam attach-role-policy"; do
   if called "$expected"; then
     pass "fresh account: called ${expected% }"
   else
     fail "fresh account: never called ${expected% }"
   fi
 done
+if called "iam create-user" || called "iam attach-user-policy"; then
+  fail "fresh account: created a legacy deploy user without an explicit key request"
+else
+  pass "fresh account: no legacy deploy user by default"
+fi
 if called "create-access-key"; then
   fail "fresh account: created an access key without --create-access-key"
 else
@@ -121,6 +126,40 @@ if called "iam create-policy " || called "iam create-user" || called "iam create
   fail "drifted account: recreated entities that already exist"
 else
   pass "drifted account: no spurious creates"
+fi
+
+# --- Scenario 4: legacy key requires a named non-default profile ------------
+
+setup
+mkdir -p "$WORK/home"
+if OUT="$(HOME="$WORK/home" "$BOOTSTRAP" "$REGION" --repo "$REPO" \
+    --create-access-key dillinger-legacy-deploy 2>&1)"; then
+  pass "legacy key: explicit named-profile request exits 0"
+else
+  fail "legacy key: explicit request exited non-zero: $OUT"
+fi
+if called "iam create-user" && called "iam attach-user-policy" && called "iam create-access-key"; then
+  pass "legacy key: creates the IAM user only when explicitly requested"
+else
+  fail "legacy key: expected user, policy attachment, and access-key creation"
+fi
+if grep -q '^\[dillinger-legacy-deploy\]$' "$WORK/home/.aws/credentials" \
+    && [[ "$(stat -c '%a' "$WORK/home/.aws/credentials")" == "600" ]]; then
+  pass "legacy key: writes an owner-only named profile"
+else
+  fail "legacy key: named profile missing or credentials file permissions are not 600"
+fi
+if [[ "$OUT" == *"mock-secret"* || "$OUT" == *"AKIAMOCK"* ]]; then
+  fail "legacy key: credential material appeared in command output"
+else
+  pass "legacy key: credential material is not printed"
+fi
+
+setup
+if OUT="$("$BOOTSTRAP" "$REGION" --create-access-key default 2>&1)"; then
+  fail "legacy key: accepted the default profile"
+else
+  pass "legacy key: rejects the default profile"
 fi
 
 echo "===================================="

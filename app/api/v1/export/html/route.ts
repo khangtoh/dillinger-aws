@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/api-auth";
 import { getExportFilename, renderHtmlDocument } from "@/lib/export";
-import { renderMarkdown } from "@/lib/markdown";
+import { renderMarkdownSafe } from "@/lib/markdown";
 
 export async function POST(request: NextRequest) {
   const authError = validateApiKey(request);
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const htmlContent = await renderMarkdown(markdown);
+    const htmlContent = await renderMarkdownSafe(markdown);
     const filename = getExportFilename(title, "html");
     const fullHtml = renderHtmlDocument({ title, html: htmlContent, styled });
 

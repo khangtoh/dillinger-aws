@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/api-auth";
-import { renderMarkdown } from "@/lib/markdown";
+import { renderMarkdownSafe } from "@/lib/markdown";
 
 export async function POST(request: NextRequest) {
   const authError = validateApiKey(request);
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const html = await renderMarkdown(markdown);
+    const html = await renderMarkdownSafe(markdown);
 
     return NextResponse.json({ html });
   } catch {

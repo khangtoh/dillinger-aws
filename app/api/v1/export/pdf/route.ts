@@ -5,17 +5,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/api-auth";
 import { getExportFilename } from "@/lib/export";
 import { renderPdfBuffer } from "@/lib/pdf";
+import {
+  isMarkdownWithinLimit,
+  rejectOversizedRequest,
+} from "@/lib/request-limits";
 
 export async function POST(request: NextRequest) {
   const authError = validateApiKey(request);
   if (authError) return authError;
 
+  const oversized = rejectOversizedRequest(request);
+  if (oversized) return oversized;
+
   try {
     const { markdown, title = "document" } = await request.json();
 
-    if (typeof markdown !== "string" || !markdown.trim()) {
+    if (!isMarkdownWithinLimit(markdown)) {
       return NextResponse.json(
-        { error: "markdown field is required" },
+        { error: "markdown field is required and must not exceed 512 KiB" },
         { status: 400 }
       );
     }

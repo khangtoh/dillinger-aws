@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useToast } from "@/components/ui/Toast";
+import {
+  SAME_ORIGIN_JSON_HEADERS,
+  SAME_ORIGIN_REQUEST_HEADERS,
+} from "@/lib/client-request";
 
 interface DriveFile {
   id: string;
@@ -53,7 +57,10 @@ export function useGoogleDrive() {
 
   const disconnect = useCallback(async () => {
     try {
-      await fetch("/api/google-drive/unlink", { method: "POST" });
+      await fetch("/api/google-drive/unlink", {
+        method: "POST",
+        headers: SAME_ORIGIN_REQUEST_HEADERS,
+      });
       setState({
         isConnected: false,
         files: [],
@@ -89,7 +96,7 @@ export function useGoogleDrive() {
     try {
       const response = await fetch("/api/google-drive/files", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: SAME_ORIGIN_JSON_HEADERS,
         body: JSON.stringify({ fileId }),
       });
 
@@ -112,7 +119,7 @@ export function useGoogleDrive() {
     try {
       const response = await fetch("/api/google-drive/save", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: SAME_ORIGIN_JSON_HEADERS,
         body: JSON.stringify({
           name,
           content,

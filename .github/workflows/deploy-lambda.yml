@@ -21,16 +21,60 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  id-token: write
-  contents: write # push the updated infra/tenants.json registry back
+  contents: read
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
   STAGING_TENANT_ID: staging
 
 jobs:
-  deploy:
+  security:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Generate CycloneDX SBOM
+        run: npm sbom --sbom-format cyclonedx > sbom.cdx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: dillinger-sbom
+          path: sbom.cdx.json
+          if-no-files-found: error
+
+  deploy:
+    needs: security
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: staging
+    concurrency:
+      group: dillinger-staging-deploy
+      cancel-in-progress: false
+    permissions:
+      id-token: write
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4

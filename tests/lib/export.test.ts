@@ -30,6 +30,20 @@ describe("renderHtmlDocument", () => {
     expect(result).toContain("<title>My Doc</title>");
   });
 
+  it("escapes active markup in the document title", () => {
+    const result = renderHtmlDocument({
+      title: "</title><script>alert(1)</script>",
+      html: "",
+    });
+    expect(result).not.toContain("<script>alert(1)</script>");
+    expect(result).toContain("&lt;/title&gt;&lt;script&gt;");
+  });
+
+  it("adds a restrictive content security policy", () => {
+    const result = renderHtmlDocument({ html: "<p>hi</p>" });
+    expect(result).toContain("default-src 'none'");
+  });
+
   it("includes provided HTML in the body", () => {
     const result = renderHtmlDocument({ html: "<h1>Hello</h1>" });
     expect(result).toContain("<h1>Hello</h1>");
@@ -50,8 +64,9 @@ describe("renderHtmlDocument", () => {
     expect(explicitFalse).not.toContain("<style>");
   });
 
-  it("includes KaTeX CSS link in styled variant", () => {
+  it("does not load remote styles in the styled variant", () => {
     const result = renderHtmlDocument({ html: "", styled: true });
-    expect(result).toContain("katex.min.css");
+    expect(result).not.toContain("@import");
+    expect(result).not.toContain("cdnjs.cloudflare.com");
   });
 });

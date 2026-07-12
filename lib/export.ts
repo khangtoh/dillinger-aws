@@ -1,8 +1,6 @@
 import { replaceExtension, sanitizeDownloadFilename } from "@/lib/document";
 
 const STYLED_EXPORT_CSS = `
-  @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.css");
-
   body {
     font-family: Georgia, Cambria, serif;
     font-size: 14px;
@@ -75,6 +73,15 @@ const STYLED_EXPORT_CSS = `
   }
 `;
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export function getExportFilename(title: string | undefined, extension: string): string {
   const safeTitle = sanitizeDownloadFilename(title?.trim() || "document");
   return sanitizeDownloadFilename(replaceExtension(safeTitle, extension));
@@ -90,13 +97,15 @@ export function renderHtmlDocument({
   styled?: boolean;
 }): string {
   const styleTag = styled ? `<style>${STYLED_EXPORT_CSS}</style>` : "";
+  const safeTitle = escapeHtml(title || "Document");
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title || "Document"}</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: https:; style-src 'unsafe-inline'; font-src data:">
+  <title>${safeTitle}</title>
   ${styleTag}
 </head>
 <body id="preview">

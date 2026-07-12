@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useToast } from "@/components/ui/Toast";
+import {
+  SAME_ORIGIN_JSON_HEADERS,
+  SAME_ORIGIN_REQUEST_HEADERS,
+} from "@/lib/client-request";
 
 interface DropboxUser {
   name: string;
@@ -65,7 +69,10 @@ export function useDropbox() {
 
   const disconnect = useCallback(async () => {
     try {
-      await fetch("/api/dropbox/unlink", { method: "POST" });
+      await fetch("/api/dropbox/unlink", {
+        method: "POST",
+        headers: SAME_ORIGIN_REQUEST_HEADERS,
+      });
       setState((s) => ({
         ...s,
         isConnected: false,
@@ -135,7 +142,7 @@ export function useDropbox() {
         notify("Fetching file...", 2000);
         const response = await fetch("/api/dropbox/files", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: SAME_ORIGIN_JSON_HEADERS,
           body: JSON.stringify({ path }),
         });
         const data = await response.json();
@@ -158,7 +165,7 @@ export function useDropbox() {
         notify("Saving to Dropbox...", 3000);
         const response = await fetch("/api/dropbox/save", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: SAME_ORIGIN_JSON_HEADERS,
           body: JSON.stringify({ path, content }),
         });
 

@@ -7,5 +7,6 @@ spec
 tests
 docs
 *.md
-.env
-.env*.local
+.env*
+!.env.example
+!.env.local.example

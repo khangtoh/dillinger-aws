@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic";
 
-import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { NextRequest } from "next/server";
 import { getAppUrl } from "@/lib/env";
+import { hasValidOAuthState, oauthCallbackRedirect } from "@/lib/oauth-state";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -11,12 +11,19 @@ export async function GET(request: NextRequest) {
 
   const baseUrl = getAppUrl();
 
+  if (!hasValidOAuthState(request, "dropbox")) {
+    return oauthCallbackRedirect(`${baseUrl}?dropbox_error=invalid_state`, "dropbox");
+  }
+
   if (error) {
-    return NextResponse.redirect(`${baseUrl}?dropbox_error=${error}`);
+    return oauthCallbackRedirect(
+      `${baseUrl}?dropbox_error=${encodeURIComponent(error)}`,
+      "dropbox"
+    );
   }
 
   if (!code) {
-    return NextResponse.redirect(`${baseUrl}?dropbox_error=no_code`);
+    return oauthCallbackRedirect(`${baseUrl}?dropbox_error=no_code`, "dropbox");
   }
 
   try {
@@ -41,14 +48,19 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       await tokenResponse.text();
-      return NextResponse.redirect(`${baseUrl}?dropbox_error=token_exchange_failed`);
+      return oauthCallbackRedirect(
+        `${baseUrl}?dropbox_error=token_exchange_failed`,
+        "dropbox"
+      );
     }
 
     const result = await tokenResponse.json();
 
-    // Store tokens in HTTP-only cookie
-    const cookieStore = await cookies();
-    cookieStore.set(
+    const response = oauthCallbackRedirect(
+      `${baseUrl}?dropbox_connected=true`,
+      "dropbox"
+    );
+    response.cookies.set(
       "dropbox_token",
       JSON.stringify({
         access_token: result.access_token,
@@ -63,8 +75,11 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    return NextResponse.redirect(`${baseUrl}?dropbox_connected=true`);
+    return response;
   } catch {
-    return NextResponse.redirect(`${baseUrl}?dropbox_error=token_exchange_failed`);
+    return oauthCallbackRedirect(
+      `${baseUrl}?dropbox_error=token_exchange_failed`,
+      "dropbox"
+    );
   }
 }

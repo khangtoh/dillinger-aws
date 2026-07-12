@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/Toast";
+import { SAME_ORIGIN_REQUEST_HEADERS } from "@/lib/client-request";
 
 interface UploadResult {
   url: string;
@@ -25,6 +26,7 @@ export function useImageUpload() {
 
         const response = await fetch("/api/upload/image", {
           method: "POST",
+          headers: SAME_ORIGIN_REQUEST_HEADERS,
           body: formData,
         });
 

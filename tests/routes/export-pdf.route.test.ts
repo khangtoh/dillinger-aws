@@ -12,6 +12,18 @@ import { renderPdfBuffer } from "@/lib/pdf";
 const renderPdfBufferMock = vi.mocked(renderPdfBuffer);
 const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
+function pdfRequest(body: unknown) {
+  return new Request("http://localhost:3000/api/export/pdf", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "http://localhost:3000",
+      "X-Dillinger-Request": "same-origin",
+    },
+    body: JSON.stringify(body),
+  }) as never;
+}
+
 describe("POST /api/export/pdf", () => {
   afterEach(() => {
     vi.clearAllMocks();
@@ -23,10 +35,7 @@ describe("POST /api/export/pdf", () => {
 
   it("rejects missing markdown", async () => {
     const response = await exportPdf(
-      new Request("http://localhost/api/export/pdf", {
-        method: "POST",
-        body: JSON.stringify({}),
-      }) as never
+      pdfRequest({})
     );
 
     expect(response.status).toBe(400);
@@ -36,16 +45,7 @@ describe("POST /api/export/pdf", () => {
     renderPdfBufferMock.mockResolvedValue(Buffer.from("%PDF-1.4"));
 
     const response = await exportPdf(
-      new Request("http://localhost/api/export/pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          markdown: "# Exported",
-          title: "Exported.md",
-        }),
-      }) as never
+      pdfRequest({ markdown: "# Exported", title: "Exported.md" })
     );
 
     expect(response.status).toBe(200);
@@ -60,18 +60,26 @@ describe("POST /api/export/pdf", () => {
     renderPdfBufferMock.mockRejectedValue(new Error("missing chrome"));
 
     const response = await exportPdf(
-      new Request("http://localhost/api/export/pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          markdown: "# Exported",
-          title: "Exported.md",
-        }),
-      }) as never
+      pdfRequest({ markdown: "# Exported", title: "Exported.md" })
     );
 
     expect(response.status).toBe(500);
+  });
+
+  it("rejects cross-origin requests before launching Chromium", async () => {
+    const response = await exportPdf(
+      new Request("http://localhost:3000/api/export/pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Origin: "https://attacker.example",
+          "X-Dillinger-Request": "same-origin",
+        },
+        body: JSON.stringify({ markdown: "# Exported" }),
+      }) as never
+    );
+
+    expect(response.status).toBe(403);
+    expect(renderPdfBufferMock).not.toHaveBeenCalled();
   });
 });

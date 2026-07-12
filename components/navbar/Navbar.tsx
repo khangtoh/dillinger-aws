@@ -5,6 +5,7 @@ import { useStore } from "@/stores/store";
 import { useToast } from "@/components/ui/Toast";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { importDocumentFile } from "@/lib/import";
+import { SAME_ORIGIN_JSON_HEADERS } from "@/lib/client-request";
 import {
   Menu,
   Eye,
@@ -84,7 +85,7 @@ export function Navbar() {
 
       const response = await fetch(`/api/export/${format}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: SAME_ORIGIN_JSON_HEADERS,
         body: JSON.stringify({
           markdown: currentDocument.body,
           title: currentDocument.title,
@@ -323,7 +324,7 @@ export function Navbar() {
       <input
         ref={imageInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/gif,image/webp"
         data-testid="image-import-input"
         className="hidden"
         onChange={handleImageSelection}

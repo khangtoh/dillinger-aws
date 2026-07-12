@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { DropboxAuth } from "dropbox";
 import { getAppUrl } from "@/lib/env";
+import { createOAuthState, setOAuthStateCookie } from "@/lib/oauth-state";
 
 export async function GET() {
   const clientId = process.env.DROPBOX_APP_KEY;
@@ -16,11 +17,12 @@ export async function GET() {
   }
 
   const redirectUri = `${baseUrl}/api/dropbox/callback`;
+  const state = createOAuthState();
 
   const dbxAuth = new DropboxAuth({ clientId });
   const authUrl = await dbxAuth.getAuthenticationUrl(
     redirectUri,
-    undefined,
+    state,
     "code",
     "offline",
     undefined,
@@ -28,5 +30,7 @@ export async function GET() {
     false
   );
 
-  return NextResponse.redirect(authUrl.toString());
+  const response = NextResponse.redirect(authUrl.toString());
+  setOAuthStateCookie(response, "dropbox", state);
+  return response;
 }

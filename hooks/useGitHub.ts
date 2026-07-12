@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useToast } from "@/components/ui/Toast";
+import {
+  SAME_ORIGIN_JSON_HEADERS,
+  SAME_ORIGIN_REQUEST_HEADERS,
+} from "@/lib/client-request";
 
 interface GitHubUser {
   login: string;
@@ -102,7 +106,10 @@ export function useGitHub() {
 
   const disconnect = useCallback(async () => {
     try {
-      await fetch("/api/github/unlink", { method: "POST" });
+      await fetch("/api/github/unlink", {
+        method: "POST",
+        headers: SAME_ORIGIN_REQUEST_HEADERS,
+      });
       setState((s) => ({
         ...s,
         isConnected: false,
@@ -215,7 +222,7 @@ export function useGitHub() {
         notify("Fetching file...", 2000);
         const response = await fetch("/api/github/files", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: SAME_ORIGIN_JSON_HEADERS,
           body: JSON.stringify({ owner, repo, path }),
         });
         const data = await response.json();
@@ -250,7 +257,7 @@ export function useGitHub() {
         notify("Saving to GitHub...", 3000);
         const response = await fetch("/api/github/save", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: SAME_ORIGIN_JSON_HEADERS,
           body: JSON.stringify({
             owner,
             repo,

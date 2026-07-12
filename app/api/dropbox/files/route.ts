@@ -2,6 +2,8 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { enforceSameOrigin } from "@/lib/csrf";
+import { isObject, providerPath } from "@/lib/validation";
 
 // List markdown files
 export async function GET(request: NextRequest) {
@@ -15,7 +17,11 @@ export async function GET(request: NextRequest) {
   try {
     const { access_token } = JSON.parse(tokenCookie);
     const searchParams = request.nextUrl.searchParams;
-    const path = searchParams.get("path") || "";
+    const rawPath = searchParams.get("path") || "";
+    const path = rawPath ? providerPath(rawPath) : "";
+    if (path === null) {
+      return NextResponse.json({ error: "Invalid path" }, { status: 400 });
+    }
 
     // Use direct API call instead of SDK
     const response = await fetch("https://api.dropboxapi.com/2/files/list_folder", {
@@ -63,6 +69,9 @@ export async function GET(request: NextRequest) {
 
 // Fetch file content
 export async function POST(request: NextRequest) {
+  const forbidden = enforceSameOrigin(request);
+  if (forbidden) return forbidden;
+
   const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("dropbox_token")?.value;
 
@@ -71,7 +80,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { path } = await request.json();
+    const body: unknown = await request.json();
+    if (!isObject(body)) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+    const path = providerPath(body.path);
+    if (!path) {
+      return NextResponse.json({ error: "Invalid path" }, { status: 400 });
+    }
     const { access_token } = JSON.parse(tokenCookie);
 
     // Use direct API call instead of SDK

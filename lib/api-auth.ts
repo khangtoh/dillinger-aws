@@ -1,4 +1,9 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+
+function digest(value: string): Buffer {
+  return createHash("sha256").update(value, "utf8").digest();
+}
 
 export function validateApiKey(request: NextRequest): NextResponse | null {
   const apiKey = process.env.DILLINGER_API_KEY;
@@ -18,7 +23,7 @@ export function validateApiKey(request: NextRequest): NextResponse | null {
   }
 
   const token = auth.slice(7);
-  if (token !== apiKey) {
+  if (!timingSafeEqual(digest(token), digest(apiKey))) {
     return NextResponse.json({ error: "Invalid API key" }, { status: 403 });
   }
 

@@ -1,8 +1,8 @@
 # Switching AWS accounts (or standing up a new one)
 
-Everything account-specific in this project lives in exactly four places:
-the AWS account itself (IAM + deployed stacks), your local AWS profile,
-two GitHub repo variables, and two committed registry files
+Everything account-specific in this project lives in the AWS account
+itself (IAM + deployed stacks), two GitHub repo variables, and two
+committed registry files
 (`infra/tenants.json`, `infra/desired-tenants.json`). Nothing else in
 the repo cares which account it's pointed at — scripts resolve
 account/region at runtime, and CI reads its role ARN from a variable.
@@ -16,15 +16,14 @@ account would mean rediscovering all of that.
 ## Stand up a new account
 
 ```bash
-# 0. Get admin/root credentials for the TARGET account into a named
-#    profile (never the default profile - that's the deploy user's):
-aws login --profile new-account-admin        # or aws configure --profile ...
+# 0. Get temporary admin credentials for the TARGET account into a named
+#    profile. Prefer IAM Identity Center or another federated login.
+aws sso login --profile new-account-admin
 
 # 1. Create/sync the IAM setup (idempotent - safe to re-run any time):
 infra/bootstrap/bootstrap-account.sh ap-southeast-1 \
   --profile new-account-admin \
-  --repo khangtoh/dillinger-aws \
-  --create-access-key            # writes deploy-user key into [default]
+  --repo khangtoh/dillinger-aws
 
 # 2. Point CI at the new account (values are printed by step 1):
 gh variable set AWS_REGION --body "ap-southeast-1"
@@ -36,10 +35,8 @@ echo '{"tenants": []}' > infra/tenants.json
 rm -f infra/orchestrator/state/*.json
 #    ...and adjust the region in infra/desired-tenants.json if changing.
 
-# 4. Verify the deploy user, then deploy:
-infra/orchestrator/credential-guard.sh       # all permission checks pass?
-gh workflow run deploy-lambda.yml            # tenant image builds ONLY in CI
-infra/orchestrator/run.sh                    # gateway + reconcile to IN_SYNC
+# 4. Verify the OIDC deployment path:
+gh workflow run deploy-lambda.yml
 
 # 5. Record the new account/region in the gitignored spec/.aws-context.md.
 ```
@@ -54,6 +51,24 @@ Notes:
   on an up-to-date account are complete no-ops.
 - Tenant deploys require Docker, which the dev sandbox lacks — the CI
   workflow is the build path (`.github/workflows/README.md`).
+
+## Human and local access
+
+Use an IAM Identity Center or other federated named profile with a
+permission set based on `deploy-policy.template.json`. Sessions must be
+temporary and separate from the bootstrap administrator profile:
+
+```bash
+aws sso login --profile dillinger-operator
+AWS_PROFILE=dillinger-operator infra/orchestrator/credential-guard.sh
+AWS_PROFILE=dillinger-operator infra/orchestrator/run.sh
+```
+
+Do not store an AWS access key in the `default` profile. For a workload
+that genuinely cannot use federation, `--create-access-key
+dillinger-legacy-deploy` remains an explicit legacy escape hatch. Record
+an owner and expiry, review access-key last-used data, and remove it as
+soon as the workload can assume a role.
 
 ## Tear down the old account
 
@@ -79,8 +94,8 @@ still trusts it — it may be shared with unrelated projects.
 
 | File | Purpose |
 |---|---|
-| `deploy-policy.template.json` | The least-privilege deploy policy, `__ACCOUNT__`/`__REGION__` placeholders. Attached to both the deploy user and the CI role (one permission surface). |
+| `deploy-policy.template.json` | The least-privilege deploy policy, `__ACCOUNT__`/`__REGION__` placeholders. Attached to the CI role and, only when requested, the legacy deploy user. |
 | `ci-trust-policy.template.json` | CI role trust: GitHub OIDC, pinned to this repo's `staging` environment (`__ACCOUNT__`/`__REPO__` placeholders). |
-| `bootstrap-account.sh` | Idempotent create/drift-sync of policy, user, OIDC provider, CI role. |
+| `bootstrap-account.sh` | Idempotent create/drift-sync of policy, OIDC provider, and CI role. Creates a legacy IAM user only when explicitly requested. |
 | `teardown-account.sh` | Inventoried, confirmed, ordered destroy of everything the project put in an account. |
 | `test/` | Mocked-`aws` test suites for both scripts (`bootstrap.test.sh`, `teardown.test.sh`) — run them after any change here. |

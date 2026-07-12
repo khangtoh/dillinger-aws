@@ -52,4 +52,22 @@ describe("POST /api/export/html", () => {
     expect(await styledResponse.text()).toContain("<style>");
     expect(await plainResponse.text()).not.toContain("<style>");
   });
+
+  it("does not pass raw HTML through the server renderer", async () => {
+    const response = await exportHtml(
+      new Request("http://localhost/api/export/html", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          markdown: "<script>alert(1)</script><h1>Injected</h1>",
+          title: "Safe",
+        }),
+      }) as never
+    );
+
+    const html = await response.text();
+    expect(html).not.toContain("<script>alert(1)</script>");
+    expect(html).not.toContain("<h1>Injected</h1>");
+    expect(html).toContain("&lt;script&gt;");
+  });
 });

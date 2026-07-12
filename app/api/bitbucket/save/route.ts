@@ -2,6 +2,15 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { enforceSameOrigin } from "@/lib/csrf";
+import {
+  boundedString,
+  isObject,
+  optionalBoundedString,
+  providerContent,
+  providerIdentifier,
+  providerPath,
+} from "@/lib/validation";
 
 async function getAccessToken(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -14,6 +23,9 @@ async function getAccessToken(): Promise<string | null> {
 }
 
 export async function POST(request: NextRequest) {
+  const forbidden = enforceSameOrigin(request);
+  if (forbidden) return forbidden;
+
   const accessToken = await getAccessToken();
 
   if (!accessToken) {
@@ -21,23 +33,31 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { workspace, repo, branch, path, content, message } = await request.json();
+    const body: unknown = await request.json();
+    if (!isObject(body)) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+    const workspace = providerIdentifier(body.workspace);
+    const repo = providerIdentifier(body.repo);
+    const branch = body.branch ? boundedString(body.branch, 255) : "main";
+    const path = providerPath(body.path);
+    const content = providerContent(body.content);
+    const message = optionalBoundedString(body.message, 500);
 
-    if (!workspace || !repo || !path || !content) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!workspace || !repo || !branch || !path || content === null || message === null) {
+      return NextResponse.json({ error: "Invalid or missing fields" }, { status: 400 });
     }
 
-    const branchRef = branch || "main";
     const commitMessage = message || `Update ${path}`;
 
     // Create form data for the commit
     const formData = new FormData();
     formData.append(path, content);
     formData.append("message", commitMessage);
-    formData.append("branch", branchRef);
+    formData.append("branch", branch);
 
     const response = await fetch(
-      `https://api.bitbucket.org/2.0/repositories/${workspace}/${repo}/src`,
+      `https://api.bitbucket.org/2.0/repositories/${encodeURIComponent(workspace)}/${encodeURIComponent(repo)}/src`,
       {
         method: "POST",
         headers: {

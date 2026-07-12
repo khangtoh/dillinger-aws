@@ -3,6 +3,15 @@
 Goal: this environment has working AWS credentials that can create/manage
 Lambda, ECR, IAM, and CloudWatch Logs resources.
 
+> **Security review update (2026-07-12):** Phase 7 OIDC is live, so the
+> historical static-key decision below is superseded. New account
+> bootstraps no longer create an IAM user by default. Human access should
+> use IAM Identity Center/federation and temporary named-profile sessions.
+> The existing `dillinger-aws-deploy` key was confirmed active by a
+> read-only STS call and must be deactivated, observed for failed callers,
+> then deleted after the local orchestrator has moved to temporary
+> credentials. No credential value was read or recorded by the review.
+
 **Decision (2026-07-10, pending explicit user confirmation — asked twice,
 tool errored both times, defaulting to this recommendation and proceeding;
 override any time):** use a **dedicated least-privilege IAM user with a

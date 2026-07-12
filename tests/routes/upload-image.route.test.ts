@@ -9,6 +9,17 @@ const PNG_BYTES = Buffer.from(
 );
 
 describe("POST /api/upload/image", () => {
+  function uploadRequest(formData: FormData) {
+    return new Request("http://localhost:3000/api/upload/image", {
+      method: "POST",
+      headers: {
+        Origin: "http://localhost:3000",
+        "X-Dillinger-Request": "same-origin",
+      },
+      body: formData,
+    }) as never;
+  }
+
   it("returns markdown for a valid image upload", async () => {
     const formData = new FormData();
     formData.append(
@@ -17,10 +28,7 @@ describe("POST /api/upload/image", () => {
     );
 
     const response = await uploadImage(
-      new Request("http://localhost/api/upload/image", {
-        method: "POST",
-        body: formData,
-      }) as never
+      uploadRequest(formData)
     );
 
     const json = await response.json();
@@ -38,10 +46,7 @@ describe("POST /api/upload/image", () => {
     );
 
     const response = await uploadImage(
-      new Request("http://localhost/api/upload/image", {
-        method: "POST",
-        body: formData,
-      }) as never
+      uploadRequest(formData)
     );
 
     expect(response.status).toBe(400);
@@ -57,12 +62,33 @@ describe("POST /api/upload/image", () => {
     );
 
     const response = await uploadImage(
-      new Request("http://localhost/api/upload/image", {
-        method: "POST",
-        body: formData,
-      }) as never
+      uploadRequest(formData)
     );
 
+    expect(response.status).toBe(413);
+  });
+
+  it("rejects a spoofed image MIME type", async () => {
+    const formData = new FormData();
+    formData.append(
+      "image",
+      new File(["not a png"], "fake.png", { type: "image/png" })
+    );
+
+    const response = await uploadImage(uploadRequest(formData));
+    expect(response.status).toBe(400);
+  });
+
+  it("rejects SVG as active content", async () => {
+    const formData = new FormData();
+    formData.append(
+      "image",
+      new File(["<svg xmlns='http://www.w3.org/2000/svg'/>"], "active.svg", {
+        type: "image/svg+xml",
+      })
+    );
+
+    const response = await uploadImage(uploadRequest(formData));
     expect(response.status).toBe(400);
   });
 });

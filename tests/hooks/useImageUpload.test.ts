@@ -99,6 +99,7 @@ describe("useImageUpload", () => {
     const [url, options] = vi.mocked(globalThis.fetch).mock.calls[0];
     expect(url).toBe(UPLOAD_ENDPOINT);
     expect(options?.method).toBe("POST");
+    expect(options?.headers).toEqual({ "X-Dillinger-Request": "same-origin" });
     expect(options?.body).toBeInstanceOf(FormData);
 
     const formData = options?.body as FormData;

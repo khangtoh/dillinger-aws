@@ -2,6 +2,8 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { enforceSameOrigin } from "@/lib/csrf";
+import { isObject, providerIdentifier } from "@/lib/validation";
 
 async function getAccessToken(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -22,7 +24,10 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
-  const folderId = searchParams.get("folderId") || "root";
+  const folderId = providerIdentifier(searchParams.get("folderId") || "root");
+  if (!folderId) {
+    return NextResponse.json({ error: "Invalid folder ID" }, { status: 400 });
+  }
 
   try {
     // Query for folders and markdown files
@@ -60,6 +65,9 @@ export async function GET(request: NextRequest) {
 
 // POST: Get file content
 export async function POST(request: NextRequest) {
+  const forbidden = enforceSameOrigin(request);
+  if (forbidden) return forbidden;
+
   const accessToken = await getAccessToken();
 
   if (!accessToken) {
@@ -67,15 +75,23 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { fileId } = await request.json();
+    const body: unknown = await request.json();
+    if (!isObject(body)) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+    const fileId = providerIdentifier(body.fileId);
+    if (!fileId) {
+      return NextResponse.json({ error: "Invalid file ID" }, { status: 400 });
+    }
+    const encodedFileId = encodeURIComponent(fileId);
 
     const authHeaders = { Authorization: `Bearer ${accessToken}` };
 
     const [metaResponse, contentResponse] = await Promise.all([
-      fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=name`, {
+      fetch(`https://www.googleapis.com/drive/v3/files/${encodedFileId}?fields=name`, {
         headers: authHeaders,
       }),
-      fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+      fetch(`https://www.googleapis.com/drive/v3/files/${encodedFileId}?alt=media`, {
         headers: authHeaders,
       }),
     ]);

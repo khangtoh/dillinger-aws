@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useToast } from "@/components/ui/Toast";
+import {
+  SAME_ORIGIN_JSON_HEADERS,
+  SAME_ORIGIN_REQUEST_HEADERS,
+} from "@/lib/client-request";
 
 interface Workspace {
   slug: string;
@@ -80,7 +84,10 @@ export function useBitbucket() {
 
   const disconnect = useCallback(async () => {
     try {
-      await fetch("/api/bitbucket/unlink", { method: "POST" });
+      await fetch("/api/bitbucket/unlink", {
+        method: "POST",
+        headers: SAME_ORIGIN_REQUEST_HEADERS,
+      });
       setState({
         isConnected: false,
         workspaces: [],
@@ -242,7 +249,7 @@ export function useBitbucket() {
     try {
       const response = await fetch("/api/bitbucket/files", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: SAME_ORIGIN_JSON_HEADERS,
         body: JSON.stringify({
           workspace: selectedWorkspace,
           repo: selectedRepo,
@@ -272,7 +279,7 @@ export function useBitbucket() {
     try {
       const response = await fetch("/api/bitbucket/save", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: SAME_ORIGIN_JSON_HEADERS,
         body: JSON.stringify({
           workspace: selectedWorkspace,
           repo: selectedRepo,

@@ -141,7 +141,7 @@ Resources:
         DefaultCacheBehavior:
           TargetOriginId: placeholder-origin
           ViewerProtocolPolicy: redirect-to-https
-          AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+          AllowedMethods: [GET, HEAD, OPTIONS, POST]
           CachedMethods: [GET, HEAD]
           # Dynamic, per-session/per-cookie responses - do not cache by
           # default, so CloudFront never serves one tenant's/user's

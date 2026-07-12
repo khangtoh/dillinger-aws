@@ -26,7 +26,8 @@ AWS IAM OIDC provider  token.actions.githubusercontent.com
   │ sts:AssumeRoleWithWebIdentity
   ▼
 IAM role  dillinger-ci-deploy
-  trust policy: only subs matching repo:khangtoh/dillinger-aws:*
+  trust policy target: sub equals
+                repo:khangtoh/dillinger-aws:environment:staging
   permissions: the same customer-managed dillinger-deploy-policy
                attached to the human deploy user
 ```
@@ -39,7 +40,8 @@ Three properties this buys:
    with it.
 2. **Repo-scoped trust.** No other repository (including forks — fork
    PRs never get `id-token: write` here) can assume the role; the trust
-   policy's `sub` condition pins it to `repo:khangtoh/dillinger-aws:*`.
+   policy's `sub` condition must pin it to
+   `repo:khangtoh/dillinger-aws:environment:staging`.
 3. **One permission surface.** The role reuses `dillinger-deploy-policy`
    — the exact policy the human deploy user has (least-privilege,
    scoped to `dillinger-*` resources; see
@@ -49,8 +51,11 @@ Three properties this buys:
 
 ## What the workflow does
 
-1. **Checkout + OIDC auth + install SAM CLI** (Python 3.12, pip).
-2. **`infra/provision-tenant.sh staging <region>`** — the same script
+1. **Security gate** — lockfile install, TypeScript, unit tests, production
+   dependency audit, and a CycloneDX SBOM artifact.
+2. **Checkout + OIDC auth + install SAM CLI** (Python 3.12, pip). The deploy
+   job only runs from `main` and uses the `staging` GitHub Environment.
+3. **`infra/provision-tenant.sh staging <region>`** — the same script
    used for any tenant: `sam build` (Docker build of the Next.js
    standalone image + Lambda Web Adapter), `sam deploy` with
    `--resolve-image-repos --resolve-s3` (SAM manages the ECR repo and
@@ -58,10 +63,10 @@ Three properties this buys:
    `NEXT_PUBLIC_BASE_URL` to the Function URL the first pass created
    (OAuth callbacks need the real URL, which isn't known until after
    the first deploy).
-3. **Smoke test** — curls the staging Function URL from
+4. **Smoke test** — curls the staging Function URL from
    `infra/tenants.json` and fails the run on any non-2xx/3xx status, so
    a deploy that technically succeeded but serves errors still fails CI.
-4. **Commit `infra/tenants.json` back** if the registry changed.
+5. **Commit `infra/tenants.json` back** if the registry changed.
 
 ## Trigger policy: manual only (deliberate)
 
@@ -87,6 +92,13 @@ human action (`infra/provision-tenant.sh <tenant>` or declaring the
 tenant in `infra/desired-tenants.json` and running
 `infra/orchestrator/run.sh`; see `spec/09-multi-tenancy.md` and
 `spec/11-deployment-orchestrator/`).
+
+## Recreating this in another account
+
+The OIDC provider, role, trust policy, and permission policy are all
+created by `infra/bootstrap/bootstrap-account.sh` from committed
+templates — see `infra/bootstrap/README.md`. The two repo variables are
+the only GitHub-side wiring.
 
 ## Setup log
 

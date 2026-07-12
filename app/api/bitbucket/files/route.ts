@@ -2,6 +2,14 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { enforceSameOrigin } from "@/lib/csrf";
+import {
+  boundedString,
+  encodeProviderPath,
+  isObject,
+  providerIdentifier,
+  providerPath,
+} from "@/lib/validation";
 
 async function getAccessToken(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -22,19 +30,20 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
-  const workspace = searchParams.get("workspace");
-  const repo = searchParams.get("repo");
-  const branch = searchParams.get("branch") || "main";
-  const path = searchParams.get("path") || "";
+  const workspace = providerIdentifier(searchParams.get("workspace"));
+  const repo = providerIdentifier(searchParams.get("repo"));
+  const branch = boundedString(searchParams.get("branch") || "main", 255);
+  const rawPath = searchParams.get("path") || "";
+  const path = rawPath ? providerPath(rawPath) : "";
 
-  if (!workspace || !repo) {
-    return NextResponse.json({ error: "Workspace and repo required" }, { status: 400 });
+  if (!workspace || !repo || !branch || path === null) {
+    return NextResponse.json({ error: "Invalid repository fields" }, { status: 400 });
   }
 
   try {
     // For listing directory contents, we need to add trailing slash if no path
-    const apiPath = path ? `/${path}/` : "/";
-    const url = `https://api.bitbucket.org/2.0/repositories/${workspace}/${repo}/src/${branch}${apiPath}`;
+    const apiPath = path ? `/${encodeProviderPath(path)}/` : "/";
+    const url = `https://api.bitbucket.org/2.0/repositories/${encodeURIComponent(workspace)}/${encodeURIComponent(repo)}/src/${encodeURIComponent(branch)}${apiPath}`;
 
     console.log("Bitbucket: Fetching files from", url);
 
@@ -74,6 +83,9 @@ export async function GET(request: NextRequest) {
 
 // POST: Get file content
 export async function POST(request: NextRequest) {
+  const forbidden = enforceSameOrigin(request);
+  if (forbidden) return forbidden;
+
   const accessToken = await getAccessToken();
 
   if (!accessToken) {
@@ -81,17 +93,22 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { workspace, repo, branch, path } = await request.json();
-
-    if (!workspace || !repo || !path) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    const body: unknown = await request.json();
+    if (!isObject(body)) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
+    const workspace = providerIdentifier(body.workspace);
+    const repo = providerIdentifier(body.repo);
+    const branch = body.branch ? boundedString(body.branch, 255) : "main";
+    const path = providerPath(body.path);
 
-    const branchRef = branch || "main";
+    if (!workspace || !repo || !branch || !path) {
+      return NextResponse.json({ error: "Invalid or missing fields" }, { status: 400 });
+    }
 
     // Get file content
     const response = await fetch(
-      `https://api.bitbucket.org/2.0/repositories/${workspace}/${repo}/src/${branchRef}/${path}`,
+      `https://api.bitbucket.org/2.0/repositories/${encodeURIComponent(workspace)}/${encodeURIComponent(repo)}/src/${encodeURIComponent(branch)}/${encodeProviderPath(path)}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,

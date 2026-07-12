@@ -135,20 +135,22 @@ describe("cache", () => {
     });
   });
 
-  describe("tokenPrefix", () => {
-    it("returns the first 8 characters of a token", async () => {
-      const { tokenPrefix } = await loadCache();
+  describe("tokenFingerprint", () => {
+    it("returns a stable SHA-256 fingerprint", async () => {
+      const { tokenFingerprint } = await loadCache();
 
-      expect(tokenPrefix("abcdefghijklmnop")).toBe("abcdefgh");
-      expect(tokenPrefix("ghp_abc123xyz456")).toBe("ghp_abc1");
+      expect(tokenFingerprint("abcdefghijklmnop")).toMatch(/^[a-f0-9]{64}$/);
+      expect(tokenFingerprint("abcdefghijklmnop")).toBe(
+        tokenFingerprint("abcdefghijklmnop")
+      );
     });
 
-    it("handles strings shorter than 8 characters", async () => {
-      const { tokenPrefix } = await loadCache();
+    it("does not collide for tokens sharing a prefix", async () => {
+      const { tokenFingerprint } = await loadCache();
 
-      expect(tokenPrefix("short")).toBe("short");
-      expect(tokenPrefix("")).toBe("");
-      expect(tokenPrefix("12345678")).toBe("12345678");
+      expect(tokenFingerprint("ghp_same-prefix-one")).not.toBe(
+        tokenFingerprint("ghp_same-prefix-two")
+      );
     });
   });
 });

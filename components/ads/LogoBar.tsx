@@ -17,6 +17,7 @@ declare global {
 
 const AD_ZONE_KEY = "CWBDC2QM";
 const AD_PLACEMENT = "placement:dillingerio-logobar";
+const ADS_ENABLED = process.env.NEXT_PUBLIC_ENABLE_THIRD_PARTY_ADS === "true";
 const AD_TEMPLATE = `
 <a href="##statlink##" class="native-flex">
     <div class="native-sponsor">Ad</div>
@@ -35,10 +36,14 @@ function initAd() {
 }
 
 export function LogoBar() {
+  if (!ADS_ENABLED) {
+    return <div id="logobar" className="min-h-12" />;
+  }
+
   return (
     <>
       <Script
-        src="//m.servedby-buysellads.com/monetization.js"
+        src="https://m.servedby-buysellads.com/monetization.js"
         strategy="lazyOnload"
         onReady={initAd}
       />

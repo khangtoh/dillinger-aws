@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useToast } from "@/components/ui/Toast";
+import {
+  SAME_ORIGIN_JSON_HEADERS,
+  SAME_ORIGIN_REQUEST_HEADERS,
+} from "@/lib/client-request";
 
 interface DriveFile {
   id: string;
@@ -53,7 +57,10 @@ export function useOneDrive() {
 
   const disconnect = useCallback(async () => {
     try {
-      await fetch("/api/onedrive/unlink", { method: "POST" });
+      await fetch("/api/onedrive/unlink", {
+        method: "POST",
+        headers: SAME_ORIGIN_REQUEST_HEADERS,
+      });
       setState({
         isConnected: false,
         files: [],
@@ -89,7 +96,7 @@ export function useOneDrive() {
     try {
       const response = await fetch("/api/onedrive/files", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: SAME_ORIGIN_JSON_HEADERS,
         body: JSON.stringify({ fileId }),
       });
 
@@ -112,7 +119,7 @@ export function useOneDrive() {
     try {
       const response = await fetch("/api/onedrive/save", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: SAME_ORIGIN_JSON_HEADERS,
         body: JSON.stringify({
           name,
           content,

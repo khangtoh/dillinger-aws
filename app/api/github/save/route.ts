@@ -2,8 +2,21 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { enforceSameOrigin } from "@/lib/csrf";
+import {
+  boundedString,
+  encodeProviderPath,
+  isObject,
+  optionalBoundedString,
+  providerContent,
+  providerIdentifier,
+  providerPath,
+} from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
+  const forbidden = enforceSameOrigin(request);
+  if (forbidden) return forbidden;
+
   const cookieStore = await cookies();
   const token = cookieStore.get("github_token")?.value;
 
@@ -12,12 +25,22 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { owner, repo, path, content, sha, message, branch } =
-      await request.json();
+    const parsed: unknown = await request.json();
+    if (!isObject(parsed)) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
 
-    if (!owner || !repo || !path || !content || !branch) {
+    const owner = providerIdentifier(parsed.owner);
+    const repo = providerIdentifier(parsed.repo);
+    const path = providerPath(parsed.path);
+    const content = providerContent(parsed.content);
+    const branch = boundedString(parsed.branch, 255);
+    const sha = optionalBoundedString(parsed.sha, 64);
+    const message = optionalBoundedString(parsed.message, 500);
+
+    if (!owner || !repo || !path || content === null || !branch || sha === null || message === null) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Invalid or missing fields" },
         { status: 400 }
       );
     }
@@ -38,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+      `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodeProviderPath(path)}`,
       {
         method: "PUT",
         headers: {

@@ -57,9 +57,11 @@ function applyLegacyRendererRules(instance: MarkdownIt) {
 }
 
 let md: MarkdownIt | null = null;
+let safeMd: MarkdownIt | null = null;
 
-async function getMarkdownRenderer(): Promise<MarkdownIt> {
-  if (md) return md;
+async function getMarkdownRenderer(allowHtml: boolean): Promise<MarkdownIt> {
+  const cached = allowHtml ? md : safeMd;
+  if (cached) return cached;
 
   const [
     { default: MarkdownIt },
@@ -91,8 +93,8 @@ async function getMarkdownRenderer(): Promise<MarkdownIt> {
     import("katex"),
   ]);
 
-  md = new MarkdownIt({
-    html: true,
+  const renderer = new MarkdownIt({
+    html: allowHtml,
     linkify: true,
     typographer: true,
     breaks: true,
@@ -123,12 +125,23 @@ async function getMarkdownRenderer(): Promise<MarkdownIt> {
       delimiters: "dollars",
     });
 
-  applyLegacyRendererRules(md);
+  applyLegacyRendererRules(renderer);
 
-  return md;
+  if (allowHtml) {
+    md = renderer;
+  } else {
+    safeMd = renderer;
+  }
+
+  return renderer;
 }
 
 export async function renderMarkdown(content: string): Promise<string> {
-  const renderer = await getMarkdownRenderer();
+  const renderer = await getMarkdownRenderer(true);
+  return renderer.render(content);
+}
+
+export async function renderMarkdownSafe(content: string): Promise<string> {
+  const renderer = await getMarkdownRenderer(false);
   return renderer.render(content);
 }

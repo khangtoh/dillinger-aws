@@ -2,8 +2,13 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { enforceSameOrigin } from "@/lib/csrf";
+import { isObject, providerContent, providerPath } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
+  const forbidden = enforceSameOrigin(request);
+  if (forbidden) return forbidden;
+
   const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("dropbox_token")?.value;
 
@@ -12,11 +17,16 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { path, content } = await request.json();
+    const body: unknown = await request.json();
+    if (!isObject(body)) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+    const path = providerPath(body.path);
+    const content = providerContent(body.content);
 
-    if (!path || content === undefined) {
+    if (!path || content === null) {
       return NextResponse.json(
-        { error: "Path and content are required" },
+        { error: "Valid path and content are required" },
         { status: 400 }
       );
     }

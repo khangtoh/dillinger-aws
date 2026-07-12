@@ -39,6 +39,7 @@ model.
 | 9 | [09-multi-tenancy.md](09-multi-tenancy.md) | Multi-user: isolated single-tenant instance per user | Phase 4 |
 | 10 | [10-gateway.md](10-gateway.md) | Single entry gateway routing to each tenant | Phase 9 |
 | 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | Phase 9 + 10 |
+| 12 | [12-security-hardening.md](12-security-hardening.md) | Close repository, AWS, credential, and operational security findings | Phase 7 + 8 + 10 + 11 |
 
 ## Status
 
@@ -48,12 +49,14 @@ model.
   2026-07-11 via CI, browser-verified end-to-end incl. live preview and
   PDF export — see `spec/08-testing.md` results log).
 - Overall phase progress: see individual files.
-- Phase 1 AWS credentials (`spec/01-aws-account-onboarding.md`):
-  **resolved 2026-07-10** — the `dillinger-aws-deploy` IAM user exists
-  with a scoped policy; `credential-guard.sh` passes all 7 permission
-  groups against real AWS, not mocks. See `spec/.aws-context.md`
-  (gitignored — account ID/region live there, not here) for details.
-  Everything below is now unblocked to actually run.
+- Phase 1 bootstrap (`spec/01-aws-account-onboarding.md`): **operational,
+  security closure pending** — OIDC deployment is live and new bootstraps
+  no longer create IAM users by default. The active legacy deploy key must
+  move to temporary federated access and be deleted under Phase 12.
+- Security hardening (`spec/12-security-hardening.md`): **open** — the
+  prioritized closure backlog for credentials, supported dependencies,
+  CI/CD, CloudFront origin access, WAF, AWS account controls, secret
+  lifecycle, tenant isolation, and incident operations.
 - Multi-user model (`spec/09-multi-tenancy.md`): **resolved** — one
   isolated Lambda deployment per user (`infra/provision-tenant.sh`), never
   shared. First real tenant (`staging`) provisioned 2026-07-11 via CI;

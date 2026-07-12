@@ -2,7 +2,8 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getCached, setCache, tokenPrefix } from "@/lib/cache";
+import { getCached, setCache, tokenFingerprint } from "@/lib/cache";
+import { integerInRange, providerIdentifier } from "@/lib/validation";
 
 export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
@@ -13,15 +14,18 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
-  const owner = searchParams.get("owner");
-  const page = searchParams.get("page") || "1";
-  const perPage = searchParams.get("per_page") || "30";
+  const owner = providerIdentifier(searchParams.get("owner"));
+  const page = integerInRange(searchParams.get("page"), 1, 1, 10_000);
+  const perPage = integerInRange(searchParams.get("per_page"), 30, 1, 100);
 
   if (!owner) {
     return NextResponse.json({ error: "Owner is required" }, { status: 400 });
   }
+  if (page === null || perPage === null) {
+    return NextResponse.json({ error: "Invalid pagination" }, { status: 400 });
+  }
 
-  const cacheKey = `gh:repos:${tokenPrefix(token)}:${owner}:${page}:${perPage}`;
+  const cacheKey = `gh:repos:${tokenFingerprint(token)}:${owner}:${page}:${perPage}`;
   const cached = getCached<{ items: unknown[] }>(cacheKey);
   if (cached) {
     return NextResponse.json(cached);
@@ -41,7 +45,7 @@ export async function GET(request: NextRequest) {
     if (owner === user.login) {
       url = `https://api.github.com/user/repos?page=${page}&per_page=${perPage}&sort=updated`;
     } else {
-      url = `https://api.github.com/orgs/${owner}/repos?page=${page}&per_page=${perPage}&sort=updated`;
+      url = `https://api.github.com/orgs/${encodeURIComponent(owner)}/repos?page=${page}&per_page=${perPage}&sort=updated`;
     }
 
     const response = await fetch(url, {

@@ -304,7 +304,10 @@ describe("useGitHub", () => {
     expect(result.current.user).toBeNull();
     expect(result.current.orgs).toEqual([]);
     expect(result.current.repos).toEqual([]);
-    expect(fetchMock).toHaveBeenCalledWith("/api/github/unlink", { method: "POST" });
+    expect(fetchMock).toHaveBeenCalledWith("/api/github/unlink", {
+      method: "POST",
+      headers: { "X-Dillinger-Request": "same-origin" },
+    });
   });
 
   it("isLoading is true during fetch and false after", async () => {

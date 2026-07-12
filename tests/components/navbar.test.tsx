@@ -204,7 +204,10 @@ describe("Navbar", () => {
     const input = screen.getByTestId("image-import-input");
     expect(input).toBeInTheDocument();
     expect(input).toHaveAttribute("type", "file");
-    expect(input).toHaveAttribute("accept", "image/*");
+    expect(input).toHaveAttribute(
+      "accept",
+      "image/jpeg,image/png,image/gif,image/webp"
+    );
   });
 
   describe("handleExport", () => {
@@ -247,7 +250,10 @@ describe("Navbar", () => {
       await waitFor(() => {
         expect(globalThis.fetch).toHaveBeenCalledWith("/api/export/markdown", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-Dillinger-Request": "same-origin",
+          },
           body: JSON.stringify({
             markdown: "# Hello World",
             title: "Test Document",
@@ -276,7 +282,10 @@ describe("Navbar", () => {
       await waitFor(() => {
         expect(globalThis.fetch).toHaveBeenCalledWith("/api/export/html", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-Dillinger-Request": "same-origin",
+          },
           body: JSON.stringify({
             markdown: "# Hello World",
             title: "Test Document",
@@ -303,7 +312,10 @@ describe("Navbar", () => {
       await waitFor(() => {
         expect(globalThis.fetch).toHaveBeenCalledWith("/api/export/html", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-Dillinger-Request": "same-origin",
+          },
           body: JSON.stringify({
             markdown: "# Hello World",
             title: "Test Document",
@@ -328,7 +340,10 @@ describe("Navbar", () => {
       await waitFor(() => {
         expect(globalThis.fetch).toHaveBeenCalledWith("/api/export/pdf", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-Dillinger-Request": "same-origin",
+          },
           body: JSON.stringify({
             markdown: "# Hello World",
             title: "Test Document",

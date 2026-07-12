@@ -2,7 +2,15 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getCached, setCache, tokenPrefix } from "@/lib/cache";
+import { getCached, setCache, tokenFingerprint } from "@/lib/cache";
+import { enforceSameOrigin } from "@/lib/csrf";
+import {
+  encodeProviderPath,
+  boundedString,
+  isObject,
+  providerIdentifier,
+  providerPath,
+} from "@/lib/validation";
 
 export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
@@ -13,9 +21,9 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
-  const owner = searchParams.get("owner");
-  const repo = searchParams.get("repo");
-  const branch = searchParams.get("branch");
+  const owner = providerIdentifier(searchParams.get("owner"));
+  const repo = providerIdentifier(searchParams.get("repo"));
+  const branch = boundedString(searchParams.get("branch"), 255);
 
   if (!owner || !repo || !branch) {
     return NextResponse.json(
@@ -24,7 +32,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const cacheKey = `gh:files:${tokenPrefix(token)}:${owner}:${repo}:${branch}`;
+  const cacheKey = `gh:files:${tokenFingerprint(token)}:${owner}:${repo}:${branch}`;
   const cached = getCached<unknown[]>(cacheKey);
   if (cached) {
     return NextResponse.json(cached);
@@ -32,7 +40,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get the tree for the branch
-    const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`;
+    const treeUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
 
     const response = await fetch(treeUrl, {
       headers: {
@@ -74,6 +82,9 @@ export async function GET(request: NextRequest) {
 
 // Fetch single file content
 export async function POST(request: NextRequest) {
+  const forbidden = enforceSameOrigin(request);
+  if (forbidden) return forbidden;
+
   const cookieStore = await cookies();
   const token = cookieStore.get("github_token")?.value;
 
@@ -82,7 +93,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { owner, repo, path } = await request.json();
+    const body: unknown = await request.json();
+    if (!isObject(body)) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+
+    const owner = providerIdentifier(body.owner);
+    const repo = providerIdentifier(body.repo);
+    const path = providerPath(body.path);
 
     if (!owner || !repo || !path) {
       return NextResponse.json(
@@ -92,7 +110,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+      `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodeProviderPath(path)}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
