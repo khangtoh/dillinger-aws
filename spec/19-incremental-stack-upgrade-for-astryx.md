@@ -155,33 +155,49 @@ Checked directly against npm metadata and this repo's real
 
 ## Step 2 — React 18 → React 19.2.7 (Next stays on 15.5.20)
 
-- [ ] Create a branch for this step from the merged Step 1 result (e.g.
-      `upgrade/react-19`).
-- [ ] Update `react` and `react-dom` to `19.2.7`; update `@types/react`
-      and `@types/react-dom` to the matching v19 type packages.
-- [ ] Regenerate the lockfile.
-- [ ] Grep the codebase for React 19 breaking-change patterns before
-      assuming none apply: `forwardRef` usage (still works in 19 but is
-      deprecated in favor of `ref` as a normal prop — do not mass-migrate
-      in this step, just confirm nothing relies on removed behavior),
-      any `propTypes`/`defaultProps` on function components (both are
-      no-ops/removed for function components in 19), and any direct
-      `ReactDOM.render`/`unmountComponentAtNode` calls (removed in 19 —
-      this app should already be on Next's own root APIs, but confirm).
-- [ ] Resolve compile/runtime changes without weakening the same
-      security controls named in Working rules.
-- [ ] Run `npx tsc --noEmit`; fix type errors.
-- [ ] Run `npm run test:unit`; fix failures — pay attention to any
-      `@testing-library/react` assertions relying on React 18-specific
-      act()/effect-timing behavior, since React 19 changed some of this.
-- [ ] Run `npm run build`; confirm a clean production build.
-- [ ] Run `npm run test:e2e`; fix failures.
+- [x] ~~Create a branch for this step~~ **Adapted, same as Step 1**:
+      committed directly to `claude/modern-dillinger-aws`.
+- [x] Update `react` and `react-dom` to `19.2.7`; update `@types/react`
+      and `@types/react-dom` to the matching v19 type packages (`^19`).
+      `npm ls react react-dom` confirms a single deduplicated 19.2.7
+      across the whole tree (Monaco, RTL, Next, zustand) — no version
+      splits.
+- [x] Regenerate the lockfile.
+- [x] Grep the codebase for React 19 breaking-change patterns before
+      assuming none apply: `forwardRef`, `propTypes`/`defaultProps` on
+      function components, direct `ReactDOM.render`/
+      `unmountComponentAtNode` calls. **Zero matches** across the
+      codebase — nothing to migrate.
+- [x] Resolve compile/runtime changes without weakening the same
+      security controls named in Working rules. **None needed** — see
+      above.
+- [x] Run `npx tsc --noEmit`; fix type errors. **46 errors, identical to
+      the Step 1 baseline**, same single file
+      (`tests/components/github-modal.test.tsx`, pre-existing). No new
+      errors from the React 19 type packages.
+- [x] Run `npm run test:unit`; fix failures. **308/318 passing, identical
+      to the Step 1 baseline** (same 10 pre-existing failures, same test
+      names). No `act()`/effect-timing regressions found.
+- [x] Run `npm run build`; confirm a clean production build. **Clean.**
+- [x] Run `npm run lint`. **Clean** (not in the original checklist, added
+      for parity with Step 1).
+- [x] Run `npm run test:e2e`; fix failures. **34/42 passing, identical to
+      the Step 1 baseline** (same 8 pre-existing failures, verified in
+      Step 1 to be unrelated to any dependency version). No new
+      regressions from React 19. (Sandbox Chromium-build override used
+      for local verification only, not committed — same caveat as Step 1.)
 - [ ] Build and boot the Lambda container image; confirm no regression
-      versus Step 1's already-verified Next 15 baseline.
-- [ ] Deploy to the same scratch/staging tenant used in Step 1.
-- [ ] Smoke-test the deployed Function URL, same checklist as Step 1.
+      versus Step 1's already-verified Next 15 baseline. **Not run** —
+      same sandbox-has-no-Docker constraint as Step 1.
+- [ ] Deploy to the same scratch/staging tenant used in Step 1. **Not
+      run** — same manual-dispatch-only / needs-explicit-go-ahead
+      constraint as Step 1.
+- [ ] Smoke-test the deployed Function URL. **Blocked on the deploy task
+      above.**
 - [ ] Record the Step 1 image digest as this step's rollback point.
-- [ ] Merge this step once green.
+      **Blocked on the deploy task above.**
+- [x] Merge this step once green — N/A (no separate branch); committed
+      directly once all runnable-in-this-sandbox checks passed.
 
 ## Step 3 — Add `@stylexjs/stylex@0.18.3`
 
@@ -239,3 +255,15 @@ Checked directly against npm metadata and this repo's real
   by design, so an actual AWS deploy needs an explicit go-ahead rather
   than being triggered automatically. Step 1's code is ready to hand to
   CI for the container-build/deploy leg.
+- **2026-07-12: Step 2 code-level verification complete and committed.**
+  React/react-dom landed at 19.2.7 on top of the already-verified Next
+  15.5.20, with `@types/react`/`@types/react-dom` bumped to `^19` and
+  `@testing-library/react@16.3.2` confirmed (peer range check) to already
+  support React 19 without a version change. `npm ls react react-dom`
+  shows one deduplicated 19.2.7 across the entire tree — no split
+  versions. Grepped for every documented React 19 breaking-change pattern
+  (`forwardRef`, function-component `propTypes`/`defaultProps`, direct
+  `ReactDOM.render`) — zero matches, nothing to migrate. Typecheck, unit
+  tests, build, lint, and E2E are all identical to the Step 1 baseline
+  (same pre-existing failures, same counts, no new regressions). Same
+  container-build/deploy gap as Step 1, same reason.
