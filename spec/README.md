@@ -46,6 +46,7 @@ model.
 | 16 | [16-notes-information-architecture.md](16-notes-information-architecture.md) | Folders/tags/search on top of the client-only document model | Phase 13 (data model); Phase 15 (sidebar surface) |
 | 17 | [17-ai-agent-native-features.md](17-ai-agent-native-features.md) | Real AI-native product features: document API contract, in-editor AI actions, follow-on MCP server | Phase 13; AI-3 needs Phase 15's command palette |
 | 18 | [18-ui-verification-and-testing.md](18-ui-verification-and-testing.md) | Prove the UI refresh works live and closes the StackEdit gap | Phase 15 + 16 + 17 (AI-1/AI-3) |
+| 19 | [19-incremental-stack-upgrade-for-astryx.md](19-incremental-stack-upgrade-for-astryx.md) | Incrementally land Next 15.5.20, then React 19.2.7, then StyleX 0.18.3 — Astryx's actual minimum requirements | None (executes Phase 12's stack-upgrade item); unblocks Phase 14 |
 
 ## Status
 
@@ -111,11 +112,11 @@ multi-tenancy/gateway model from Phases 1-12.
 - [ ] **UI refresh live** — not yet started. Phase 13 decisions recorded
       (2026-07-12). Phase 14's clarification pass found Astryx requires
       React ≥19 (this app is on React 18/Next 14.2.35) — **paused on
-      `spec/12-security-hardening.md`'s "P0 - Move to a supported
-      application stack"** (now explicitly targeting React 19) per the
-      user's 2026-07-12 sequencing decision. Work that Phase 12 item to
-      unblock Phase 14. Update this line with the tenant URL and date once
-      Phase 18 closes out.
+      `spec/19-incremental-stack-upgrade-for-astryx.md`**, a 3-step
+      incremental plan (Next 15.5.20 → React 19.2.7 → StyleX 0.18.3) that
+      also executes `spec/12`'s "P0 - Move to a supported application
+      stack" item. Work Phase 19 to unblock Phase 14. Update this line
+      with the tenant URL and date once Phase 18 closes out.
 
 ## Non-goals for the UI-refresh initiative (Phase 13-18)
 

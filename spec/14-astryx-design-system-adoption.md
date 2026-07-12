@@ -7,13 +7,13 @@ make an explicit go/no-go call before any real component migrates
 
 Depends on: Phase 13 decisions (design system = Astryx, coexists with
 Tailwind, matches current plum brand unless told otherwise). **As of
-2026-07-12, also depends on `spec/12-security-hardening.md`'s "P0 - Move
-to a supported application stack" landing React 19** — see this file's
-Findings below and Phase 13's Decisions for why. Do not resume the
-clarification pass or any spike task in this file until every box in
-that Phase 12 section is checked and its own verification steps have
-passed; re-run the `npm install --dry-run` check in Findings first to
-confirm the blocker is actually cleared before resuming.
+2026-07-12, also depends on `spec/19-incremental-stack-upgrade-for-
+astryx.md`** (the concrete, incremental execution plan for landing React
+19 — see this file's Findings below and Phase 13's Decisions for why).
+Do not resume the clarification pass or any spike task in this file
+until Phase 19's Step 4 is checked off; that step re-runs the
+`npm install --dry-run` check below to confirm the blocker is actually
+cleared before this phase resumes.
 
 ## Working rules
 
@@ -201,10 +201,12 @@ unchecked until Phase 13's decision is revised (see that file's new
   and dark mode," and bundle-size clarification tasks above were never
   started because there is nothing installable to spike against.
 - **2026-07-12: Resequenced, not abandoned.** User decision (recorded in
-  `spec/13-ui-refresh-requirements.md` Decisions): sequence
-  `spec/12-security-hardening.md`'s "P0 - Move to a supported application
-  stack" (now explicitly targeting React 19, per that file's 2026-07-12
-  cross-reference) ahead of this phase, then resume. This phase stays
-  paused — no further tasks here — until that Phase 12 section is fully
-  checked off and Phase 8-style verification has passed on the upgraded
-  stack.
+  `spec/13-ui-refresh-requirements.md` Decisions): sequence a React 19
+  upgrade ahead of this phase, then resume. That upgrade is executed
+  incrementally, not as one jump — see
+  `spec/19-incremental-stack-upgrade-for-astryx.md` for the concrete
+  3-step plan (Next 15.5.20 first with React unchanged, then React
+  19.2.7, then pin `@stylexjs/stylex@0.18.3`) and its "Researched facts"
+  section for why that specific path is lower-risk than a single
+  big-bang upgrade. This phase stays paused until Phase 19's Step 4
+  confirms the `npm install --dry-run` check above passes clean.

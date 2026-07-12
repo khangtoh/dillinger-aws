@@ -75,15 +75,20 @@ Source reviews:
 Phase 14 (Astryx design-system adoption) is now also blocked on this item
 — `@astryxdesign/core` requires `react >=19.0.0`, confirmed via
 `npm view`/dry-run install (see `spec/14-astryx-design-system-adoption.md`
-Findings). This adds a hard constraint to the first task below: the
-selected target must land **React 19**, not merely "a currently supported
-Next.js major" in the abstract — record that explicitly when this task is
-picked up, and treat Phase 14 as a dependent phase that resumes only once
-every box in this section is checked and Phase 8-style verification has
-passed on the upgraded stack.
+Findings). **Execution plan superseded by
+`spec/19-incremental-stack-upgrade-for-astryx.md`** (added 2026-07-12):
+rather than one big-bang upgrade, that phase lands Next 15.5.20 first
+(React stays on 18), then React 19.2.7 on top of it, then pins
+`@stylexjs/stylex@0.18.3` — three independently-verified steps. Work
+Phase 19's tasks, not a fresh ad hoc upgrade; its Step 4 checks off the
+tasks below once all three steps are verified.
 
 - [ ] Select a currently supported Next.js major using the official support
       policy **that ships on React 19** and record the target version.
+      **Target selected and researched in `spec/19`: Next 15.5.20** (last
+      release on the still-supported 15 line; accepts React 18 or 19 as a
+      peer, which is what makes the incremental path possible — see that
+      file's "Researched facts").
 - [ ] Create a dedicated framework-upgrade branch.
 - [ ] Update Next.js, React, React DOM, ESLint configuration, and compatible
       type packages together.
