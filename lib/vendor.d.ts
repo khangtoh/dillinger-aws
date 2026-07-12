@@ -15,10 +15,6 @@ declare module "markdown-it-texmath" {
   export default function markdownItTexmath(md: MarkdownIt, options?: TexmathOptions): void;
 }
 
-declare module "breakdance" {
-  export default function breakdance(html: string): string;
-}
-
 declare module "turndown" {
   interface TurndownRule {
     filter: string | string[] | ((node: unknown, options: unknown) => boolean);
