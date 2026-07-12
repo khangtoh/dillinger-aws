@@ -19,6 +19,7 @@
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
     "@sparticuz/chromium": "^143.0.4",
+    "@stylexjs/stylex": "0.18.3",
     "@types/dompurify": "^3.0.5",
     "breakdance": "^3.0.1",
     "clsx": "^2.1.1",

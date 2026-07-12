@@ -201,21 +201,26 @@ Checked directly against npm metadata and this repo's real
 
 ## Step 3 — Add `@stylexjs/stylex@0.18.3`
 
-- [ ] Create a branch for this step from the merged Step 2 result.
-- [ ] Add `@stylexjs/stylex` pinned to the **exact** version `0.18.3`
-      (not a caret range defaulting to latest) — this is required, not a
-      style preference; see "Researched facts" above.
-- [ ] Regenerate the lockfile; confirm `npm install` completes with no
-      `ERESOLVE` warnings related to StyleX.
-- [ ] Do **not** wire a StyleX build plugin into `next.config.mjs` or
-      `postcss.config.mjs` in this step — the goal here is only to
-      satisfy the peer-dependency requirement so Phase 14 can install
-      Astryx; actual StyleX build-pipeline integration (if any is even
-      needed beyond Astryx's pre-built CSS) is Phase 14's job, not this
-      one.
-- [ ] Run `npx tsc --noEmit`, `npm run test:unit`, and `npm run build` to
+- [x] ~~Create a branch for this step~~ **Adapted, same as Steps 1-2**:
+      committed directly to `claude/modern-dillinger-aws`.
+- [x] Add `@stylexjs/stylex` pinned to the **exact** version `0.18.3`
+      (no caret — `"@stylexjs/stylex": "0.18.3"` in `package.json`, not a
+      range). Installed version confirmed via
+      `node_modules/@stylexjs/stylex/package.json`: exactly `0.18.3`.
+- [x] Regenerate the lockfile; confirm `npm install` completes with no
+      `ERESOLVE` warnings related to StyleX. **Clean install, zero
+      warnings** — confirms the exact pin satisfies
+      `@astryxdesign/core`'s `^0.18.3` peer range.
+- [x] Did **not** wire a StyleX build plugin into `next.config.mjs` or
+      `postcss.config.mjs` — dependency added but unused, exactly as
+      scoped; build-pipeline integration stays Phase 14's job.
+- [x] Run `npx tsc --noEmit`, `npm run test:unit`, and `npm run build` to
       confirm adding an unused-so-far dependency doesn't break anything.
-- [ ] Merge this step once green.
+      **All identical to the Step 1/2 baseline** (46 pre-existing type
+      errors, 308/318 unit tests, clean build) — no impact from adding an
+      unwired dependency.
+- [x] Merge this step once green — N/A (no separate branch); committed
+      directly.
 
 ## Step 4 — Confirm the Astryx blocker is actually cleared
 
@@ -267,3 +272,9 @@ Checked directly against npm metadata and this repo's real
   tests, build, lint, and E2E are all identical to the Step 1 baseline
   (same pre-existing failures, same counts, no new regressions). Same
   container-build/deploy gap as Step 1, same reason.
+- **2026-07-12: Step 3 complete and committed.** `@stylexjs/stylex`
+  pinned to exactly `0.18.3` (no caret). `npm install` completed with
+  zero `ERESOLVE` warnings, confirming the pin satisfies astryx-core's
+  `^0.18.3` peer range exactly as researched. Typecheck/unit/build all
+  identical to baseline — adding the unwired dependency had zero impact,
+  as expected.
