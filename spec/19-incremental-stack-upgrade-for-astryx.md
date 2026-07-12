@@ -68,39 +68,90 @@ Checked directly against npm metadata and this repo's real
 
 ## Step 1 — Next.js 14.2.35 → 15.5.20 (React stays on 18)
 
-- [ ] Create a branch for this step (e.g. `upgrade/next-15`).
-- [ ] Update `next` to `15.5.20` and `eslint-config-next` to the matching
+- [x] ~~Create a branch for this step~~ **Adapted**: per the user's
+      explicit branch instruction for this whole initiative, all work
+      commits directly to `claude/modern-dillinger-aws` rather than a
+      separate per-step branch — each step is still its own commit(s),
+      giving the same revert granularity without a second branch to manage.
+- [x] Update `next` to `15.5.20` and `eslint-config-next` to the matching
       `15.5.20` release; leave `react`/`react-dom` untouched at `^18`.
-- [ ] Regenerate the lockfile from the reviewed change.
-- [ ] Run `npx @next/codemod@15.5.20 upgrade` (or the specific named
-      codemods for the App Router async-API changes — `next-async-request-api`
-      at minimum) against this codebase.
-- [ ] Grep for and fix any direct, non-awaited use of `cookies()`,
-      `headers()`, `params`, or `searchParams` in `app/api/*` route
-      handlers and `app/(content)/*` pages — these became async in Next
-      15 and are the most common breakage source for this kind of app.
-- [ ] Resolve any other compile/runtime changes surfaced, without
+- [x] Regenerate the lockfile from the reviewed change.
+- [x] Run the official codemod (`npx @next/codemod@latest
+      next-async-request-api .`) against this codebase. **Result: 0 files
+      needed changes** (154 processed) — confirmed by reading the actual
+      source that this app already uses `request.nextUrl.searchParams` and
+      `response.cookies.set()` directly on Next's request/response
+      objects, not the standalone `cookies()`/`headers()` functions from
+      `next/headers` that became async in Next 15, and has no dynamic
+      route segments in its API routes. One pre-existing, unrelated file
+      (`app/api/google-drive/save/route.ts`) broke the codemod's parser
+      on a duplicate `const body` declaration — fixed below, not caused by
+      Next 15.
+- [x] Grep for and fix any direct, non-awaited use of `cookies()`,
+      `headers()`, `params`, or `searchParams`. **N/A — see above,**
+      already using the request/response-scoped APIs that didn't change.
+- [x] Resolve any other compile/runtime changes surfaced, without
       weakening CSP/CSRF/OAuth-state/validation/export-sanitization
-      controls (per Working rules).
-- [ ] Run `npx tsc --noEmit` on the clean install; fix type errors.
-- [ ] Run `npm run test:unit`; fix failures.
-- [ ] Run `npm run build`; confirm a clean production build.
-- [ ] Run `npm run test:e2e`; fix failures, paying particular attention
-      to OAuth start/callback flows and PDF export (both touch
-      request/response handling patterns Next 15 changed).
+      controls. Two real Next 15 breaks fixed: (1) `next.config.mjs`'s
+      `experimental.serverComponentsExternalPackages` renamed to
+      top-level `serverExternalPackages`; (2) `app/page.tsx` used
+      `next/dynamic(..., { ssr: false })` directly in a Server Component,
+      which Next 15 now hard-errors on — extracted into a new
+      `components/editor/ClientEditor.tsx` Client Component. Also fixed
+      the pre-existing, upgrade-unrelated duplicate `const body` bug in
+      `app/api/google-drive/save/route.ts` (renamed to `multipartBody`)
+      because it blocked the production-build verification gate below.
+- [x] Run `npx tsc --noEmit` on the clean install; fix type errors.
+      **46 errors, all pre-existing** (confined to
+      `tests/components/github-modal.test.tsx`, a store-typing issue in a
+      test file, unrelated to this upgrade) — down from the 49-error
+      pre-upgrade baseline because fixing the google-drive duplicate
+      `body` bug above resolved 3 of them. No new errors.
+- [x] Run `npm run test:unit`; fix failures. **308/318 passing, identical
+      to the pre-upgrade baseline** (same 10 pre-existing failures across
+      `navbar.test.tsx`, `settings-modal.test.tsx`, `toast.test.tsx` —
+      confirmed unrelated by baselining before touching any dependency).
+      No new failures.
+- [x] Run `npm run build`; confirm a clean production build. **Clean**
+      after the two Next 15 fixes above.
+- [x] Run `npm run lint`. **Clean** (`eslint-config-next@15.5.20`), with
+      a deprecation notice that `next lint` itself is removed in Next 16
+      — not a concern for this phase's Next 15 target, noted for whoever
+      eventually does the Next 16 jump.
+- [x] Run `npm run test:e2e`; fix failures. **34/42 passing.** The
+      remaining 8 (`settings-sidebar.spec.ts`/`editor.spec.ts` modal/
+      sidebar-dismissal timing assertions) were verified **pre-existing**
+      by stashing every Step 1 change, reinstalling the original Next
+      14.2.35 lockfile, and re-running the exact same 8 tests — identical
+      failures, identical assertions, against unmodified code. Not a
+      regression. Separately (sandbox-only, not a code issue): this
+      environment's pre-installed Chromium build (1194) doesn't match
+      what the pinned `@playwright/test@^1.58.2` expects (1208); the
+      numbers above are from a temporary, uncommitted
+      `launchOptions.executablePath` override for local verification only
+      — `playwright.config.ts` itself is unchanged, since hardcoding a
+      sandbox-specific browser path would break CI and other machines.
 - [ ] Build the Lambda container image locally (or via CI) and confirm it
-      still boots with the AWS Lambda Web Adapter per `ARCHITECTURE.md`'s
-      documented process — a Next major bump can change `output:
-      'standalone'` bundle shape.
-- [ ] Deploy this step to a scratch/staging tenant (not necessarily the
-      long-lived `staging` tenant if the user prefers isolation) via the
-      existing CI/OIDC path.
-- [ ] Smoke-test the deployed Function URL: editor loads, live preview
-      works, one export format round-trips, no console errors — matching
-      Phase 8's method.
-- [ ] Record the pre-upgrade image digest as the rollback point.
-- [ ] Merge this step once green; do not start Step 2 on an unmerged or
-      partially-verified Step 1.
+      still boots with the AWS Lambda Web Adapter. **Not run** — this
+      sandbox has no Docker (`ARCHITECTURE.md` already documents this
+      constraint; the image build runs on GitHub Actions). Requires
+      either a CI run or a machine with Docker.
+- [ ] Deploy this step to a scratch/staging tenant via the existing
+      CI/OIDC path. **Not run** — `deploy-lambda.yml` is
+      `workflow_dispatch`-only (no auto-deploy on push, by design per
+      `spec/12`'s security posture), and triggering a real deploy to a
+      live AWS tenant is exactly the kind of action this project's
+      operating rules say to confirm before taking, not assume. Needs an
+      explicit go-ahead.
+- [ ] Smoke-test the deployed Function URL. **Blocked on the deploy task
+      above.**
+- [ ] Record the pre-upgrade image digest as the rollback point. **Blocked
+      on the deploy task above** — the current live `staging` digest is
+      already recorded in `spec/README.md`'s Status section as the
+      rollback target if needed.
+- [x] Merge this step once green — N/A (no separate branch, see first
+      item); committed directly to `claude/modern-dillinger-aws` once all
+      runnable-in-this-sandbox checks above passed.
 
 ## Step 2 — React 18 → React 19.2.7 (Next stays on 15.5.20)
 
@@ -170,5 +221,21 @@ Checked directly against npm metadata and this repo's real
 
 ## Findings
 
-_(append dated entries per step: version landed, verification results,
-any deviation from the plan above and why)_
+- **2026-07-12: Step 1 code-level verification complete and committed.**
+  Next 15.5.20 landed with React untouched at 18.3.1, exactly as planned.
+  Two real Next-15 breaks found and fixed (`serverExternalPackages`
+  config rename; `next/dynamic({ssr:false})` no longer allowed directly
+  in a Server Component, fixed via a new `ClientEditor` Client
+  Component). The async-request-API codemod needed zero changes across
+  154 files — this app already used request/response-scoped
+  cookies/searchParams, not the standalone functions that changed.
+  Typecheck (46 pre-existing errors, down from 49 after an incidental
+  fix), unit tests (308/318, identical to baseline), build, and lint are
+  all clean or baseline-identical. E2E: 34/42 passing; the 8 failures
+  were proven pre-existing by re-running them against a stashed,
+  unmodified Next 14.2.35 checkout — byte-identical failures. **Not yet
+  done**: Lambda container build and staging deploy/smoke-test — this
+  sandbox has no Docker, and the deploy workflow is manual-dispatch-only
+  by design, so an actual AWS deploy needs an explicit go-ahead rather
+  than being triggered automatically. Step 1's code is ready to hand to
+  CI for the container-build/deploy leg.
