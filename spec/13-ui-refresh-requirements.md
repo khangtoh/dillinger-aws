@@ -371,15 +371,78 @@ access scoped as the natural next phase once that contract is stable.
 Phase 18 holds all of the above to the same "prove it, don't just build
 it" bar the Lambda migration used in Phase 8.
 
-## Open questions for the user
+## Revision — 2026-07-12: Astryx blocked on React 19, decision needed
+
+Phase 14's clarification pass (before any spike code was written) found
+that `@astryxdesign/core` has required `react: ">=19.0.0"` /
+`react-dom: ">=19.0.0"` since its first published version (`0.0.15`) —
+not a recent bump, a structural fact. This repo runs React 18
+(`"^18"`) on Next.js `14.2.35`, which does not carry stable React 19
+support. `npm install @astryxdesign/core@0.1.4
+@astryxdesign/theme-neutral@0.1.4 --dry-run` against this repo's real
+`package.json` fails with `ERESOLVE`, confirmed, not inferred. Two
+smaller compounding findings from the same pass: no shipped Astryx theme
+is close to the plum brand accent at the token level (a custom theme was
+always going to be needed, per the original Section B evaluation — this
+doesn't change), and Astryx's documented CSS integration snippet targets
+Tailwind v4 syntax, not this repo's Tailwind 3.4.1. Full detail and the
+reproduction transcript: `spec/14-astryx-design-system-adoption.md`
+Findings.
+
+This **replaces** the "Design system: adopt Astryx" line in Decisions
+above pending a choice among:
+
+1. **Sequence a React 19 / Next.js 15 upgrade first.** `spec/12-security-
+   hardening.md`'s open, unstarted "P0 - Move to a supported application
+   stack" item already targets exactly this upgrade for EOL/security
+   reasons, independent of Astryx. Astryx adoption would become a
+   dependent phase after that upgrade lands, not before. Real cost: a
+   major-version framework upgrade is a large, independently risky
+   change (Phase 12 already scopes it as its own P0 with a full
+   regression pass) — bundling "adopt a beta design system" onto it
+   couples two big changes and makes it harder to isolate which one
+   caused a regression if something breaks.
+2. **Do not adopt Astryx; keep the typed-component-API and theming
+   *goals* from Section E but reach them a different way** — e.g. a
+   React-18-compatible primitive layer (Radix UI or similar, which this
+   ecosystem already trusts for accessible unstyled primitives) wrapped
+   in this project's own typed, documented component API, with a
+   hand-authored token/theme file replacing the "swizzle an Astryx
+   theme" plan. Loses Astryx's pattern library and CLI; keeps everything
+   in Section E that's actually load-bearing (typed props, semantic
+   names, CSS-custom-property theming) without a framework-version fight.
+3. **Stay on hand-rolled Tailwind, formalize conventions instead of
+   adopting a library** — cheapest, no new dependency, but weakest on
+   Section A's actual complaint (duplicated bespoke interactive
+   patterns) and Section E's agent-consistency goal.
+
+**Recommendation:** Option 2. It preserves everything Phase 13 Section E
+actually established as load-bearing (typed API + swizzle-style
+ownership + real theming), doesn't gate a UI-refresh initiative behind a
+separately-scoped, independently risky major framework upgrade, and
+doesn't leave Section A's bespoke-pattern-duplication problem unaddressed
+the way option 3 would. This is a real product/sequencing call, not a
+technical fact, so it's left for explicit user confirmation rather than
+silently decided — see the first item under "Open questions for the
+user," now updated to reflect this.
+
+
 
 These are business/product calls, not technical facts — recorded here so
 they aren't silently decided, per this phase's own convention of not
 letting a scheduled agent guess on genuinely ambiguous items:
 
-- Should the Astryx theme starting point deliberately match the current
-  plum (`#35D7BB`) brand, or is a broader rebrand in scope for this UI
-  refresh? (Phase 14 assumes "match current brand" unless told otherwise.)
+- **[BLOCKING, new 2026-07-12] Which path from the "Revision" section
+  above** — sequence a React 19/Next 15 upgrade first (option 1), drop
+  Astryx for a React-18-compatible primitive layer reaching the same
+  goals a different way (option 2, recommended), or stay hand-rolled and
+  just formalize conventions (option 3)? Phase 14 and everything
+  downstream that assumes "Astryx" by name (Phase 15's swizzle tasks,
+  Phase 13 Decisions' "Design system" line) is paused on this answer.
+- Should the eventual component-layer theme deliberately match the
+  current plum (`#35D7BB`) brand, or is a broader rebrand in scope for
+  this UI refresh? (Assumed "match current brand" unless told otherwise
+  — unaffected by which option above is chosen.)
 - Is real-time collaborative editing (StackEdit's merge feature) ever in
   scope, given it's structurally in tension with the stateless,
   per-tenant-isolated Lambda architecture (Phase 9/`ARCHITECTURE.md`)? (

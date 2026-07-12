@@ -27,28 +27,80 @@ A scheduled agent runs these first — each is a fast, checkable research
 task, not a judgment call — so the spike below never starts on an
 assumption that turns out to be wrong.
 
-- [ ] Confirm the current published Astryx package names and versions on
+- [x] Confirm the current published Astryx package names and versions on
       npm (`@astryxdesign/core`, `@astryxdesign/theme-neutral` or
       equivalent) match what Phase 13's research found; record the exact
-      versions pinned.
-- [ ] Confirm whether a theme closer to the plum accent (`#35D7BB`) ships
+      versions pinned. **Confirmed real**: `@astryxdesign/core@0.1.4`,
+      MIT, published 5 days old (`npm view`), matches Phase 13. Seven
+      theme packages confirmed on npm (`theme-neutral`, `theme-butter`,
+      `theme-chocolate`, `theme-matcha`, `theme-stone`, `theme-gothic`,
+      `theme-y2k`), each pinned to `@astryxdesign/core: "0.1.4"` exactly
+      (not a range) — themes and core version-lock together, so future
+      core upgrades will require matching theme-package bumps.
+- [x] Confirm whether a theme closer to the plum accent (`#35D7BB`) ships
       out of the box, or whether Phase 13's "match current brand" default
       requires a custom theme file from day one; record the answer.
-- [ ] Confirm Astryx's stated React version support explicitly covers
+      **No shipped theme is close.** Inspected the actual `dist/theme.css`
+      token values (not just theme descriptions): `theme-neutral`'s
+      `--color-accent` is grayscale (`#262626`/`#ebebeb`, effectively no
+      accent color at all); `theme-matcha`'s is `#3E481D`/`#C0CBA9`
+      (dark olive / pale sage) — nowhere near the bright teal-mint plum.
+      Confirms Phase 13's assumption: a custom theme file is required
+      from day one to keep the current brand, not optional polish.
+- [x] Confirm Astryx's stated React version support explicitly covers
       React 18.x (this repo's `package.json` version), not just "18+"
-      loosely worded in docs.
+      loosely worded in docs. **It does not — this is a hard blocker,
+      see Findings below.** `npm view @astryxdesign/core peerDependencies`
+      returns `react: ">=19.0.0"`, `react-dom: ">=19.0.0"`,
+      `@stylexjs/stylex: "^0.18.3"`. Checked every published core version
+      back to the first (`0.0.15`): all require `react >=19.0.0` —
+      this was never a React-18-compatible library, not a recent bump.
+      This directly contradicts the "React 18+" summary Phase 13 recorded
+      from a secondary (web-search-derived) source; the primary source
+      (npm package metadata) overrides it.
 - [ ] Confirm whether Astryx's CSS `@layer` approach conflicts with this
       repo's existing `app/globals.css` (`@tailwind base/components/
       utilities` + a `katex` import + hand-written `.preview-html` rules)
       — read the current file, not just Phase 13's summary, before writing
-      the merged version.
+      the merged version. **Deprioritized — see Findings.** Worth noting
+      without a full spike: the documented Astryx integration snippet
+      (`@import 'tailwindcss/theme.css' layer(theme)`) is Tailwind v4
+      CSS-first syntax; this repo runs Tailwind **3.4.1** with classic
+      `@tailwind base/components/utilities` directives, so the published
+      integration guide doesn't transfer as-is even setting the React
+      blocker aside — a second, compounding integration cost.
 - [ ] Confirm Astryx's bundle-size impact is compatible with this
       project's Lambda-image and cold-start budget documented in
       `ARCHITECTURE.md` (server bundle only grows with server-rendered
       component code, not client CSS, but record the actual added KB to
-      `.next/static` so Phase 18 has a before/after baseline).
+      `.next/static` so Phase 18 has a before/after baseline). **Not
+      run — moot until the blocker below is resolved; a real build
+      requires the package to actually install.**
 
-## Spike: install and coexist
+## Spike: install and coexist — BLOCKED, do not start
+
+Per this phase's own working rules ("if any P0 clarification task
+surfaces a blocking incompatibility, stop... route it back to Phase 13's
+Decisions section"), this section does not run. Evidence:
+
+```
+$ npm install @astryxdesign/core@0.1.4 @astryxdesign/theme-neutral@0.1.4 --dry-run
+npm error code ERESOLVE
+npm error Found: react@18.3.1 (node_modules/react, "^18" from the root project)
+npm error Could not resolve dependency:
+npm error   peer react@">=19.0.0" from @astryxdesign/core@0.1.4
+```
+
+Confirmed directly against this repo's real `package.json`
+(`react: "^18"`, `react-dom: "^18"`, `next: "14.2.35"`) — not a
+hypothetical. Next.js 14.2.35 does not carry stable React 19 support
+(that lands with Next 15), so unblocking this would mean at minimum a
+React 19 upgrade, and realistically the Next.js 14→15 major upgrade too
+— which is exactly the "Move to a supported application stack" work item
+already sitting open and unstarted in `spec/12-security-hardening.md`
+("P0 - Move to a supported application stack"). The tasks below stay
+unchecked until Phase 13's decision is revised (see that file's new
+"Revision" section) and this phase is explicitly restarted.
 
 - [ ] Create the spike branch from the current UI-refresh working branch.
 - [ ] `npm install` the pinned Astryx packages from the clarification pass.
@@ -98,24 +150,46 @@ assumption that turns out to be wrong.
 
 ## Go / no-go decision
 
-- [ ] Tally the clarification-pass and spike results against these gates:
+- [x] Tally the clarification-pass and spike results against these gates:
       no console errors, no visual regression on `/`, dropdown spike
       matches or exceeds original a11y behavior, dark-mode toggle wiring
       resolved (with or without a workaround), bundle-size delta
-      acceptable per the clarification-pass baseline.
-- [ ] Write a dated "Findings" entry below with a clear **Go** or **No-go**
+      acceptable per the clarification-pass baseline. **Fails at the
+      first gate before any spike work is possible**: `npm install`
+      itself cannot resolve, so no console-error/visual-regression/a11y/
+      bundle-size check can even be attempted. Called early per this
+      phase's own working rule rather than padding out unreachable spike
+      tasks.
+- [x] Write a dated "Findings" entry below with a clear **Go** or **No-go**
       call. A **No-go** must name the specific gate that failed and route
-      back to Phase 13 rather than being silently abandoned.
+      back to Phase 13 rather than being silently abandoned. **Done — see
+      Findings below.**
 - [ ] If **Go**: merge the spike branch's `package.json`/`globals.css`
       changes (but not the one-off `Navbar.tsx` spike component — that's
       superseded by Phase 15's real migration) into the UI-refresh working
-      branch, and check this box to unblock Phase 15.
-- [ ] If **No-go**: open a revision to Phase 13's "Design system" decision
+      branch, and check this box to unblock Phase 15. **N/A this pass.**
+- [x] If **No-go**: open a revision to Phase 13's "Design system" decision
       recording the alternative chosen (e.g., stay on hand-rolled
       Tailwind, or evaluate a second candidate) before Phase 15 starts.
+      **Done — see `spec/13-ui-refresh-requirements.md`'s "Revision
+      2026-07-12" section.**
 
 ## Findings
 
-_(append dated entries here, e.g. "2026-07-15: Go — zero console errors,
-dropdown spike passes a11y checks unchanged, dark-mode class toggle drives
-both systems with no extra wiring, +14KB gzip to client CSS, acceptable.")_
+- **2026-07-12: No-go, blocked before the install step.**
+  `@astryxdesign/core` requires `react: ">=19.0.0"` /
+  `react-dom: ">=19.0.0"` (every published version back to `0.0.15` —
+  not a recent bump) plus `@stylexjs/stylex: "^0.18.3"`. This repo runs
+  `react: "^18"` / `react-dom: "^18"` on Next.js `14.2.35`, which does
+  not carry stable React 19 support. `npm install
+  @astryxdesign/core@0.1.4 @astryxdesign/theme-neutral@0.1.4 --dry-run`
+  against the real `package.json` fails with `ERESOLVE` (see transcript
+  above) — reproducible, not inferred from docs. Separately, no shipped
+  Astryx theme is close to the plum brand accent (token-level check, not
+  a guess), and the documented CSS integration snippet targets Tailwind
+  v4's `@layer`/`@import ... layer(theme)` syntax, not this repo's
+  Tailwind 3.4.1 `@tailwind` directives — two more integration costs on
+  top of the hard blocker. Routed back to Phase 13 for a decision
+  revision; the "Spike: one real component via swizzle," "Spike: theming
+  and dark mode," and bundle-size clarification tasks above were never
+  started because there is nothing installable to spike against.
