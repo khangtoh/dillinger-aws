@@ -1,0 +1,161 @@
+name: Tenant lifecycle test (provision -> verify -> deprovision)
+
+# End-to-end proof that the full single-tenant lifecycle works, on demand:
+# provisions a fresh throwaway tenant, verifies it actually serves
+# Dillinger (smoke + exports + isolation from staging), then deprovisions
+# it - ALWAYS, even when verification fails, so nothing leaks.
+#
+# Trigger it anytime:
+#   gh workflow run tenant-lifecycle.yml
+#   gh workflow run tenant-lifecycle.yml -f tenant_id=my-test-tenant
+#
+# The throwaway tenant defaults to lt<run-id>, so concurrent/repeated
+# runs never collide on stack names. Registry files (tenants.json /
+# desired-tenants.json) are modified only inside the runner's workspace
+# and net out to zero (provision adds, deprovision removes) - nothing is
+# committed back.
+#
+# Also serves as the spec/09 "second tenant" isolation check: the
+# throwaway tenant must get its own Function URL, and the staging tenant
+# must keep serving untouched while this one comes and goes.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tenant_id:
+        description: "Tenant id (default: lt<run-id>, a fresh throwaway)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+
+concurrency:
+  group: dillinger-tenant-lifecycle
+  cancel-in-progress: false
+
+jobs:
+  lifecycle:
+    runs-on: ubuntu-latest
+    # The OIDC trust policy pins sub to this repo's "staging" environment
+    # (see infra/bootstrap/ci-trust-policy.template.json) - every job that
+    # assumes the deploy role must run in it.
+    environment: staging
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up Python (for AWS SAM CLI)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install AWS SAM CLI
+        run: pip install aws-sam-cli
+
+      - name: Resolve tenant id
+        id: tenant
+        run: |
+          TENANT_ID="${{ inputs.tenant_id }}"
+          TENANT_ID="${TENANT_ID:-lt${{ github.run_id }}}"
+          if [[ "$TENANT_ID" == "staging" ]]; then
+            echo "Refusing to run the throwaway lifecycle against the staging tenant" >&2
+            exit 1
+          fi
+          echo "id=${TENANT_ID}" >> "$GITHUB_OUTPUT"
+          echo "Lifecycle tenant: ${TENANT_ID}"
+
+      - name: Record staging URL (isolation baseline)
+        id: staging
+        run: |
+          URL=$(jq -r '.tenants[] | select(.tenantId == "staging") | .functionUrl // empty' infra/tenants.json)
+          echo "url=${URL}" >> "$GITHUB_OUTPUT"
+          echo "Staging URL (may be empty if no staging tenant): ${URL:-<none>}"
+
+      - name: Provision
+        run: infra/provision-tenant.sh "${{ steps.tenant.outputs.id }}" "${AWS_REGION}"
+
+      - name: Verify
+        run: |
+          set -euo pipefail
+          TENANT_ID="${{ steps.tenant.outputs.id }}"
+          URL=$(jq -r --arg t "$TENANT_ID" \
+            '.tenants[] | select(.tenantId == $t) | .functionUrl' infra/tenants.json)
+          URL="${URL%/}"
+          echo "Function URL: ${URL}"
+
+          # Smoke: same script sync.sh runs after every deploy (2xx home,
+          # clean 404 on unknown routes)
+          infra/orchestrator/verify-tenant.sh "$TENANT_ID" "$URL"
+
+          # Content sanity: it's actually Dillinger being served
+          curl -sS --max-time 15 "${URL}/" | grep -qi "dillinger" \
+            && echo "PASS: homepage contains 'Dillinger'"
+
+          # Export routes (markdown always; PDF exercises Chromium-on-Lambda
+          # with a generous first-launch timeout)
+          MD_STATUS=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 30 \
+            -X POST "${URL}/api/export/markdown" \
+            -H "content-type: application/json" \
+            -d '{"markdown":"# lifecycle test","title":"t"}')
+          [[ "$MD_STATUS" == "200" ]] && echo "PASS: markdown export 200" \
+            || { echo "FAIL: markdown export -> ${MD_STATUS}"; exit 1; }
+
+          PDF_FILE=$(mktemp)
+          PDF_STATUS=$(curl -sS -o "$PDF_FILE" -w "%{http_code}" --max-time 60 \
+            -X POST "${URL}/api/export/pdf" \
+            -H "content-type: application/json" \
+            -d '{"markdown":"# lifecycle test","title":"t"}')
+          if [[ "$PDF_STATUS" == "200" ]] && head -c 5 "$PDF_FILE" | grep -q "%PDF-"; then
+            echo "PASS: PDF export 200, valid %PDF magic"
+          else
+            echo "FAIL: PDF export -> ${PDF_STATUS}"; exit 1
+          fi
+
+          # Isolation (spec/09): our URL is not staging's, and staging is
+          # still serving while this tenant exists
+          STAGING_URL="${{ steps.staging.outputs.url }}"
+          if [[ -n "$STAGING_URL" ]]; then
+            [[ "${URL}/" != "$STAGING_URL" ]] && echo "PASS: distinct Function URL from staging" \
+              || { echo "FAIL: same URL as staging?!"; exit 1; }
+            S=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "$STAGING_URL")
+            [[ "$S" =~ ^2 ]] && echo "PASS: staging still serving (${S}) alongside this tenant" \
+              || { echo "FAIL: staging returned ${S} during lifecycle test"; exit 1; }
+          else
+            echo "SKIP: no staging tenant registered - isolation check skipped"
+          fi
+
+      - name: Deprovision (always - even when verification failed)
+        if: always()
+        run: infra/deprovision-tenant.sh "${{ steps.tenant.outputs.id }}" "${AWS_REGION}" --yes
+
+      - name: Confirm nothing leaked
+        if: always()
+        run: |
+          set -euo pipefail
+          TENANT_ID="${{ steps.tenant.outputs.id }}"
+          if aws cloudformation describe-stacks --region "$AWS_REGION" \
+              --stack-name "dillinger-${TENANT_ID}" >/dev/null 2>&1; then
+            echo "FAIL: stack dillinger-${TENANT_ID} still exists after deprovision" >&2
+            exit 1
+          fi
+          LEFT=$(aws cloudformation list-stacks --region "$AWS_REGION" \
+            --query "StackSummaries[?starts_with(StackName, 'dillinger-${TENANT_ID}-') && StackStatus != 'DELETE_COMPLETE'].StackName" \
+            --output text)
+          if [[ -n "$LEFT" ]]; then
+            echo "FAIL: leaked companion stack(s): ${LEFT}" >&2
+            exit 1
+          fi
+          echo "PASS: no stacks remain for tenant ${TENANT_ID}"
