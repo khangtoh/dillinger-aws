@@ -7,6 +7,14 @@
       "functionUrl": "https://iepu7ka2gyaxnyhhnldynzgxgy0yonzr.lambda-url.ap-southeast-1.on.aws/",
       "createdAt": "2026-07-11T12:10:44.214338+00:00",
       "updatedAt": "2026-07-11T12:10:44.214338+00:00"
+    },
+    {
+      "tenantId": "branch-claude-modern-dillinger-aws",
+      "stackName": "dillinger-branch-claude-modern-dillinger-aws",
+      "region": "ap-southeast-1",
+      "functionUrl": "https://3tfsfijqedt62hf3vfdfxwunua0rkjgo.lambda-url.ap-southeast-1.on.aws/",
+      "createdAt": "2026-07-13T07:06:11.765351+00:00",
+      "updatedAt": "2026-07-13T07:06:11.765351+00:00"
     }
   ]
 }
