@@ -153,15 +153,52 @@ Depends on: Phase 14 **Go** decision.
 
 ## Navbar
 
-- [ ] Replace `Navbar.tsx`'s hand-rolled export dropdown with the real
+- [x] Replace `Navbar.tsx`'s hand-rolled export dropdown with the real
       (non-spike) Astryx menu component, reusing the pattern proven in
-      Phase 14's spike.
-- [ ] Migrate the remaining Navbar buttons (import, image insert, preview
+      Phase 14's spike. **Already done, confirmed**: `Navbar.tsx`'s
+      export dropdown was already wired to the swizzled
+      `components/astryx/DropdownMenu` directly in the real component
+      (not a separate spike file) — Phase 14's Findings note there was
+      never a separate spike branch, everything landed on the working
+      branch directly. Reworded the stale in-file comment that still
+      called this "Phase 14 swizzle spike" to reflect that it's the
+      shipped implementation; behavior and markup untouched.
+- [x] Migrate the remaining Navbar buttons (import, image insert, preview
       toggle, zen mode, settings, shortcuts) to Astryx button primitives,
       preserving every existing `aria-label`/`title`/`aria-pressed`.
-- [ ] Run `tests/components/navbar.test.tsx` and confirm it passes with
+      **Done**: Import/Image now use Astryx's `Button`
+      (`@astryxdesign/core/Button`) with `icon` + a responsive
+      `<span className="hidden sm:inline">` child for the visible
+      "Import"/"Image" text (hidden below `sm`, exactly as before) —
+      `label` stays the accessible name ("Import file"/"Insert image")
+      since Astryx's `Button` sets `aria-label` from `label` whenever
+      visible `children` differ from it. Zen mode/Settings/Keyboard
+      shortcuts are icon-only `Button`s (`isIconOnly`) with the same
+      `label` text as before. The preview toggle is Astryx's
+      `ToggleButton` (`@astryxdesign/core/ToggleButton`) — it computes
+      `aria-pressed` from `isPressed={previewVisible}` automatically
+      (matches the original hand-set `aria-pressed`), and swaps
+      `icon`/`pressedIcon` to reproduce the original's exact
+      `previewVisible ? Eye : EyeOff` mapping. Every button's `title`
+      became Astryx's `tooltip` prop (same hover text, plus a proper
+      `aria-describedby` link the original `title` attribute never had).
+      Kept the existing `className="text-text-invert hover:text-plum"`
+      override on every button — already proven to compose cleanly with
+      Astryx's StyleX output by the export dropdown's button in Phase 14.
+      Real-browser-verified (Playwright/Chromium): all navbar icons
+      render correctly against the dark navbar background, the Settings
+      button's tooltip appears on hover, and clicking the preview toggle
+      flips `aria-pressed` `"true"` → `"false"` and swaps the icon to the
+      crossed-eye glyph while the preview pane collapses — zero new
+      console errors.
+- [x] Run `tests/components/navbar.test.tsx` and confirm it passes with
       no assertion deletions beyond ones tied to intentionally-changed
-      markup.
+      markup. **Passes, zero assertions changed**: all 30 tests pass
+      unmodified (plus the 1 pre-existing Phase 14 jsdom-limitation
+      skip) — every accessible-name and `aria-pressed` query in the
+      suite already matched Astryx's output because the migration
+      preserved the exact `label`/`aria-pressed` values. Full repo suite
+      (317 tests) still green after this change.
 
 ## Sidebar and modals
 

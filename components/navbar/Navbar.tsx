@@ -7,6 +7,8 @@ import { useImageUpload } from "@/hooks/useImageUpload";
 import { importDocumentFile } from "@/lib/import";
 import { SAME_ORIGIN_JSON_HEADERS } from "@/lib/client-request";
 import { DropdownMenu, type DropdownMenuOption } from "@/components/astryx/DropdownMenu";
+import { Button } from "@astryxdesign/core/Button";
+import { ToggleButton } from "@astryxdesign/core/ToggleButton";
 import {
   Menu,
   Eye,
@@ -163,35 +165,34 @@ export function Navbar() {
 
       {/* Right side */}
       <div className="flex items-center gap-2">
-        <button
+        <Button
+          label="Import file"
+          icon={<Upload size={18} />}
+          variant="ghost"
           onClick={() => importInputRef.current?.click()}
-          aria-label="Import file"
-          title="Import file"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] px-3 py-2
-                     flex items-center gap-1 text-sm rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+          tooltip="Import file"
+          className="text-text-invert hover:text-plum"
         >
-          <Upload size={18} />
           <span className="hidden sm:inline">Import</span>
-        </button>
+        </Button>
 
-        <button
+        <Button
+          label="Insert image"
+          icon={<ImagePlus size={18} />}
+          variant="ghost"
           onClick={() => imageInputRef.current?.click()}
-          aria-label="Insert image"
-          title="Insert image"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] px-3 py-2
-                     flex items-center gap-1 text-sm rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+          tooltip="Insert image"
+          className="text-text-invert hover:text-plum"
         >
-          <ImagePlus size={18} />
           <span className="hidden sm:inline">Image</span>
-        </button>
+        </Button>
 
-        {/* Export dropdown — Phase 14 swizzle spike: swizzled from
-            Astryx's DropdownMenu (components/astryx/DropdownMenu). Replaces
-            the hand-rolled useState/useEffect/ref dismissible-panel pattern;
-            open state, Escape, click-outside, and focus-return are all
-            handled internally by the component's usePopover/useListFocus. */}
+        {/* Export dropdown — migrated to Astryx's DropdownMenu
+            (components/astryx/DropdownMenu), proven in Phase 14's spike.
+            Replaces the hand-rolled useState/useEffect/ref
+            dismissible-panel pattern; open state, Escape, click-outside,
+            and focus-return are all handled internally by the
+            component's usePopover/useListFocus. */}
         <DropdownMenu
           items={exportItems}
           hasChevron={false}
@@ -205,48 +206,48 @@ export function Navbar() {
         />
 
         {/* Preview toggle */}
-        <button
-          onClick={togglePreview}
-          aria-label={previewVisible ? "Hide preview" : "Show preview"}
-          title={previewVisible ? "Hide preview" : "Show preview"}
-          aria-pressed={previewVisible}
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] p-2 rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
-        >
-          {previewVisible ? <Eye size={20} /> : <EyeOff size={20} />}
-        </button>
+        <ToggleButton
+          label={previewVisible ? "Hide preview" : "Show preview"}
+          icon={<EyeOff size={20} />}
+          pressedIcon={<Eye size={20} />}
+          isPressed={previewVisible}
+          onPressedChange={() => togglePreview()}
+          isIconOnly
+          tooltip={previewVisible ? "Hide preview" : "Show preview"}
+          className="text-text-invert hover:text-plum"
+        />
 
         {/* Zen mode */}
-        <button
+        <Button
+          label="Enter zen mode"
+          icon={<Maximize2 size={20} />}
+          variant="ghost"
+          isIconOnly
           onClick={() => setZenMode(true)}
-          aria-label="Enter zen mode"
-          title="Zen mode (⌘⇧Z)"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] p-2 rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
-        >
-          <Maximize2 size={20} />
-        </button>
+          tooltip="Zen mode (⌘⇧Z)"
+          className="text-text-invert hover:text-plum"
+        />
 
         {/* Settings */}
-        <button
+        <Button
+          label="Open settings"
+          icon={<Settings size={20} />}
+          variant="ghost"
+          isIconOnly
           onClick={toggleSettings}
-          aria-label="Open settings"
-          title="Settings"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] p-2 rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
-        >
-          <Settings size={20} />
-        </button>
+          tooltip="Settings"
+          className="text-text-invert hover:text-plum"
+        />
 
-        <button
+        <Button
+          label="Keyboard shortcuts"
+          icon={<HelpCircle size={20} />}
+          variant="ghost"
+          isIconOnly
           onClick={toggleShortcuts}
-          title="Keyboard shortcuts (?)"
-          aria-label="Keyboard shortcuts"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] p-2 rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
-        >
-          <HelpCircle size={20} />
-        </button>
+          tooltip="Keyboard shortcuts (?)"
+          className="text-text-invert hover:text-plum"
+        />
       </div>
 
       <input

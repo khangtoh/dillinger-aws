@@ -139,10 +139,17 @@ multi-tenancy/gateway model from Phases 1-12.
       primitives (`useToast()`'s call signature and Toast's container
       role/aria unchanged; KeyboardShortcuts' shortcut-list content
       unchanged), Skeleton intentionally left hand-rolled Tailwind (see
-      `spec/15-ui-component-migration.md` for why), full unit suite green
-      (317 passed / 1 pre-existing skip), typecheck/lint clean, real-
-      browser-verified (Playwright) with zero new console errors. Navbar,
-      Sidebar/modals, and the new UI-2..UI-6 requirements are still
+      `spec/15-ui-component-migration.md` for why). The **Navbar group is
+      also complete**: the export dropdown was already on the real
+      (non-spike) Astryx `DropdownMenu`, and the remaining buttons
+      (import, image insert, preview toggle, zen mode, settings,
+      shortcuts) now use Astryx's `Button`/`ToggleButton`, preserving
+      every `aria-label`/`aria-pressed` (the preview toggle's
+      `aria-pressed` and icon swap are computed by `ToggleButton` itself
+      instead of hand-set). Full unit suite green (317 passed / 1
+      pre-existing skip), typecheck/lint clean, real-browser-verified
+      (Playwright) with zero new console errors on both groups.
+      Sidebar/modals and the new UI-2..UI-6 requirements are still
       unstarted. Separately, not yet done: the Lambda container build and
       staging deploy for the Phase 19 stack upgrade (no Docker in the dev
       sandbox; deploy workflow is manual-dispatch-only) — needs a CI run
