@@ -24,6 +24,12 @@ how the Docker image becomes a Firecracker microVM, cold-start anatomy
 with real measurements, and why per-tenant functions are the isolation
 model.
 
+**Is a goal actually done?**
+[`goal-completion-check.md`](goal-completion-check.md) — a reusable
+prompt that traces a stated goal through requirements → mapped spec
+phases → actual checkbox state, instead of answering from impression.
+Use it before telling anyone something ships.
+
 ## Phases
 
 | # | File | Purpose | Blocking dependency |
