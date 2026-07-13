@@ -326,3 +326,23 @@ Checked directly against npm metadata and this repo's real
   found at any step. Container build and staging deploy remain the one
   outstanding item, deferred to CI pending an explicit go-ahead (see
   each step's notes above).
+- **2026-07-12: Container build + real AWS deploy exercised via
+  `deploy-branch-tenant.yml`** (a new, separate per-branch-tenant CI
+  workflow, not `deploy-lambda.yml`/`staging`). First attempt failed on
+  CI's `security` job (`npm run typecheck` + `npm run test:unit` had
+  never actually run against this codebase in CI before — surfaced real
+  pre-existing test/type bugs, fixed separately, see git history for
+  that commit). Second attempt failed on `npm audit --omit=dev
+  --audit-level=high` (also never previously exercised in CI) — an
+  unused `breakdance` dependency dragging in an unfixable high-severity
+  transitive vuln; removed it and narrowly overrode five other
+  vulnerable transitives (see that commit). Third attempt got all the
+  way to a real `sam deploy` — image built and pushed to ECR
+  successfully, IAM role created — then failed on the actual Lambda
+  function creation with an AWS account concurrency-quota error,
+  unrelated to any of the above. Fixed by deploying this tenant at
+  `MaxTenantConcurrency=1`; see `spec/09-multi-tenancy.md` and
+  `ARCHITECTURE.md`'s "Reserved concurrency and the microVM pool" for
+  the full mechanism. Upgraded stack (Next 15.5.20/React
+  19.2.7/StyleX 0.18.3) is what's actually being deployed by this
+  workflow.

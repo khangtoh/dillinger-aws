@@ -61,6 +61,20 @@ stays intentionally simple because each instance only ever has one user:
       all. The tenant was then deprovisioned with zero leaked stacks —
       this check is now repeatable anytime via
       `gh workflow run tenant-lifecycle.yml`.
+- [x] Provision a second **persistent** (non-throwaway) tenant alongside
+      `staging` and confirm the account can actually sustain it. Done
+      2026-07-12 via `deploy-branch-tenant.yml`: found the account's
+      Lambda concurrency quota is tight enough that a second tenant at
+      the template's default `MaxTenantConcurrency=2` fails
+      CloudFormation creation outright (AWS's mandatory ≥10-unit
+      unreserved-concurrency floor — see `ARCHITECTURE.md`'s "Reserved
+      concurrency and the microVM pool" for the full mechanism and the
+      exact error). Resolved by deploying that tenant at
+      `MaxTenantConcurrency=1` (now a 3rd, optional argument to
+      `infra/provision-tenant.sh`). Accepted as fine for the current
+      dev stage; revisit (raise the account's quota, or budget each
+      tenant's concurrency deliberately) before this needs to support
+      many concurrent users per tenant.
 - [ ] Decide, once real usage exists, whether `FunctionUrlConfig.AuthType`
       should move from `NONE` (public-but-unguessable URL, current v1
       default) to `AWS_IAM` per-tenant for stricter access control —

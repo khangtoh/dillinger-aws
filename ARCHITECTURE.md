@@ -169,6 +169,51 @@ Per-tenant cost of this model is near zero when idle: no reserved
 instances, no per-tenant containers running overnight — an idle tenant
 is just an ECR-referenced filesystem image and some metadata.
 
+## Reserved concurrency and the microVM pool
+
+Recall from "Runtime: the Firecracker microVM" above: **one execution
+environment = one microVM, and each handles one request at a time** —
+concurrency for a given tenant is entirely a question of *how many
+microVMs Lambda is willing to run in parallel for that tenant's
+function*. That number is exactly what `template.yaml`'s
+`MaxTenantConcurrency` parameter controls, via
+`ReservedConcurrentExecutions` on the `DillingerFunction` resource
+(default `2`, capped `1`-`10`). It is not a rate limit or a throttle in
+the request-handling sense — it's a hard ceiling on the tenant's
+**microVM pool size**: at `MaxTenantConcurrency=2`, a third simultaneous
+request finds no free microVM and no budget to boot a new one, so Lambda
+throttles it (`429`/`TooManyRequestsException`) rather than queuing it
+indefinitely.
+
+**Why this is capped low on purpose, not just for cost:** reserved
+concurrency is carved out of the AWS account's total regional Lambda
+concurrency quota, and AWS enforces a hard, account-wide floor — **at
+least 10 units must always remain *unreserved*, no matter how many
+functions or tenants exist.** This isn't configurable; it's a platform
+invariant. Concretely, this project hit it directly: deploying a second
+tenant (a per-branch tenant alongside the existing `staging` tenant,
+each defaulting to `MaxTenantConcurrency=2`) failed CloudFormation
+creation with:
+
+```
+Specified ReservedConcurrentExecutions for function decreases account's
+UnreservedConcurrentExecution below its minimum value of [10].
+```
+
+i.e., this AWS account's total concurrency quota is tight enough that
+`staging`'s 2-unit reservation plus a second tenant's 2-unit ask already
+crossed the line. The fix was to deploy that tenant with
+`MaxTenantConcurrency=1` instead (`infra/provision-tenant.sh
+<tenant-id> <region> 1`) — accepting that this dev-stage tenant's
+microVM pool caps at one concurrent request (a second simultaneous
+request throttles rather than getting its own microVM) in exchange for
+fitting inside the account's remaining headroom. That trade-off is fine
+for a branch/dev tenant serving one person at a time; it would need
+revisiting — either raising the account's Lambda concurrency quota via
+AWS Service Quotas, or deliberately budgeting each tenant's
+`MaxTenantConcurrency` against the account total — before this pattern
+scales to many concurrent real users per tenant.
+
 ## Docker hosting vs. what actually runs
 
 | | Docker on a host (ECS/EC2/K8s) | Lambda + Firecracker (this project) |

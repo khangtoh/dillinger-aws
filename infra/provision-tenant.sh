@@ -4,7 +4,19 @@
 # function, and Function URL — no state or infra is shared between
 # tenants. Run this once per new user.
 #
-# Usage: infra/provision-tenant.sh <tenant-id> [aws-region]
+# Usage: infra/provision-tenant.sh <tenant-id> [aws-region] [max-concurrency]
+#
+# max-concurrency overrides the template's MaxTenantConcurrency (default
+# 2, i.e. the ReservedConcurrentExecutions on that tenant's Lambda
+# function — see ARCHITECTURE.md's "Reserved concurrency and the
+# microVM pool" section for what this actually caps). Every AWS account
+# must keep at least 10 units of *unreserved* concurrency free at all
+# times; on accounts with a low total Lambda concurrency quota, adding
+# a new tenant at the default of 2 can fail with "decreases account's
+# UnreservedConcurrentExecution below its minimum value of [10]" once
+# enough tenants exist. Pass a smaller value (as low as 1) to fit a new
+# tenant into whatever headroom remains, at the cost of that tenant only
+# being able to run one concurrent request before others are throttled.
 #
 # Requires: AWS CLI configured with credentials that have the
 # least-privilege permissions described in spec/01-aws-account-onboarding.md,
@@ -12,8 +24,9 @@
 
 set -euo pipefail
 
-TENANT_ID="${1:?Usage: provision-tenant.sh <tenant-id> [aws-region]}"
+TENANT_ID="${1:?Usage: provision-tenant.sh <tenant-id> [aws-region] [max-concurrency]}"
 REGION="${2:-${AWS_DEFAULT_REGION:-us-east-1}}"
+MAX_CONCURRENCY="${3:-}"
 STACK_NAME="dillinger-${TENANT_ID}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -22,9 +35,14 @@ if ! [[ "$TENANT_ID" =~ ^[a-z0-9-]+$ ]]; then
   exit 1
 fi
 
+PARAM_OVERRIDES=("TenantId=${TENANT_ID}")
+if [[ -n "$MAX_CONCURRENCY" ]]; then
+  PARAM_OVERRIDES+=("MaxTenantConcurrency=${MAX_CONCURRENCY}")
+fi
+
 # shellcheck source=orchestrator/lib/config-hash.sh
 source "$REPO_ROOT/infra/orchestrator/lib/config-hash.sh"
-CONFIG_HASH=$(compute_config_hash "$REPO_ROOT/infra/template.yaml" "TenantId=${TENANT_ID}")
+CONFIG_HASH=$(compute_config_hash "$REPO_ROOT/infra/template.yaml" "${PARAM_OVERRIDES[@]}")
 TAGS=("DillingerConfigHash=${CONFIG_HASH}" "Project=dillinger-aws" "TenantId=${TENANT_ID}")
 
 echo "==> Building ${STACK_NAME} (tenant: ${TENANT_ID}, region: ${REGION})"
@@ -38,7 +56,7 @@ sam deploy \
   --resolve-image-repos \
   --resolve-s3 \
   --capabilities CAPABILITY_IAM \
-  --parameter-overrides "TenantId=${TENANT_ID}" \
+  --parameter-overrides "${PARAM_OVERRIDES[@]}" \
   --tags "${TAGS[@]}" \
   --no-confirm-changeset \
   --no-fail-on-empty-changeset
@@ -56,7 +74,7 @@ sam deploy \
   --resolve-image-repos \
   --resolve-s3 \
   --capabilities CAPABILITY_IAM \
-  --parameter-overrides "TenantId=${TENANT_ID}" "NextPublicBaseUrl=${FUNCTION_URL}" \
+  --parameter-overrides "${PARAM_OVERRIDES[@]}" "NextPublicBaseUrl=${FUNCTION_URL}" \
   --tags "${TAGS[@]}" \
   --no-confirm-changeset \
   --no-fail-on-empty-changeset
