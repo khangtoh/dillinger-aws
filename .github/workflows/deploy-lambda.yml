@@ -97,7 +97,9 @@ jobs:
         run: infra/provision-tenant.sh "${STAGING_TENANT_ID}" "${AWS_REGION}"
 
       - name: Smoke test
+        id: smoke
         run: |
+          set -euo pipefail
           FUNCTION_URL=$(python3 -c "
           import json
           data = json.load(open('infra/tenants.json'))
@@ -110,6 +112,57 @@ jobs:
             echo "Smoke test failed" >&2
             exit 1
           fi
+          echo "function_url=${FUNCTION_URL}" >> "$GITHUB_OUTPUT"
+          echo "http_status=${status}" >> "$GITHUB_OUTPUT"
+
+      # Makes the deployed URL something an engineer can actually find and
+      # check, not just a fact buried in step logs: a Job Summary entry
+      # visible directly on the run page, plus a downloadable JSON artifact
+      # with enough detail (commit, smoke-test result, timestamp) to verify
+      # which code is live without re-running anything.
+      - name: Publish deployment URL artifact
+        run: |
+          set -euo pipefail
+          FUNCTION_URL="${{ steps.smoke.outputs.function_url }}"
+          HTTP_STATUS="${{ steps.smoke.outputs.http_status }}"
+          DEPLOYED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          mkdir -p artifact
+          cat > artifact/deployment-info.json <<JSON
+          {
+            "tenantId": "${STAGING_TENANT_ID}",
+            "functionUrl": "${FUNCTION_URL}",
+            "region": "${AWS_REGION}",
+            "smokeTestHttpStatus": "${HTTP_STATUS}",
+            "commitSha": "${{ github.sha }}",
+            "branch": "${GITHUB_REF_NAME}",
+            "deployedAt": "${DEPLOYED_AT}",
+            "workflowRunUrl": "${RUN_URL}"
+          }
+          JSON
+          cat artifact/deployment-info.json
+
+          {
+            echo "## Deployment: \`${STAGING_TENANT_ID}\`"
+            echo ""
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Function URL | ${FUNCTION_URL} |"
+            echo "| Smoke test | HTTP ${HTTP_STATUS} |"
+            echo "| Region | ${AWS_REGION} |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo "| Deployed at (UTC) | ${DEPLOYED_AT} |"
+            echo ""
+            echo "Verify independently: \`curl -I ${FUNCTION_URL}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload deployment URL artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-info-${{ env.STAGING_TENANT_ID }}
+          path: artifact/deployment-info.json
+          if-no-files-found: error
 
       - name: Commit updated tenant registry
         run: |

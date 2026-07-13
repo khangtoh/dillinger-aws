@@ -72,7 +72,19 @@ Three properties this buys:
 4. **Smoke test** — curls the staging Function URL from
    `infra/tenants.json` and fails the run on any non-2xx/3xx status, so
    a deploy that technically succeeded but serves errors still fails CI.
-5. **Commit `infra/tenants.json` back** if the registry changed.
+5. **Publish the deployment URL artifact** — so an engineer looking at
+   the run doesn't have to dig through step logs or clone the repo to
+   find out what got deployed and whether it's actually up:
+   - A **Job Summary** entry (visible directly on the run's page in the
+     GitHub UI) with the Function URL, smoke-test HTTP status, region,
+     commit SHA, and UTC deploy time.
+   - A downloadable **`deployment-info-<tenant-id>` artifact**
+     (`deployment-info.json`) with the same fields in machine-readable
+     form, so it can be diffed against a previous run, fed into another
+     tool, or just fetched via `gh run download` without re-running
+     anything. Includes a `curl -I <url>` line an engineer can run
+     themselves to independently re-verify it's live.
+6. **Commit `infra/tenants.json` back** if the registry changed.
 
 ## Trigger policy: manual only (deliberate)
 
@@ -93,8 +105,10 @@ Environment with required reviewers for an approval gate.
 ## Per-branch tenants: `deploy-branch-tenant.yml`
 
 Same security gate, same OIDC auth, same `infra/provision-tenant.sh`
-script as `deploy-lambda.yml` — the differences are the trigger type and
-which tenant id gets deployed.
+script, and the same Job Summary + `deployment-info-<tenant-id>`
+artifact publishing as `deploy-lambda.yml` (see "What the workflow does"
+above) — the differences are the trigger type and which tenant id gets
+deployed.
 
 **Trigger: `push`, scoped to an explicit branch allowlist — not
 `workflow_dispatch`, and not "every branch."** `workflow_dispatch` only
