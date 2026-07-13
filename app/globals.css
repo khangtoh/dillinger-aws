@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 @import "katex/dist/katex.min.css";
+/* Astryx spike (Phase 14): the documented integration snippet uses
+   Tailwind v4's @layer/@import ... layer(theme) cascade syntax, which
+   doesn't apply here (this repo is on Tailwind 3.4.1) - Astryx's own
+   CSS files are plain stylesheets with no v4 dependency, so plain
+   @import in cascade order works without it. */
+@import "@astryxdesign/core/reset.css";
+@import "@astryxdesign/core/astryx.css";
+@import "@astryxdesign/theme-neutral/theme.css";
+@import "@astryxdesign/core/tailwind-theme.css";
 
 body {
   background: #ffffff;
