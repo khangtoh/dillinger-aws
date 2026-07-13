@@ -23,34 +23,133 @@ Depends on: Phase 14 **Go** decision.
 
 ## Clarification pass
 
-- [ ] Re-read `components/*/CLAUDE.md` recent-activity notes for any
+- [x] Re-read `components/*/CLAUDE.md` recent-activity notes for any
       component listed below to catch undocumented recent changes before
       migrating it (the repo's memory notes may be ahead of this spec).
-- [ ] For each of UI-3 (scroll-sync) and UI-4 (Mermaid/diagram support),
+      **Done**: `components/ui/CLAUDE.md`'s recent-activity table covers
+      only Toast (z-index token, a11y attributes, the original custom
+      implementation) — nothing undocumented in this spec. No recent-
+      activity entries exist for Skeleton or KeyboardShortcuts beyond
+      what this spec already describes.
+- [x] For each of UI-3 (scroll-sync) and UI-4 (Mermaid/diagram support),
       confirm current behavior by exercising the running app first —
       Phase 13 flagged these as "confirm and close the gap, don't assume
       it's missing." Record what's actually there before writing tasks
-      that assume a blank slate.
-- [ ] Decide the Mermaid/diagram rendering library (e.g. `mermaid` npm
+      that assume a blank slate. **UI-3 is already fully wired, not
+      missing**: `MonacoEditor.tsx`'s `onDidScrollChange` listener
+      computes a scroll percent + top visible line and writes them to
+      `editorScrollPercent`/`editorTopLine` in `stores/store.ts`;
+      `MarkdownPreview.tsx` reads both and sets `scrollTop` on the
+      preview container (line-anchor-based when `data-line-start`
+      markers are present, percent-based fallback otherwise), gated by
+      `settings.enableScrollSync` (default `true`). Confirmed by reading
+      the full call path; could not additionally drive it with a live
+      mouse-wheel scroll in this sandbox because Monaco itself fails to
+      load here (blocked CDN egress, `ERR_TUNNEL_CONNECTION_FAILED` —
+      the same pre-existing sandbox limitation Phase 14 already
+      documented, unrelated to this change). **UI-4 is genuinely
+      missing**, confirmed by grepping the whole repo for `mermaid`
+      (zero matches in `lib/`, `components/`, or `package.json`) — this
+      one really does need to be built from a blank slate.
+- [x] Decide the Mermaid/diagram rendering library (e.g. `mermaid` npm
       package client-side-only, matching the existing dynamic-import
       pattern used for Monaco) and confirm it does not require a Lambda
       packaging change (no native binary, unlike `@sparticuz/chromium`) —
       if it does, stop and route to Phase 13/`ARCHITECTURE.md` review
-      before continuing.
+      before continuing. **Decision: `mermaid` (npm, currently
+      `11.16.0`)**. Checked its full dependency tree via
+      `npm view mermaid dependencies`: every dependency is pure JS/TS
+      (`d3`, `cytoscape`, `dompurify`, `katex`, `dagre-d3-es`, etc.) —
+      no native/binary addons, unlike `@sparticuz/chromium`'s Lambda
+      layer requirement. It will be dynamic-imported client-side-only
+      (`dynamic(..., { ssr: false })`, matching the existing
+      Monaco/Sidebar pattern), so it never runs in the Lambda server
+      bundle at all — no packaging change needed. This decision and its
+      implementation is UI-4's own task group below, not this group;
+      recorded here per this checklist item's scope.
 
 ## Toast, Skeleton, KeyboardShortcuts (lowest-risk first)
 
-- [ ] Migrate `components/ui/Toast.tsx` to the Astryx toast/notification
+- [x] Migrate `components/ui/Toast.tsx` to the Astryx toast/notification
       primitive (swizzled), preserving `useToast()`'s existing call
-      signature so no call site changes.
-- [ ] Run `tests/components/toast.test.tsx`; update only assertions tied
+      signature so no call site changes. **Done**: `@astryxdesign/core`
+      ships a full toast primitive (`Toast` + `ToastViewport` +
+      `useToast()`), but its own `useToast()`/`ToastViewport` state
+      machine has a different call signature (`ToastOptions.body`,
+      `autoHideDuration`) than this app's `notify(message, duration?)` —
+      adopting it wholesale would mean rewriting every call site listed
+      in the working rules as "no call site changes." Instead: kept this
+      file's own `ToastProvider`/`useToast()` context and state
+      (`notify`, `dismiss`, the 150ms exit-delay before unmount) exactly
+      as-is, and swapped only the per-toast **rendered markup** — the
+      hand-rolled `<div>`/`<button><X/></button>` — for Astryx's
+      presentational `Toast` component (`@astryxdesign/core/Toast`),
+      which owns its own auto-hide timer via `isAutoHide`/
+      `autoHideDuration` (driven by our existing `duration` value) and
+      exposes the same `onDismiss` callback shape this file already
+      used. The outer container (`role="status"`, `aria-live="polite"`,
+      `aria-label="Notifications"`, `z-toast` positioning) is untouched.
+      Real-browser-verified (Playwright/Chromium): clicking "Save
+      Session" shows a correctly styled "Documents saved" toast with a
+      working dismiss button, zero new console errors.
+- [x] Run `tests/components/toast.test.tsx`; update only assertions tied
       to markup that intentionally changed, and confirm it passes.
-- [ ] Migrate `components/ui/Skeleton.tsx` to the Astryx skeleton/loading
+      **Done, zero assertion changes needed**: all 7 tests passed
+      unmodified — the outer container's role/aria-live/aria-label were
+      preserved exactly, and Astryx's `Toast` dismiss button already uses
+      `aria-label="Dismiss notification"` (its `label` prop), matching
+      this suite's existing query.
+- [x] Migrate `components/ui/Skeleton.tsx` to the Astryx skeleton/loading
       primitive if one exists; otherwise leave as-is and record why.
-- [ ] Run `tests/components/skeleton.test.tsx` and confirm it passes.
-- [ ] Migrate `components/ui/KeyboardShortcuts.tsx`'s modal chrome to the
+      **Left as-is — an Astryx `Skeleton` primitive exists
+      (`@astryxdesign/core/Skeleton`) but doesn't fit here.** This file's
+      `EditorSkeleton` is a full-page compound layout (`aside`/`main`
+      structure, a dozen distinct pulse-block sizes) built entirely from
+      this repo's Tailwind design-token classes (`w-sidebar`, `h-dvh`,
+      `p-4`, etc., per `CLAUDE.md`'s styling conventions) — only the leaf
+      pulse blocks are candidates for the primitive swap, and Astryx's
+      `Skeleton` takes explicit numeric/CSS `width`/`height` props (no
+      Tailwind sizing-class support), so migrating them would mean
+      hand-translating every `h-8 w-32`/`h-6 w-24`/etc. utility into
+      pixel props with no reuse benefit, breaking every existing
+      Tailwind-class-based test assertion in the process. It's also a
+      real behavior change, not just a markup swap: Astryx's `Skeleton`
+      uses a `steps()` keyframe animation with a 1000ms pre-animation
+      delay (deliberately avoiding a flash on fast loads), while this
+      component's whole purpose is an *immediate* perceived-loading cue
+      via Tailwind's `animate-pulse` — regressing that for a decorative,
+      non-interactive element buys nothing. Kept unchanged.
+- [x] Run `tests/components/skeleton.test.tsx` and confirm it passes.
+      **Passes, unmodified** — no code changed, so no assertions needed
+      updating.
+- [x] Migrate `components/ui/KeyboardShortcuts.tsx`'s modal chrome to the
       Astryx dialog primitive, preserving the documented shortcut list
-      content unchanged.
+      content unchanged. **Done**: replaced the hand-rolled
+      `role="dialog"`/backdrop/`useEffect` Escape-listener/focus-ref
+      chrome with Astryx's `Dialog` + `DialogHeader` +
+      `Layout`/`LayoutContent` (`@astryxdesign/core/Dialog`,
+      `@astryxdesign/core/Layout`). Astryx's `Dialog` uses the native
+      `<dialog>` element (`showModal()`), so `role="dialog"`/
+      `aria-modal` are implicit rather than hand-set; Escape and
+      backdrop-click dismissal are handled internally (`purpose="info"`
+      default matches this modal's original click-outside-to-close
+      behavior); `DialogHeader` auto-focuses its title `<h2>` on open
+      (screen-reader convention) in place of the original's manual
+      close-button focus; `LayoutContent` provides the scrollable body
+      area in place of the original's manual `max-h-[60vh] overflow-y-
+      auto`. The `SHORTCUT_GROUPS` data and its rendered markup
+      (headings, `<kbd>` keys) are byte-for-byte unchanged, per this
+      task's own instruction. No existing test file covers this
+      component (`tests/components/` has none), so there were no
+      assertions to update. Added a jsdom `HTMLDialogElement.prototype.
+      showModal`/`close` shim to `vitest.setup.ts` (Astryx's own
+      `Dialog.test.tsx` uses the identical shim) so any future test —
+      and this suite's own environment — can render it; the full suite
+      (317 tests) still passes with this shim in place, and it changes
+      nothing for tests that don't touch a `<dialog>` element.
+      Real-browser-verified (Playwright/Chromium): the `?` shortcut opens
+      the dialog with correct title/close-button/backdrop styling and
+      the full unmodified shortcut list, zero new console errors.
 
 ## Navbar
 

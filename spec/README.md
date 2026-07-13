@@ -130,8 +130,21 @@ multi-tenancy/gateway model from Phases 1-12.
       tally and two carry-forward costs recorded for Phase 15
       (`@stylexjs/unplugin` wiring + import fixups; a custom theme file
       still needed to match the plum brand). **Phase 15 is unblocked.**
-      Separately, not yet done: the Lambda container build and staging
-      deploy for the Phase 19 stack upgrade (no Docker in the dev
+      **Phase 15 in progress** (2026-07-13): clarification pass done
+      (UI-3 scroll-sync confirmed already fully wired end-to-end,
+      UI-4 diagram library decided — `mermaid`, pure-JS deps, client-only
+      dynamic import, no Lambda packaging impact) and the lowest-risk
+      "Toast, Skeleton, KeyboardShortcuts" migration group is complete:
+      Toast and KeyboardShortcuts now use Astryx's `Toast`/`Dialog`
+      primitives (`useToast()`'s call signature and Toast's container
+      role/aria unchanged; KeyboardShortcuts' shortcut-list content
+      unchanged), Skeleton intentionally left hand-rolled Tailwind (see
+      `spec/15-ui-component-migration.md` for why), full unit suite green
+      (317 passed / 1 pre-existing skip), typecheck/lint clean, real-
+      browser-verified (Playwright) with zero new console errors. Navbar,
+      Sidebar/modals, and the new UI-2..UI-6 requirements are still
+      unstarted. Separately, not yet done: the Lambda container build and
+      staging deploy for the Phase 19 stack upgrade (no Docker in the dev
       sandbox; deploy workflow is manual-dispatch-only) — needs a CI run
       before that upgrade reaches the live tenant. Update this line with
       the tenant URL and date once Phase 18 closes out.

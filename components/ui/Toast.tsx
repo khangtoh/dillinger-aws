@@ -7,11 +7,12 @@ import {
   useCallback,
   ReactNode,
 } from "react";
-import { X } from "lucide-react";
+import { Toast as AstryxToast } from "@astryxdesign/core/Toast";
 
 interface Toast {
   id: string;
   message: string;
+  duration: number;
 }
 
 interface ToastContextType {
@@ -24,6 +25,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [exiting, setExiting] = useState<Set<string>>(new Set());
 
+  // Astryx's <Toast> owns its own auto-hide timer (isAutoHide/autoHideDuration)
+  // and calls onDismiss when it fires or the user clicks its dismiss button.
+  // We only own the exit-animation delay before actually unmounting.
   const dismiss = useCallback((id: string) => {
     setExiting((prev) => new Set(prev).add(id));
     setTimeout(() => {
@@ -38,14 +42,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const notify = useCallback((message: string, duration = 3000) => {
     const id = Date.now().toString();
-    setToasts((prev) => [...prev, { id, message }]);
-
-    if (duration > 0) {
-      setTimeout(() => {
-        dismiss(id);
-      }, duration);
-    }
-  }, [dismiss]);
+    setToasts((prev) => [...prev, { id, message, duration }]);
+  }, []);
 
   return (
     <ToastContext.Provider value={{ notify }}>
@@ -57,22 +55,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         aria-label="Notifications"
       >
         {toasts.map((toast) => (
-          <div
+          <AstryxToast
             key={toast.id}
-            className={`bg-bg-navbar text-text-invert px-4 py-3 rounded shadow-lg
-                       flex items-center gap-3 transition-opacity duration-150
-                       ${exiting.has(toast.id) ? "opacity-0" : "animate-in"}`}
-          >
-            <span className="text-sm">{toast.message}</span>
-            <button
-              onClick={() => dismiss(toast.id)}
-              aria-label="Dismiss notification"
-              className="hover:opacity-70 transition-opacity rounded
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
-            >
-              <X size={16} />
-            </button>
-          </div>
+            type="info"
+            body={toast.message}
+            isAutoHide={toast.duration > 0}
+            autoHideDuration={toast.duration}
+            isExiting={exiting.has(toast.id)}
+            onDismiss={() => dismiss(toast.id)}
+          />
         ))}
       </div>
     </ToastContext.Provider>
