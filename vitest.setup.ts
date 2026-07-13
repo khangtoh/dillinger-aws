@@ -69,3 +69,31 @@ class ResizeObserverMock {
 }
 
 vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+// jsdom doesn't implement the native Popover API (showPopover/hidePopover/
+// the `:popover-open` pseudo-class) that Astryx's usePopover relies on
+// (Phase 14 swizzle spike) — same shim Astryx's own component tests use.
+if (typeof HTMLElement !== "undefined") {
+  HTMLElement.prototype.showPopover ??= function (this: HTMLElement) {
+    this.setAttribute("popover-open", "");
+    const event = new Event("toggle", { bubbles: false });
+    Object.defineProperty(event, "newState", { value: "open" });
+    this.dispatchEvent(event);
+  };
+  HTMLElement.prototype.hidePopover ??= function (this: HTMLElement) {
+    this.removeAttribute("popover-open");
+    const event = new Event("toggle", { bubbles: false });
+    Object.defineProperty(event, "newState", { value: "closed" });
+    this.dispatchEvent(event);
+  };
+  const originalMatches = HTMLElement.prototype.matches;
+  HTMLElement.prototype.matches = function (
+    this: HTMLElement,
+    selector: string
+  ): boolean {
+    if (selector === ":popover-open") {
+      return this.hasAttribute("popover-open");
+    }
+    return originalMatches.call(this, selector);
+  };
+}

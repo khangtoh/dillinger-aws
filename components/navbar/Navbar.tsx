@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useRef, useCallback, useMemo } from "react";
 import { useStore } from "@/stores/store";
 import { useToast } from "@/components/ui/Toast";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { importDocumentFile } from "@/lib/import";
 import { SAME_ORIGIN_JSON_HEADERS } from "@/lib/client-request";
+import { DropdownMenu, type DropdownMenuOption } from "@/components/astryx/DropdownMenu";
 import {
   Menu,
   Eye,
@@ -42,39 +43,14 @@ export function Navbar() {
   const { notify } = useToast();
   const { upload } = useImageUpload();
 
-  const [exportOpen, setExportOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
-
-  // Close dropdown on Escape key or click outside
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && exportOpen) {
-        setExportOpen(false);
-      }
-    };
-
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setExportOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [exportOpen]);
 
   const handleExport = useCallback(async (
     format: ExportFormat,
     options?: { styled?: boolean }
   ) => {
     if (!currentDocument) return;
-    setExportOpen(false);
 
     const formatLabel = format === "html" && options?.styled
       ? "styled HTML"
@@ -119,6 +95,13 @@ export function Navbar() {
       }
     }
   }, [currentDocument, notify]);
+
+  const exportItems = useMemo<DropdownMenuOption[]>(() => [
+    { label: "Markdown", icon: FileText, onClick: () => handleExport("markdown") },
+    { label: "HTML", icon: FileCode, onClick: () => handleExport("html", { styled: false }) },
+    { label: "Styled HTML", icon: FileCode, onClick: () => handleExport("html", { styled: true }) },
+    { label: "PDF", icon: FileType, onClick: () => handleExport("pdf") },
+  ], [handleExport]);
 
   const handleImportSelection = useCallback(async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -204,69 +187,22 @@ export function Navbar() {
           <span className="hidden sm:inline">Image</span>
         </button>
 
-        {/* Export dropdown */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setExportOpen(!exportOpen)}
-            aria-expanded={exportOpen}
-            aria-haspopup="menu"
-            aria-label="Export document"
-            className="text-text-invert hover:text-plum transition-all active:scale-[0.97] px-3 py-2
-                       flex items-center gap-1 text-sm rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
-          >
-            <Download size={18} />
-            <span className="hidden sm:inline">Export as</span>
-          </button>
-          {exportOpen && (
-            <div
-              role="menu"
-              aria-label="Export formats"
-              className="absolute right-0 top-full mt-1 bg-bg-navbar rounded shadow-lg py-1 min-w-[150px] animate-fade-in"
-            >
-              <button
-                role="menuitem"
-                onClick={() => handleExport("markdown")}
-                className="w-full px-4 py-2 text-left text-text-invert hover:bg-bg-highlight
-                           flex items-center gap-2 text-sm
-                           focus-visible:outline-none focus-visible:bg-bg-highlight"
-              >
-                <FileText size={16} />
-                Markdown
-              </button>
-              <button
-                role="menuitem"
-                onClick={() => handleExport("html", { styled: false })}
-                className="w-full px-4 py-2 text-left text-text-invert hover:bg-bg-highlight
-                           flex items-center gap-2 text-sm
-                           focus-visible:outline-none focus-visible:bg-bg-highlight"
-              >
-                <FileCode size={16} />
-                HTML
-              </button>
-              <button
-                role="menuitem"
-                onClick={() => handleExport("html", { styled: true })}
-                className="w-full px-4 py-2 text-left text-text-invert hover:bg-bg-highlight
-                           flex items-center gap-2 text-sm
-                           focus-visible:outline-none focus-visible:bg-bg-highlight"
-              >
-                <FileCode size={16} />
-                Styled HTML
-              </button>
-              <button
-                role="menuitem"
-                onClick={() => handleExport("pdf")}
-                className="w-full px-4 py-2 text-left text-text-invert hover:bg-bg-highlight
-                           flex items-center gap-2 text-sm
-                           focus-visible:outline-none focus-visible:bg-bg-highlight"
-              >
-                <FileType size={16} />
-                PDF
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Export dropdown — Phase 14 swizzle spike: swizzled from
+            Astryx's DropdownMenu (components/astryx/DropdownMenu). Replaces
+            the hand-rolled useState/useEffect/ref dismissible-panel pattern;
+            open state, Escape, click-outside, and focus-return are all
+            handled internally by the component's usePopover/useListFocus. */}
+        <DropdownMenu
+          items={exportItems}
+          hasChevron={false}
+          button={{
+            label: "Export as",
+            icon: <Download size={18} />,
+            variant: "ghost",
+            "aria-label": "Export document",
+            className: "text-text-invert hover:text-plum",
+          }}
+        />
 
         {/* Preview toggle */}
         <button
