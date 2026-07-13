@@ -26,6 +26,7 @@ const SHORTCUT_GROUPS = [
     shortcuts: [
       { keys: ["⌘", "⇧", "Z"], action: "Toggle zen mode" },
       { keys: ["Escape"], action: "Exit zen mode" },
+      { keys: ["⌘", "K"], action: "Command palette" },
     ],
   },
   {
@@ -42,7 +43,7 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
   };
 
   return (
-    <Dialog isOpen={isOpen} onOpenChange={handleOpenChange} width={384}>
+    <Dialog isOpen={isOpen} onOpenChange={handleOpenChange} width={384} aria-label="Keyboard Shortcuts">
       <Layout
         header={
           <DialogHeader title="Keyboard Shortcuts" onOpenChange={handleOpenChange} />

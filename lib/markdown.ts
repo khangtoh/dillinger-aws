@@ -8,6 +8,34 @@ const lineNumberRendererRuleNames = [
   "list_item_open",
 ] as const;
 
+// Mermaid diagrams render client-side only (MarkdownPreview.tsx dynamic-
+// imports the `mermaid` package and hydrates these containers into SVG) —
+// this just marks fenced ```mermaid blocks so that client-side step knows
+// where to look, and keeps the raw diagram source out of a <code> block
+// so it isn't syntax-highlighted or displayed as literal text once
+// hydrated.
+function applyMermaidFenceRule(instance: MarkdownIt) {
+  const previousFence = instance.renderer.rules.fence;
+
+  instance.renderer.rules.fence = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    const info = token.info ? instance.utils.unescapeAll(token.info).trim() : "";
+    const langName = info.split(/\s+/)[0];
+
+    if (langName === "mermaid") {
+      const lineAttrs = token.map?.length
+        ? ` class="has-line-data" data-line-start="${token.map[0] + 1}" data-line-end="${token.map[1]}"`
+        : "";
+      const source = instance.utils.escapeHtml(token.content);
+      return `<div class="mermaid-diagram"${lineAttrs}>${source}</div>\n`;
+    }
+
+    return previousFence
+      ? previousFence(tokens, idx, options, env, self)
+      : self.renderToken(tokens, idx, options);
+  };
+}
+
 function applyLegacyRendererRules(instance: MarkdownIt) {
   instance.renderer.rules.table_open = (tokens, idx, options, env, self) => {
     const token = tokens[idx];
@@ -126,6 +154,7 @@ async function getMarkdownRenderer(allowHtml: boolean): Promise<MarkdownIt> {
     });
 
   applyLegacyRendererRules(renderer);
+  applyMermaidFenceRule(renderer);
 
   if (allowHtml) {
     md = renderer;

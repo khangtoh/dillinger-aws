@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { useStore } from "@/stores/store";
+import type { ThemeMode } from "@/lib/types";
+import { Dialog, DialogHeader } from "@astryxdesign/core/Dialog";
+import { Layout, LayoutContent } from "@astryxdesign/core/Layout";
+import { Button } from "@astryxdesign/core/Button";
+import { SegmentedControl, SegmentedControlItem } from "@astryxdesign/core/SegmentedControl";
 import { X } from "lucide-react";
 
 export function SettingsModal() {
@@ -9,61 +13,48 @@ export function SettingsModal() {
   const settings = useStore((state) => state.settings);
   const toggleSettings = useStore((state) => state.toggleSettings);
   const updateSettings = useStore((state) => state.updateSettings);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Handle Escape key
-  useEffect(() => {
-    if (!settingsOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        toggleSettings();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    closeButtonRef.current?.focus();
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [settingsOpen, toggleSettings]);
+  if (!settingsOpen) return null;
 
   return (
-    <div
-      className={`fixed inset-0 z-settings transition-opacity duration-300
-                  ${settingsOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-      style={{ transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)" }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="settings-title"
+    <Dialog
+      isOpen
+      onOpenChange={() => toggleSettings()}
+      width={360}
+      aria-label="Settings"
     >
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={toggleSettings}
-        aria-hidden="true"
-      />
+      <Layout
+        header={
+          <DialogHeader
+            title="Settings"
+            endContent={
+              <Button
+                label="Close settings"
+                icon={<X size={20} />}
+                variant="ghost"
+                isIconOnly
+                onClick={() => toggleSettings()}
+              />
+            }
+          />
+        }
+        content={
+          <LayoutContent>
+          <div className="space-y-4">
+          {/* Theme */}
+          <div className="flex items-center justify-between">
+            <span className="text-text-primary text-sm">Theme</span>
+            <SegmentedControl
+              label="Theme"
+              value={settings.theme}
+              onChange={(value) => updateSettings({ theme: value as ThemeMode })}
+            >
+              <SegmentedControlItem value="light" label="Light" />
+              <SegmentedControlItem value="dark" label="Dark" />
+              <SegmentedControlItem value="system" label="System" />
+            </SegmentedControl>
+          </div>
 
-      <div
-        className={`absolute right-0 top-0 h-full w-80 bg-bg-navbar shadow-xl
-                    transition-transform duration-300
-                    ${settingsOpen ? "translate-x-0" : "translate-x-full"}`}
-        style={{ transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)" }}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-border-settings">
-          <h2 id="settings-title" className="text-text-invert font-semibold text-balance">Settings</h2>
-          <button
-            ref={closeButtonRef}
-            onClick={toggleSettings}
-            aria-label="Close settings"
-            className="text-text-invert hover:text-plum transition-colors rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        <div className="p-4 space-y-4">
           {/* Auto Save */}
           <SettingToggle
             id="auto-save"
@@ -106,7 +97,7 @@ export function SettingsModal() {
 
           {/* Tab Size */}
           <div className="flex items-center justify-between">
-            <label htmlFor="tab-size" className="text-text-invert text-sm">Tab Size</label>
+            <label htmlFor="tab-size" className="text-text-primary text-sm">Tab Size</label>
             <select
               id="tab-size"
               value={settings.tabSize}
@@ -122,7 +113,7 @@ export function SettingsModal() {
 
           {/* Keybindings */}
           <div className="flex items-center justify-between">
-            <label htmlFor="keybindings" className="text-text-invert text-sm">Keybindings</label>
+            <label htmlFor="keybindings" className="text-text-primary text-sm">Keybindings</label>
             <select
               id="keybindings"
               value={settings.keybindings}
@@ -139,9 +130,11 @@ export function SettingsModal() {
               <option value="emacs">Emacs</option>
             </select>
           </div>
-        </div>
-      </div>
-    </div>
+          </div>
+          </LayoutContent>
+        }
+      />
+    </Dialog>
   );
 }
 
@@ -158,14 +151,14 @@ function SettingToggle({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <label htmlFor={id} className="text-text-invert text-sm">{label}</label>
+      <label htmlFor={id} className="text-text-primary text-sm">{label}</label>
       <button
         id={id}
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`w-12 h-6 rounded-full relative transition-colors
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar ${
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
           checked ? "bg-plum" : "bg-switchery"
         }`}
       >

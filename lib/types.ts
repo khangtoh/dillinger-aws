@@ -12,6 +12,8 @@ export interface Document {
   };
 }
 
+export type ThemeMode = "light" | "dark" | "system";
+
 export interface UserSettings {
   enableAutoSave: boolean;
   enableWordsCount: boolean;
@@ -21,6 +23,7 @@ export interface UserSettings {
   keybindings: "default" | "vim" | "emacs";
   enableNightMode: boolean;
   enableGitHubComment: boolean;
+  theme: ThemeMode;
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -32,6 +35,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   keybindings: "default",
   enableNightMode: false,
   enableGitHubComment: true,
+  theme: "system",
 };
 
 export const DEFAULT_DOCUMENT_BODY = `# Welcome to Dillinger

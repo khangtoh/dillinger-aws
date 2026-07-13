@@ -4,8 +4,8 @@ import { useRef, useCallback, useMemo } from "react";
 import { useStore } from "@/stores/store";
 import { useToast } from "@/components/ui/Toast";
 import { useImageUpload } from "@/hooks/useImageUpload";
+import { useExport } from "@/hooks/useExport";
 import { importDocumentFile } from "@/lib/import";
-import { SAME_ORIGIN_JSON_HEADERS } from "@/lib/client-request";
 import { DropdownMenu, type DropdownMenuOption } from "@/components/astryx/DropdownMenu";
 import { Button } from "@astryxdesign/core/Button";
 import { ToggleButton } from "@astryxdesign/core/ToggleButton";
@@ -22,81 +22,26 @@ import {
   Upload,
   ImagePlus,
   HelpCircle,
+  Type,
 } from "lucide-react";
-
-type ExportFormat = "markdown" | "html" | "pdf";
-
-function getDownloadFilename(response: Response, fallback: string): string {
-  const contentDisposition = response.headers.get("Content-Disposition");
-  const match = contentDisposition?.match(/filename="?([^"]+)"?/i);
-  return match?.[1] || fallback;
-}
 
 export function Navbar() {
   const toggleSidebar = useStore((state) => state.toggleSidebar);
   const toggleSettings = useStore((state) => state.toggleSettings);
   const togglePreview = useStore((state) => state.togglePreview);
   const previewVisible = useStore((state) => state.previewVisible);
-  const currentDocument = useStore((state) => state.currentDocument);
+  const toggleToolbar = useStore((state) => state.toggleToolbar);
+  const toolbarVisible = useStore((state) => state.toolbarVisible);
   const createImportedDocument = useStore((state) => state.createImportedDocument);
   const insertMarkdownAtCursor = useStore((state) => state.insertMarkdownAtCursor);
   const setZenMode = useStore((state) => state.setZenMode);
   const toggleShortcuts = useStore((state) => state.toggleShortcuts);
   const { notify } = useToast();
   const { upload } = useImageUpload();
+  const { handleExport } = useExport();
 
   const importInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
-
-  const handleExport = useCallback(async (
-    format: ExportFormat,
-    options?: { styled?: boolean }
-  ) => {
-    if (!currentDocument) return;
-
-    const formatLabel = format === "html" && options?.styled
-      ? "styled HTML"
-      : format.toUpperCase();
-
-    try {
-      notify(`Preparing ${formatLabel}...`);
-
-      const response = await fetch(`/api/export/${format}`, {
-        method: "POST",
-        headers: SAME_ORIGIN_JSON_HEADERS,
-        body: JSON.stringify({
-          markdown: currentDocument.body,
-          title: currentDocument.title,
-          styled: options?.styled,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Export failed");
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = getDownloadFilename(
-        response,
-        `${currentDocument.title}.${format === "markdown" ? "md" : format}`
-      );
-      a.click();
-      URL.revokeObjectURL(url);
-
-      notify(
-        format === "html" && options?.styled === true
-          ? "Exported as styled HTML"
-          : `Exported as ${format.toUpperCase()}`
-      );
-    } catch (error) {
-      if (error instanceof TypeError) {
-        notify(`${formatLabel} export failed — check your connection`);
-      } else {
-        notify(`${formatLabel} export failed — please try again`);
-      }
-    }
-  }, [currentDocument, notify]);
 
   const exportItems = useMemo<DropdownMenuOption[]>(() => [
     { label: "Markdown", icon: FileText, onClick: () => handleExport("markdown") },
@@ -214,6 +159,17 @@ export function Navbar() {
           onPressedChange={() => togglePreview()}
           isIconOnly
           tooltip={previewVisible ? "Hide preview" : "Show preview"}
+          className="text-text-invert hover:text-plum"
+        />
+
+        {/* Formatting toolbar toggle */}
+        <ToggleButton
+          label={toolbarVisible ? "Hide formatting toolbar" : "Show formatting toolbar"}
+          icon={<Type size={20} />}
+          isPressed={toolbarVisible}
+          onPressedChange={() => toggleToolbar()}
+          isIconOnly
+          tooltip={toolbarVisible ? "Hide formatting toolbar" : "Show formatting toolbar"}
           className="text-text-invert hover:text-plum"
         />
 

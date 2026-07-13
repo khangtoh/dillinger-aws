@@ -25,6 +25,18 @@ body {
   color: #373D49;
 }
 
+/* Astryx's reset sets color directly on bare tags (h1, p, li, td, etc.),
+   which beats .preview-html's own color since that's only inherited by
+   descendants, not redeclared per-element (Phase 15 UI-6 finding: this
+   was latent even before UI-6 since Astryx's Theme wrapper always sets
+   an inherited color, just invisible while light mode's resolved value
+   happened to look like default black text — real once dark mode became
+   reachable). More specific selectors below (links, blockquote, dark-mode
+   variants) still win over this on specificity. */
+.preview-html * {
+  color: #373D49;
+}
+
 .preview-html h1,
 .preview-html h2,
 .preview-html h3,

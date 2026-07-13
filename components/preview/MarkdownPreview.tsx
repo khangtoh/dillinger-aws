@@ -40,6 +40,61 @@ export function MarkdownPreview() {
     };
   }, [currentDocument?.body]);
 
+  // Hydrate ```mermaid fences (marked by lib/markdown.ts as
+  // .mermaid-diagram containers holding the raw, HTML-escaped source) into
+  // rendered diagrams. Client-side only, dynamically imported, matching
+  // the existing Monaco/Sidebar dynamic-import pattern in
+  // EditorContainer.tsx — mermaid needs the DOM and has no SSR story here.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const diagrams = Array.from(
+      container.querySelectorAll<HTMLElement>(".mermaid-diagram")
+    );
+    if (diagrams.length === 0) return;
+
+    let cancelled = false;
+
+    (async () => {
+      const { default: mermaid } = await import("mermaid");
+      if (cancelled) return;
+
+      // securityLevel: "strict" is mermaid's own built-in, purpose-built
+      // XSS protection for exactly this "render straight into innerHTML"
+      // use case — it HTML-encodes all diagram-source text internally
+      // before generating the SVG, so this output is safe to inject
+      // as-is. DOMPurify is deliberately NOT layered on top here: mermaid
+      // renders node/edge labels via <foreignObject> (an HTML <div>
+      // embedded in the SVG's XML namespace), and DOMPurify's SVG
+      // sanitization of namespace-switched embedded HTML is a documented,
+      // hard limitation — verified directly: even with both the `svg`
+      // and `html` profiles enabled plus `ADD_TAGS: ["foreignObject"]`,
+      // it silently stripped every label's content, leaving empty shapes.
+      mermaid.initialize({ startOnLoad: false, securityLevel: "strict" });
+
+      for (const [index, el] of diagrams.entries()) {
+        const source = el.textContent ?? "";
+        try {
+          const { svg } = await mermaid.render(
+            `mermaid-diagram-${index}-${Date.now()}`,
+            source
+          );
+          if (cancelled) return;
+          el.innerHTML = svg;
+        } catch {
+          if (cancelled) return;
+          el.textContent = "Unable to render diagram";
+          el.classList.add("mermaid-diagram-error");
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sanitizedHtml]);
+
   // Scroll sync with editor
   useEffect(() => {
     if (!enableScrollSync || !containerRef.current) return;

@@ -20,13 +20,16 @@ describe("DeleteConfirmModal", () => {
   it("does not render when not open", () => {
     renderModal({ isOpen: false });
 
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   });
 
   it("renders confirmation message when open", () => {
     renderModal();
 
-    expect(screen.getByRole("dialog")).toBeVisible();
+    // Astryx's AlertDialog renders role="alertdialog" (not the generic
+    // "dialog"), matching the APG alert-dialog pattern for destructive
+    // confirmations.
+    expect(screen.getByRole("alertdialog")).toBeVisible();
     expect(screen.getByText("Delete Document")).toBeVisible();
     expect(screen.getByText(/This action cannot be undone/)).toBeVisible();
   });
@@ -49,11 +52,21 @@ describe("DeleteConfirmModal", () => {
     expect(props.onClose).toHaveBeenCalledOnce();
   });
 
-  it("escape key closes modal", async () => {
-    const user = userEvent.setup();
+  it("escape key closes modal", () => {
     const { props } = renderModal();
 
-    await user.keyboard("{Escape}");
+    // Astryx's Dialog attaches its Escape listener to the <dialog> element
+    // and relies on the browser's native showModal() auto-focus (moving
+    // focus inside the dialog) for a real keypress to bubble through it —
+    // jsdom's showModal shim doesn't replicate that. Dispatching the
+    // event directly on the dialog node matches Astryx's own
+    // Dialog.test.tsx pattern for this same jsdom limitation.
+    const escapeEvent = new KeyboardEvent("keydown", {
+      key: "Escape",
+      bubbles: true,
+      cancelable: true,
+    });
+    screen.getByRole("alertdialog").dispatchEvent(escapeEvent);
 
     expect(props.onClose).toHaveBeenCalledOnce();
   });

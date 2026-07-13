@@ -57,6 +57,32 @@ describe("renderMarkdown", () => {
     });
   });
 
+  describe("mermaid diagrams", () => {
+    it("renders a mermaid code fence as a diagram container, not a code block", async () => {
+      const result = await renderMarkdown(
+        "```mermaid\ngraph TD\n  A --> B\n```"
+      );
+      expect(result).toContain('class="mermaid-diagram');
+      expect(result).not.toContain("language-mermaid");
+      expect(result).not.toContain("<pre>");
+      // The raw source is embedded so MarkdownPreview.tsx's client-side
+      // hydration step can read it via textContent and hand it to mermaid.
+      expect(result).toContain("graph TD");
+      expect(result).toContain("A --&gt; B");
+    });
+
+    it("keeps line-data attributes on the diagram container for scroll-sync", async () => {
+      const result = await renderMarkdown("```mermaid\ngraph TD\n```");
+      expect(result).toMatch(/data-line-start="\d+"/);
+      expect(result).toMatch(/data-line-end="\d+"/);
+    });
+
+    it("does not treat a non-mermaid fence as a diagram", async () => {
+      const result = await renderMarkdown("```javascript\nconst x = 1;\n```");
+      expect(result).not.toContain("mermaid-diagram");
+    });
+  });
+
   describe("checkbox rendering", () => {
     it("renders unchecked checkboxes", async () => {
       const result = await renderMarkdown("- [ ] todo item");
