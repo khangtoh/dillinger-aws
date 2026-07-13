@@ -40,6 +40,21 @@ if [[ -n "$MAX_CONCURRENCY" ]]; then
   PARAM_OVERRIDES+=("MaxTenantConcurrency=${MAX_CONCURRENCY}")
 fi
 
+# A stack left in ROLLBACK_COMPLETE (or ROLLBACK_FAILED) by a previous
+# failed create is a CloudFormation dead end: CreateChangeSet always
+# rejects it with "can not be updated", regardless of what changed.
+# The only way forward is to delete it and let sam deploy create it
+# fresh - safe here because these states mean nothing was ever
+# successfully created, there is no live resource to lose.
+EXISTING_STATUS=$(aws cloudformation describe-stacks \
+  --region "$REGION" --stack-name "$STACK_NAME" \
+  --query 'Stacks[0].StackStatus' --output text 2>/dev/null || echo "DOES_NOT_EXIST")
+if [[ "$EXISTING_STATUS" == "ROLLBACK_COMPLETE" || "$EXISTING_STATUS" == "ROLLBACK_FAILED" ]]; then
+  echo "==> ${STACK_NAME} is stuck in ${EXISTING_STATUS} from a previous failed create - deleting before redeploy"
+  aws cloudformation delete-stack --region "$REGION" --stack-name "$STACK_NAME"
+  aws cloudformation wait stack-delete-complete --region "$REGION" --stack-name "$STACK_NAME"
+fi
+
 # shellcheck source=orchestrator/lib/config-hash.sh
 source "$REPO_ROOT/infra/orchestrator/lib/config-hash.sh"
 CONFIG_HASH=$(compute_config_hash "$REPO_ROOT/infra/template.yaml" "${PARAM_OVERRIDES[@]}")
