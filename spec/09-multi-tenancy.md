@@ -69,12 +69,25 @@ stays intentionally simple because each instance only ever has one user:
       CloudFormation creation outright (AWS's mandatory ≥10-unit
       unreserved-concurrency floor — see `ARCHITECTURE.md`'s "Reserved
       concurrency and the microVM pool" for the full mechanism and the
-      exact error). Resolved by deploying that tenant at
-      `MaxTenantConcurrency=1` (now a 3rd, optional argument to
-      `infra/provision-tenant.sh`). Accepted as fine for the current
-      dev stage; revisit (raise the account's quota, or budget each
-      tenant's concurrency deliberately) before this needs to support
-      many concurrent users per tenant.
+      exact error). `MaxTenantConcurrency=1` was tried next and **failed
+      identically** — the diagnostic that this account's quota has zero
+      headroom for any additional reservation, not just insufficient
+      headroom for a large one (math in ARCHITECTURE.md puts the
+      account's total quota at roughly 12). Resolved by dropping
+      reserved concurrency for this tenant entirely
+      (`MaxTenantConcurrency=0`, now a valid value —
+      `ReservedConcurrentExecutions` is omitted from the CloudFormation
+      resource rather than set to a degenerate `0`, and the
+      concurrency-cap alarm is skipped alongside it), so the tenant
+      draws from the account's shared unreserved pool instead of
+      fighting for a reservation. Deliberate for this dev stage: with a
+      small number of low-traffic tenants and a quota this tight,
+      reserved concurrency's isolation guarantee has no one to protect
+      against yet and only costs headroom the account doesn't have.
+      `staging`'s own reservation (`2`) is untouched. Revisit (re-enable
+      a positive `MaxTenantConcurrency` per tenant) once the account's
+      quota is raised via AWS Service Quotas, or real concurrent
+      external users make the isolation guarantee worth it again.
 - [ ] Decide, once real usage exists, whether `FunctionUrlConfig.AuthType`
       should move from `NONE` (public-but-unguessable URL, current v1
       default) to `AWS_IAM` per-tenant for stricter access control —

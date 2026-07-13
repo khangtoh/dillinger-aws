@@ -141,14 +141,18 @@ jobs:
         run: pip install aws-sam-cli
 
       - name: Deploy branch tenant
-        # MaxTenantConcurrency=1: this account's unreserved Lambda
-        # concurrency is tight enough that the template's default (2)
-        # violates AWS's mandatory 10-unit unreserved floor once the
-        # staging tenant's own reservation is accounted for. 1 is
-        # acceptable for dev-stage branch tenants (see ARCHITECTURE.md's
-        # "Reserved concurrency and the microVM pool" section) - revisit
-        # if this account's quota is raised.
-        run: infra/provision-tenant.sh "${{ steps.tenant.outputs.id }}" "${AWS_REGION}" 1
+        # MaxTenantConcurrency=0: this account's Lambda concurrency quota
+        # has zero headroom left for another reservation once staging's
+        # own reservation is accounted for (confirmed - even a 1-unit
+        # reservation hit AWS's mandatory 10-unit unreserved floor). 0
+        # skips ReservedConcurrentExecutions entirely, so this tenant
+        # draws from the account's shared unreserved pool instead. That's
+        # the right tradeoff for a dev-stage branch tenant, which doesn't
+        # need a hard per-tenant concurrency cap - see ARCHITECTURE.md's
+        # "Reserved concurrency and the microVM pool" section. Revisit if
+        # this account's quota is raised or this tenant needs isolation
+        # guarantees again.
+        run: infra/provision-tenant.sh "${{ steps.tenant.outputs.id }}" "${AWS_REGION}" 0
 
       - name: Smoke test
         id: smoke

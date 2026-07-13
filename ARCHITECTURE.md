@@ -175,44 +175,66 @@ Recall from "Runtime: the Firecracker microVM" above: **one execution
 environment = one microVM, and each handles one request at a time** —
 concurrency for a given tenant is entirely a question of *how many
 microVMs Lambda is willing to run in parallel for that tenant's
-function*. That number is exactly what `template.yaml`'s
-`MaxTenantConcurrency` parameter controls, via
-`ReservedConcurrentExecutions` on the `DillingerFunction` resource
-(default `2`, capped `1`-`10`). It is not a rate limit or a throttle in
-the request-handling sense — it's a hard ceiling on the tenant's
-**microVM pool size**: at `MaxTenantConcurrency=2`, a third simultaneous
-request finds no free microVM and no budget to boot a new one, so Lambda
+function*. `template.yaml`'s `MaxTenantConcurrency` parameter controls
+that by setting `ReservedConcurrentExecutions` on the `DillingerFunction`
+resource (default `2`; range `0`-`10`, `0` meaning "don't reserve any").
+When set to a positive number it's not a rate limit or a throttle in the
+request-handling sense — it's a hard ceiling on the tenant's **microVM
+pool size**: at `MaxTenantConcurrency=2`, a third simultaneous request
+finds no free microVM and no budget to boot a new one, so Lambda
 throttles it (`429`/`TooManyRequestsException`) rather than queuing it
 indefinitely.
 
-**Why this is capped low on purpose, not just for cost:** reserved
+**Why reserving anything is constrained, not just a cost knob:** reserved
 concurrency is carved out of the AWS account's total regional Lambda
 concurrency quota, and AWS enforces a hard, account-wide floor — **at
 least 10 units must always remain *unreserved*, no matter how many
 functions or tenants exist.** This isn't configurable; it's a platform
-invariant. Concretely, this project hit it directly: deploying a second
-tenant (a per-branch tenant alongside the existing `staging` tenant,
-each defaulting to `MaxTenantConcurrency=2`) failed CloudFormation
-creation with:
+invariant. This project hit it directly, twice: deploying a second
+tenant (a per-branch tenant alongside the existing `staging` tenant, each
+defaulting to `MaxTenantConcurrency=2`) failed CloudFormation creation
+with:
 
 ```
 Specified ReservedConcurrentExecutions for function decreases account's
 UnreservedConcurrentExecution below its minimum value of [10].
 ```
 
-i.e., this AWS account's total concurrency quota is tight enough that
-`staging`'s 2-unit reservation plus a second tenant's 2-unit ask already
-crossed the line. The fix was to deploy that tenant with
-`MaxTenantConcurrency=1` instead (`infra/provision-tenant.sh
-<tenant-id> <region> 1`) — accepting that this dev-stage tenant's
-microVM pool caps at one concurrent request (a second simultaneous
-request throttles rather than getting its own microVM) in exchange for
-fitting inside the account's remaining headroom. That trade-off is fine
-for a branch/dev tenant serving one person at a time; it would need
-revisiting — either raising the account's Lambda concurrency quota via
-AWS Service Quotas, or deliberately budgeting each tenant's
-`MaxTenantConcurrency` against the account total — before this pattern
-scales to many concurrent real users per tenant.
+The first fix attempt — deploy the new tenant at `MaxTenantConcurrency=1`
+instead of the default `2` — **failed identically**. That's the
+diagnostic signal that matters: if even the smallest possible positive
+reservation (the template enforced `MinValue: 1` at the time) still
+violates the floor, the account's total quota has *zero* headroom for
+another reservation at all, not just insufficient headroom for a large
+one. Working the inequality backward (`total_quota − staging's 2 − N ≥
+10`, failing at `N=1`) puts this account's actual total Lambda
+concurrency quota at around **12** — far below AWS's normal default of
+1000, consistent with a constrained sandbox/dev account rather than a
+production one.
+
+**The actual fix: skip the reservation entirely for dev-stage tenants**
+(`MaxTenantConcurrency=0`, now a valid template value — `MinValue`
+lowered from `1` to `0`, `ReservedConcurrentExecutions` wrapped in a
+CloudFormation `Fn::If`/`AWS::NoValue` so it's omitted from the resource
+altogether rather than set to a degenerate `0`, and the "reached its
+concurrency cap" alarm skipped via the same condition since there's no
+cap to alarm on). A function with no `ReservedConcurrentExecutions`
+draws from the account's **shared unreserved pool** instead of carving
+out a dedicated slice — this sidesteps the ≥10-unreserved-floor check
+entirely, because nothing is being reserved. **Why this is the right
+call at this stage, not just a workaround:** reserved concurrency exists
+to *guarantee* a tenant's microVM pool regardless of what every other
+function in the account is doing — a real isolation/cost-bounding
+property that matters once tenants have paying, expectant users. In
+development, with a small number of low-traffic tenants sharing one
+constrained-quota account, that guarantee has no one to protect against
+yet — the shared pool is more than sufficient, and reserving anything
+just fights the account's own quota for no present benefit. Revisit
+(re-enable a positive `MaxTenantConcurrency` per tenant) once either the
+account's quota is raised via AWS Service Quotas, or real, concurrent,
+externally-facing users make the isolation guarantee worth its cost
+again — `staging`'s own reservation (still `2`, untouched by this
+change) is the template for what that looks like.
 
 ## Docker hosting vs. what actually runs
 

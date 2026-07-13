@@ -12,11 +12,16 @@
 # microVM pool" section for what this actually caps). Every AWS account
 # must keep at least 10 units of *unreserved* concurrency free at all
 # times; on accounts with a low total Lambda concurrency quota, adding
-# a new tenant at the default of 2 can fail with "decreases account's
-# UnreservedConcurrentExecution below its minimum value of [10]" once
-# enough tenants exist. Pass a smaller value (as low as 1) to fit a new
-# tenant into whatever headroom remains, at the cost of that tenant only
-# being able to run one concurrent request before others are throttled.
+# a new tenant at any positive reservation can fail with "decreases
+# account's UnreservedConcurrentExecution below its minimum value of
+# [10]" once existing tenants already consume the account's headroom
+# down to that floor (confirmed on this project's dev account: even
+# max-concurrency=1 failed identically, because staging's existing
+# reservation already left zero room for another). Pass 0 to skip
+# reserving any concurrency for this tenant at all — it draws from the
+# account's shared unreserved pool instead, sidestepping the floor
+# check entirely. Appropriate for dev-stage tenants that don't need a
+# hard per-tenant cap.
 #
 # Requires: AWS CLI configured with credentials that have the
 # least-privilege permissions described in spec/01-aws-account-onboarding.md,

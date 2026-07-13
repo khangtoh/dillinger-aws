@@ -28,9 +28,20 @@ Parameters:
   MaxTenantConcurrency:
     Type: Number
     Default: 2
-    MinValue: 1
+    MinValue: 0
     MaxValue: 10
-    Description: Caps concurrent Lambda environments per tenant to bound abuse and cost.
+    Description: >-
+      Caps concurrent Lambda environments per tenant via
+      ReservedConcurrentExecutions, bounding abuse and cost. Set to 0 to
+      disable per-tenant reserved concurrency entirely — the function
+      then draws from the account's shared unreserved pool instead of
+      carving out its own, and the concurrency-cap alarm is skipped
+      (there's no cap to alarm on). Appropriate for dev-stage tenants
+      that don't need a hard cap and where the account's Lambda
+      concurrency quota has no headroom left for another reservation —
+      see ARCHITECTURE.md's "Reserved concurrency and the microVM pool"
+      for the full reasoning and spec/09-multi-tenancy.md for when this
+      was first needed.
   AlarmTopicArn:
     Type: String
     Default: ""
@@ -38,6 +49,7 @@ Parameters:
 
 Conditions:
   HasAlarmTopic: !Not [!Equals [!Ref AlarmTopicArn, ""]]
+  HasReservedConcurrency: !Not [!Equals [!Ref MaxTenantConcurrency, 0]]
 
 Resources:
   DillingerFunction:
@@ -52,7 +64,10 @@ Resources:
       # ~13s against the old 15s timeout. See spec/06-execution-pdf-export.md.
       MemorySize: 2048
       Timeout: 30
-      ReservedConcurrentExecutions: !Ref MaxTenantConcurrency
+      ReservedConcurrentExecutions: !If
+        - HasReservedConcurrency
+        - !Ref MaxTenantConcurrency
+        - !Ref "AWS::NoValue"
       Architectures:
         - x86_64
       Environment:
@@ -137,6 +152,7 @@ Resources:
 
   DillingerConcurrencyAlarm:
     Type: AWS::CloudWatch::Alarm
+    Condition: HasReservedConcurrency
     Properties:
       AlarmDescription: !Sub "${TenantId} tenant Lambda reached its concurrency cap"
       Namespace: AWS/Lambda

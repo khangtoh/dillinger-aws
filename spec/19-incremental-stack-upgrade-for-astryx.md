@@ -340,8 +340,14 @@ Checked directly against npm metadata and this repo's real
   way to a real `sam deploy` — image built and pushed to ECR
   successfully, IAM role created — then failed on the actual Lambda
   function creation with an AWS account concurrency-quota error,
-  unrelated to any of the above. Fixed by deploying this tenant at
-  `MaxTenantConcurrency=1`; see `spec/09-multi-tenancy.md` and
+  unrelated to any of the above. `MaxTenantConcurrency=1` was tried and
+  failed identically (zero headroom, not just insufficient headroom);
+  fixed by dropping reserved concurrency for this tenant entirely
+  (`MaxTenantConcurrency=0`, now a valid value that omits
+  `ReservedConcurrentExecutions` from the template). A prior failed
+  attempt also left the stack in `ROLLBACK_COMPLETE`, requiring a
+  self-healing delete-and-recreate check added to
+  `infra/provision-tenant.sh`. See `spec/09-multi-tenancy.md` and
   `ARCHITECTURE.md`'s "Reserved concurrency and the microVM pool" for
   the full mechanism. Upgraded stack (Next 15.5.20/React
   19.2.7/StyleX 0.18.3) is what's actually being deployed by this
