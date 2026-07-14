@@ -53,6 +53,12 @@ export function MonacoEditor() {
       colors: {
         "editor.background": "#FFFFFF",
         "editor.foreground": "#000000",
+        "editor.selectionHighlightBackground": "#35D7BB33",
+        "editor.selectionHighlightBorder": "#35D7BB80",
+        "editor.wordHighlightBackground": "#35D7BB26",
+        "editor.wordHighlightBorder": "#35D7BB66",
+        "editor.wordHighlightStrongBackground": "#35D7BB40",
+        "editor.wordHighlightStrongBorder": "#35D7BB99",
       },
     });
 
@@ -69,6 +75,12 @@ export function MonacoEditor() {
       colors: {
         "editor.background": "#1D212A",
         "editor.foreground": "#D3DAEA",
+        "editor.selectionHighlightBackground": "#35D7BB40",
+        "editor.selectionHighlightBorder": "#35D7BB99",
+        "editor.wordHighlightBackground": "#35D7BB2E",
+        "editor.wordHighlightBorder": "#35D7BB73",
+        "editor.wordHighlightStrongBackground": "#35D7BB4D",
+        "editor.wordHighlightStrongBorder": "#35D7BBB3",
       },
     });
 
@@ -207,6 +219,8 @@ export function MonacoEditor() {
       renderLineHighlight: "none" as const,
       overviewRulerLanes: 0,
       hideCursorInOverviewRuler: true,
+      selectionHighlight: true,
+      occurrencesHighlight: "singleFile" as const,
       scrollbar: {
         vertical: "auto" as const,
         horizontal: "auto" as const,
