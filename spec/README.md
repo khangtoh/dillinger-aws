@@ -40,6 +40,7 @@ model.
 | 10 | [10-gateway.md](10-gateway.md) | Single entry gateway routing to each tenant | Phase 9 |
 | 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | Phase 9 + 10 |
 | 12 | [12-security-hardening.md](12-security-hardening.md) | Close repository, AWS, credential, and operational security findings | Phase 7 + 8 + 10 + 11 |
+| 13 | [13-editor-selection-highlight-bug.md](13-editor-selection-highlight-bug.md) | Bug: Monaco selection/occurrence highlighting was invisible | None (client-side editor bug) |
 
 ## Status
 
@@ -78,6 +79,11 @@ model.
   IN_SYNC and no-ops on re-run (2026-07-11). Three region-assumption
   bugs found and fixed during first real multi-region use (gateway is
   always us-east-1; tenants elsewhere).
+- Editor selection highlight bug (`spec/13-editor-selection-highlight-bug.md`):
+  **fixed and merged** (PR #18, commit `392e8ef`, 2026-07-14) — root cause
+  was missing highlight colors in the custom Monaco themes, not a config
+  or CDN issue. **Not yet deployed** to the live `staging` Function URL;
+  requires a tenant redeploy.
 
 ## Non-goals for v1
 
