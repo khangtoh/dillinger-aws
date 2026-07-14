@@ -363,7 +363,7 @@ tests/
 
 ### Coverage
 
-Current coverage: **98% statements, 91% branches, 99.5% functions, 98% lines** (294 unit + 39 E2E tests).
+Current coverage: **91.85% statements, 75.34% branches, 92.81% functions, 92.17% lines** (344 unit + 43 E2E tests). Dropped from an earlier 98/91/99.5/98 baseline with Phase 14's Astryx swizzle (several low-coverage library-adjacent files); Phase 15 held this steady rather than regressing it further — see `spec/15-ui-component-migration.md`'s Full Regression Pass findings.
 
 ### Writing Tests
 

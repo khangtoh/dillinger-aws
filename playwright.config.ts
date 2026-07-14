@@ -28,5 +28,10 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    // Same-origin-protected API routes (image upload, cloud saves, PDF
+    // export) validate the request's Origin header against this — without
+    // it they compare against the "http://localhost:3000" default, which
+    // never matches this suite's 127.0.0.1:${port} origin and 403s.
+    env: { NEXT_PUBLIC_BASE_URL: baseURL },
   },
 });

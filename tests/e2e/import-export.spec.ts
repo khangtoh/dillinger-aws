@@ -47,7 +47,11 @@ test("imports markdown/html files, preserves prior documents, inserts images, an
   await expect(
     page.getByRole("heading", { level: 2, name: "Imported.md" })
   ).toBeVisible();
-  await expect(page.locator("#preview h1")).toHaveText("Imported");
+  // First preview render also waits on markdown-it plus a dynamic
+  // `import("dompurify")` — cold-compile caveat, see below.
+  await expect(page.locator("#preview h1")).toHaveText("Imported", {
+    timeout: 15_000,
+  });
   await expect(
     page.getByRole("button", { name: /Playwright Smoke\.md/ })
   ).toBeVisible();
@@ -59,9 +63,12 @@ test("imports markdown/html files, preserves prior documents, inserts images, an
     buffer: Buffer.from("<h1>HTML Imported</h1><p>Converted body</p>"),
   });
 
+  // The HTML import round-trips through /api/import/html-to-markdown —
+  // on a cold dev-server compile that route can take longer than the
+  // suite's default 5s expect timeout.
   await expect(
     page.getByRole("heading", { level: 2, name: "Imported.html" })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15_000 });
   await expect(page.locator("#preview h1")).toHaveText("HTML Imported");
   await expect(page.getByRole("button", { name: /Imported\.html/ })).toBeVisible();
 
@@ -71,7 +78,8 @@ test("imports markdown/html files, preserves prior documents, inserts images, an
     buffer: PNG_BYTES,
   });
 
-  await expect(page.locator("#preview img")).toHaveCount(1);
+  // Round-trips through /api/upload/image — same cold-compile caveat.
+  await expect(page.locator("#preview img")).toHaveCount(1, { timeout: 15_000 });
 
   await page.getByRole("button", { name: "Export document" }).click();
   await expect(

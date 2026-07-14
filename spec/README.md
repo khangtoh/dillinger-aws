@@ -122,7 +122,7 @@ full notes-management-app pivot — that's deferred as a separately-scoped
 v2. None of Phases 14-18 touch `infra/`, the Lambda packaging, or the
 multi-tenancy/gateway model from Phases 1-12.
 
-- [ ] **UI refresh live** — not yet started (Phase 15-18 unstarted).
+- [ ] **UI refresh live** — Phase 15 complete; Phase 16-18 unstarted.
       Phase 13 decisions recorded (2026-07-12). **Phase 19 complete**
       (2026-07-12): incrementally landed Next 15.5.20 → React 19.2.7 →
       `@stylexjs/stylex@0.18.3`, each step fully verified (typecheck,
@@ -137,11 +137,53 @@ multi-tenancy/gateway model from Phases 1-12.
       tally and two carry-forward costs recorded for Phase 15
       (`@stylexjs/unplugin` wiring + import fixups; a custom theme file
       still needed to match the plum brand). **Phase 15 is unblocked.**
-      Separately, not yet done: the Lambda container build and staging
-      deploy for the Phase 19 stack upgrade (no Docker in the dev
-      sandbox; deploy workflow is manual-dispatch-only) — needs a CI run
-      before that upgrade reaches the live tenant. Update this line with
-      the tenant URL and date once Phase 18 closes out.
+      **Phase 15 in progress** (2026-07-13): clarification pass done
+      (UI-3 scroll-sync confirmed already fully wired end-to-end,
+      UI-4 diagram library decided — `mermaid`, pure-JS deps, client-only
+      dynamic import, no Lambda packaging impact) and the lowest-risk
+      "Toast, Skeleton, KeyboardShortcuts" migration group is complete:
+      Toast and KeyboardShortcuts now use Astryx's `Toast`/`Dialog`
+      primitives (`useToast()`'s call signature and Toast's container
+      role/aria unchanged; KeyboardShortcuts' shortcut-list content
+      unchanged), Skeleton intentionally left hand-rolled Tailwind (see
+      `spec/15-ui-component-migration.md` for why). The **Navbar group is
+      also complete**: the export dropdown was already on the real
+      (non-spike) Astryx `DropdownMenu`, and the remaining buttons
+      (import, image insert, preview toggle, zen mode, settings,
+      shortcuts) now use Astryx's `Button`/`ToggleButton`, preserving
+      every `aria-label`/`aria-pressed` (the preview toggle's
+      `aria-pressed` and icon swap are computed by `ToggleButton` itself
+      instead of hand-set). Full unit suite green (317 passed / 1
+      pre-existing skip), typecheck/lint clean, real-browser-verified
+      (Playwright) with zero new console errors on both groups.
+      **Phase 15 complete** (2026-07-13): Sidebar and every remaining
+      modal (Settings, Delete-confirm, GitHub/Dropbox/Google Drive/
+      OneDrive/Bitbucket) now on Astryx `Collapsible`/`Dialog`/
+      `AlertDialog`/`Layout` primitives; UI-6 real light/dark/system
+      theming wired end-to-end (a genuinely latent dark-mode text-
+      legibility bug, present since Phase 14 but never visible until
+      dark mode was actually reachable, was found and fixed along the
+      way); UI-2 formatting toolbar and UI-5 command palette both ship,
+      sharing one `TOOLBAR_ACTIONS` source of truth; UI-3 scroll-sync
+      confirmed already correct (no code change needed); UI-4 Mermaid
+      diagrams ship, deliberately skipping DOMPurify for mermaid's own
+      generated SVG only (documented, scoped trade-off — mermaid's
+      `securityLevel: "strict"` already sanitizes it, and DOMPurify
+      itself can't preserve SVG `<foreignObject>` content). Full
+      regression pass: lint/typecheck clean, unit 344 passed (1
+      pre-existing skip), E2E 42/43 passed — the one failure needs
+      Monaco to load, which this sandbox's blocked CDN prevents
+      regardless of app code (documented in
+      `spec/15-ui-component-migration.md`, expected to pass with normal
+      network access). Coverage (91.85%/75.34%/92.81%/92.17%) matches
+      the true pre-Phase-15 baseline — the 98%/91%/99.5%/98% figure
+      documented in `CLAUDE.md` predates Phase 14's own additions and
+      was already stale before this phase started. Separately, not yet done:
+      the Lambda container build and staging deploy for the Phase 19
+      stack upgrade (no Docker in the dev sandbox; deploy workflow is
+      manual-dispatch-only) — needs a CI run before that upgrade reaches
+      the live tenant. Update this line with the tenant URL and date
+      once Phase 18 closes out.
 
 ## Non-goals for the UI-refresh initiative (Phase 13-18)
 

@@ -97,3 +97,16 @@ if (typeof HTMLElement !== "undefined") {
     return originalMatches.call(this, selector);
   };
 }
+
+// jsdom doesn't implement <dialog>'s showModal/close (Astryx's Dialog
+// primitive, Phase 15 migration) — same shim Astryx's own Dialog.test.tsx uses.
+if (typeof HTMLDialogElement !== "undefined") {
+  HTMLDialogElement.prototype.showModal ??= function (
+    this: HTMLDialogElement
+  ) {
+    this.setAttribute("open", "");
+  };
+  HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+    this.removeAttribute("open");
+  };
+}

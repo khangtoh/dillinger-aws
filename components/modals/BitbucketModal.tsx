@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useBitbucket } from "@/hooks/useBitbucket";
 import { useStore } from "@/stores/store";
 import { useToast } from "@/components/ui/Toast";
+import { Dialog, DialogHeader } from "@astryxdesign/core/Dialog";
+import { Layout, LayoutContent, LayoutFooter } from "@astryxdesign/core/Layout";
+import { Button } from "@astryxdesign/core/Button";
 import {
-  X,
   GitBranch,
   ArrowLeft,
   Folder,
@@ -27,7 +29,6 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
   const { notify } = useToast();
   const currentDocument = useStore((state) => state.currentDocument);
   const createImportedDocument = useStore((state) => state.createImportedDocument);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const [formState, setFormState] = useState({
     newFileName: "",
@@ -35,23 +36,9 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
     selectedFilePath: null as string | null,
   });
 
-  // Handle Escape key
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    closeButtonRef.current?.focus();
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, onClose]);
+  const handleOpenChange = (open: boolean) => {
+    if (!open) onClose();
+  };
 
   useEffect(() => {
     if (isOpen && bitbucket.isConnected) {
@@ -107,86 +94,58 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
   // Not connected state
   if (!bitbucket.isConnected) {
     return (
-      <div
-        className="fixed inset-0 z-modal flex items-center justify-center"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="bitbucket-connect-title"
-      >
-        <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
-        <div className="relative bg-bg-navbar rounded-lg shadow-xl w-full max-w-md p-6">
-          <button
-            ref={closeButtonRef}
-            onClick={onClose}
-            aria-label="Close"
-            className="absolute top-4 right-4 text-text-invert hover:text-plum rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
-          >
-            <X size={20} />
-          </button>
-
-          <div className="text-center">
-            <GitBranch size={48} className="mx-auto text-text-invert mb-4" aria-hidden="true" />
-            <h2 id="bitbucket-connect-title" className="text-xl font-semibold text-text-invert mb-2 text-balance">
-              Connect to Bitbucket
-            </h2>
-            <p className="text-text-muted mb-6">
-              Connect your Bitbucket account to import and save markdown files.
-            </p>
-            <button
-              onClick={bitbucket.connect}
-              className="bg-plum text-bg-sidebar px-6 py-2 rounded font-medium
-                         hover:opacity-90 transition-opacity
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
-            >
-              Connect Bitbucket
-            </button>
-          </div>
-        </div>
-      </div>
+      <Dialog isOpen onOpenChange={handleOpenChange} width={448} aria-label="Connect to Bitbucket">
+        <Layout
+          header={<DialogHeader title="Connect to Bitbucket" onOpenChange={handleOpenChange} />}
+          content={
+            <LayoutContent>
+              <div className="text-center">
+                <GitBranch size={48} className="mx-auto text-text-primary mb-4" aria-hidden="true" />
+                <p className="text-text-secondary mb-6">
+                  Connect your Bitbucket account to import and save markdown files.
+                </p>
+                <Button
+                  label="Connect Bitbucket"
+                  variant="primary"
+                  onClick={bitbucket.connect}
+                  className="bg-plum text-bg-sidebar hover:opacity-90"
+                />
+              </div>
+            </LayoutContent>
+          }
+        />
+      </Dialog>
     );
   }
 
   return (
-    <div
-      className="fixed inset-0 z-modal flex items-center justify-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="bitbucket-modal-title"
+    <Dialog
+      isOpen
+      onOpenChange={handleOpenChange}
+      width={512}
+      maxHeight="80vh"
+      aria-label={mode === "import" ? "Import from Bitbucket" : "Save to Bitbucket"}
     >
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
-      <div className="relative bg-bg-navbar rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border-settings">
-          <div className="flex items-center gap-2">
-            {bitbucket.pathHistory.length > 0 && (
-              <button
-                onClick={bitbucket.navigateBack}
-                aria-label="Go back"
-                className="text-text-invert hover:text-plum rounded
-                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
-              >
-                <ArrowLeft size={20} />
-              </button>
-            )}
-            <GitBranch size={24} className="text-text-invert" aria-hidden="true" />
-            <h2 id="bitbucket-modal-title" className="text-lg font-semibold text-text-invert text-balance">
-              {mode === "import" ? "Import from Bitbucket" : "Save to Bitbucket"}
-            </h2>
-          </div>
-          <button
-            ref={closeButtonRef}
-            onClick={onClose}
-            aria-label="Close"
-            className="text-text-invert hover:text-plum rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-auto p-4">
+      <Layout
+        header={
+          <DialogHeader
+            title={mode === "import" ? "Import from Bitbucket" : "Save to Bitbucket"}
+            onOpenChange={handleOpenChange}
+            startContent={
+              bitbucket.pathHistory.length > 0 && (
+                <Button
+                  label="Go back"
+                  icon={<ArrowLeft size={20} />}
+                  variant="ghost"
+                  isIconOnly
+                  onClick={bitbucket.navigateBack}
+                />
+              )
+            }
+          />
+        }
+        content={
+          <LayoutContent>
           {/* Selectors */}
           <div className="space-y-3 mb-4">
             {/* Workspace selector */}
@@ -312,7 +271,7 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
                     <button
                       key={item.path}
                       onClick={() => handleItemClick(item)}
-                      className={`w-full text-left px-3 py-2 rounded text-text-invert
+                      className={`w-full text-left px-3 py-2 rounded text-text-primary
                                  hover:bg-bg-highlight flex items-center gap-2
                                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum
                                  ${formState.selectedFilePath === item.path ? "bg-bg-highlight" : ""}`}
@@ -329,23 +288,22 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
               )}
             </>
           )}
-        </div>
-
-        {/* Footer */}
-        {mode === "save" && bitbucket.selectedBranch && (
-          <div className="p-4 border-t border-border-settings">
-            <button
-              onClick={handleSave}
-              className="w-full bg-plum text-bg-sidebar py-2 px-4 rounded font-medium
-                         hover:opacity-90 transition-opacity flex items-center justify-center gap-2
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
-            >
-              <Save size={18} />
-              Save to Bitbucket
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+          </LayoutContent>
+        }
+        footer={
+          mode === "save" && bitbucket.selectedBranch && (
+            <LayoutFooter hasDivider>
+              <Button
+                label="Save to Bitbucket"
+                icon={<Save size={18} />}
+                variant="primary"
+                onClick={handleSave}
+                className="w-full bg-plum text-bg-sidebar hover:opacity-90"
+              />
+            </LayoutFooter>
+          )
+        }
+      />
+    </Dialog>
   );
 }

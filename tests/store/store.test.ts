@@ -374,6 +374,28 @@ describe("useStore", () => {
       expect(useStore.getState().settings).toEqual(DEFAULT_SETTINGS);
     });
 
+    it("restores a persisted theme setting across a reload", () => {
+      const doc = createTestDocument();
+      localStorage.setItem("files", JSON.stringify([doc]));
+      localStorage.setItem("currentDocument", JSON.stringify(doc));
+      localStorage.setItem("profileV3", JSON.stringify({ theme: "dark" }));
+
+      useStore.getState().hydrate();
+
+      expect(useStore.getState().settings.theme).toBe("dark");
+    });
+
+    it("defaults theme to system when profileV3 predates the theme setting", () => {
+      const doc = createTestDocument();
+      localStorage.setItem("files", JSON.stringify([doc]));
+      localStorage.setItem("currentDocument", JSON.stringify(doc));
+      localStorage.setItem("profileV3", JSON.stringify({ tabSize: 2 }));
+
+      useStore.getState().hydrate();
+
+      expect(useStore.getState().settings.theme).toBe("system");
+    });
+
     it("sets currentDocument to first document when currentDocument is null in storage", () => {
       const doc = createTestDocument({ id: "first" });
       localStorage.setItem("files", JSON.stringify([doc]));
@@ -482,6 +504,15 @@ describe("useStore", () => {
       expect(storedFiles[0].id).toBe("persist-1");
       expect(storedCurrent.title).toBe("Persisted.md");
       expect(storedSettings.tabSize).toBe(8);
+    });
+
+    it("persists the theme setting", () => {
+      useStore.getState().updateSettings({ theme: "dark" });
+
+      useStore.getState().persist();
+
+      const storedSettings = JSON.parse(localStorage.getItem("profileV3")!);
+      expect(storedSettings.theme).toBe("dark");
     });
 
     it("stores null currentDocument when none is selected", () => {

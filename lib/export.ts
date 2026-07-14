@@ -1,4 +1,17 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { replaceExtension, sanitizeDownloadFilename } from "@/lib/document";
+
+// Inlined (not CDN-linked) so the exported file stays fully self-contained
+// and works under the strict CSP below, which allows no external style/font
+// hosts — matches katex.min.css from the `katex` package already used for
+// the live preview (app/globals.css). Read via a plain filesystem path
+// (not require.resolve) because Next's server bundler rewrites .css
+// require.resolve targets to a virtual path that doesn't exist on disk.
+const KATEX_CSS = `/* katex.min.css */\n${readFileSync(
+  join(process.cwd(), "node_modules/katex/dist/katex.min.css"),
+  "utf8"
+)}`;
 
 const STYLED_EXPORT_CSS = `
   body {
@@ -96,7 +109,9 @@ export function renderHtmlDocument({
   html: string;
   styled?: boolean;
 }): string {
-  const styleTag = styled ? `<style>${STYLED_EXPORT_CSS}</style>` : "";
+  const styleTag = styled
+    ? `<style>${KATEX_CSS}${STYLED_EXPORT_CSS}</style>`
+    : "";
   const safeTitle = escapeHtml(title || "Document");
 
   return `<!DOCTYPE html>

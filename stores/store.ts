@@ -16,7 +16,9 @@ interface AppState {
   sidebarOpen: boolean;
   settingsOpen: boolean;
   shortcutsOpen: boolean;
+  commandPaletteOpen: boolean;
   previewVisible: boolean;
+  toolbarVisible: boolean;
   zenMode: boolean;
   isDirty: boolean;
   editorScrollPercent: number;
@@ -39,7 +41,9 @@ interface AppState {
   toggleSidebar: () => void;
   toggleSettings: () => void;
   toggleShortcuts: () => void;
+  toggleCommandPalette: () => void;
   togglePreview: () => void;
+  toggleToolbar: () => void;
   setZenMode: (enabled: boolean) => void;
   setEditorScrollPercent: (percent: number) => void;
   setEditorTopLine: (line: number) => void;
@@ -65,7 +69,9 @@ export const useStore = create<AppState>((set, get) => ({
   sidebarOpen: false,
   settingsOpen: false,
   shortcutsOpen: false,
+  commandPaletteOpen: false,
   previewVisible: true,
+  toolbarVisible: true,
   zenMode: false,
   isDirty: false,
   editorScrollPercent: 0,
@@ -184,7 +190,9 @@ export const useStore = create<AppState>((set, get) => ({
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
   toggleSettings: () => set((state) => ({ settingsOpen: !state.settingsOpen })),
   toggleShortcuts: () => set((state) => ({ shortcutsOpen: !state.shortcutsOpen })),
+  toggleCommandPalette: () => set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen })),
   togglePreview: () => set((state) => ({ previewVisible: !state.previewVisible })),
+  toggleToolbar: () => set((state) => ({ toolbarVisible: !state.toolbarVisible })),
   setZenMode: (enabled) => set({ zenMode: enabled }),
   setEditorScrollPercent: (percent) => set({ editorScrollPercent: percent }),
   setEditorTopLine: (line) => set({ editorTopLine: line }),

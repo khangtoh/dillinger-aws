@@ -15,6 +15,7 @@ import { GoogleDriveModal } from "@/components/modals/GoogleDriveModal";
 import { OneDriveModal } from "@/components/modals/OneDriveModal";
 import { BitbucketModal } from "@/components/modals/BitbucketModal";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
+import { Collapsible } from "@astryxdesign/core/Collapsible";
 import {
   Plus,
   Save,
@@ -24,7 +25,6 @@ import {
   HardDrive,
   CloudCog,
   GitBranch,
-  ChevronRight,
   Plug,
   CloudDownload,
   CloudUpload,
@@ -254,37 +254,27 @@ function CollapsibleSection({
 }) {
   return (
     <div className="mb-3">
-      <button
-        onClick={onToggle}
-        aria-expanded={isOpen}
-        aria-controls={panelId}
-        className="w-full flex items-center justify-between py-2 text-text-muted text-xs uppercase tracking-wider rounded
-                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+      <Collapsible
+        trigger={
+          <span className="flex items-center gap-2 text-text-muted text-xs uppercase tracking-wider">
+            {icon}
+            {label}
+          </span>
+        }
+        isOpen={isOpen}
+        onOpenChange={() => onToggle()}
       >
-        <span className="flex items-center gap-2">
-          {icon}
-          {label}
-        </span>
-        <ChevronRight
-          size={14}
-          className={`transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`}
-          style={{ transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)" }}
-        />
-      </button>
-      <div
-        id={panelId}
-        className="grid transition-[grid-template-rows] duration-200"
-        style={{
-          gridTemplateRows: isOpen ? "1fr" : "0fr",
-          transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)",
-        }}
-      >
-        <div className="overflow-hidden">
-          <div className="ml-2 space-y-1 mt-1">
+        {/* Astryx's Collapsible always renders its content wrapper (toggling
+            display:none), so mounting this div only while open — rather than
+            passing it unconditionally as children — keeps the #panelId node
+            itself absent from the DOM when collapsed, matching this app's
+            existing E2E assertions (`toHaveCount(0)`, not just hidden). */}
+        {isOpen && (
+          <div id={panelId} className="ml-2 space-y-1 mt-1">
             {children}
           </div>
-        </div>
-      </div>
+        )}
+      </Collapsible>
     </div>
   );
 }

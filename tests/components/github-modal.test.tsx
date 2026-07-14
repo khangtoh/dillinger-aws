@@ -1,6 +1,6 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GitHubModal } from "@/components/modals/GitHubModal";
 import { useStore } from "@/stores/store";
@@ -520,9 +520,7 @@ describe("GitHubModal", () => {
       expect(mockConnect).toHaveBeenCalledOnce();
     });
 
-    it("backdrop click on connect modal calls onClose", async () => {
-      const user = userEvent.setup();
-
+    it("backdrop click on connect modal calls onClose", () => {
       githubOverrides = {
         isConnected: false,
         user: null,
@@ -531,9 +529,12 @@ describe("GitHubModal", () => {
 
       const { props } = renderModal();
 
-      // Click the backdrop (the element with aria-hidden="true")
-      const backdrop = screen.getByRole("dialog").querySelector("[aria-hidden='true']");
-      if (backdrop) await user.click(backdrop);
+      // Astryx's Dialog uses the native <dialog> element's ::backdrop
+      // pseudo-element (not a separate DOM node) and detects a backdrop
+      // click by checking event.target === event.currentTarget — i.e. a
+      // click landing on the <dialog> element itself, not a descendant.
+      // Firing the click directly on the dialog node reproduces that.
+      fireEvent.click(screen.getByRole("dialog"));
 
       expect(props.onClose).toHaveBeenCalled();
     });

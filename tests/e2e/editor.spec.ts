@@ -197,7 +197,7 @@ test.describe("Document deletion", () => {
     // Click delete — should open the confirmation modal
     await page.getByRole("button", { name: "Delete Document" }).click();
     await expect(
-      page.getByRole("dialog", { name: "Delete Document" })
+      page.getByRole("alertdialog", { name: "Delete Document" })
     ).toBeVisible();
 
     // Confirm deletion
@@ -509,8 +509,9 @@ test.describe("Sidebar toggle", () => {
   test("opens and closes the sidebar", async ({ page }) => {
     await page.goto("/");
 
-    // Sidebar should be closed by default
-    await expect(page.locator("aside")).toHaveCount(0);
+    // Sidebar should be closed by default (translated off-screen, not
+    // unmounted — the slide animation requires it to stay in the DOM).
+    await expect(page.locator("aside")).not.toBeInViewport();
 
     // Open sidebar
     await page.getByRole("button", { name: "Toggle sidebar" }).click();
@@ -521,7 +522,7 @@ test.describe("Sidebar toggle", () => {
 
     // Close sidebar
     await page.getByRole("button", { name: "Toggle sidebar" }).click();
-    await expect(page.locator("aside")).toHaveCount(0);
+    await expect(page.locator("aside")).not.toBeInViewport();
   });
 
   test("sidebar shows the documents section with seeded document", async ({
@@ -535,6 +536,58 @@ test.describe("Sidebar toggle", () => {
     await expect(
       page.getByRole("button", { name: /Editor Test\.md/ })
     ).toBeVisible();
+  });
+});
+
+test.describe("Editor/preview scroll sync", () => {
+  test("scrolling the editor scrolls the preview proportionally", async ({
+    page,
+  }) => {
+    const longBody = Array.from(
+      { length: 60 },
+      (_, i) => `## Section ${i + 1}\n\nContent for section ${i + 1}.`
+    ).join("\n\n");
+    const doc = {
+      id: "scroll-sync-doc",
+      title: "Scroll Sync.md",
+      body: longBody,
+      createdAt: "2026-03-10T00:00:00.000Z",
+    };
+
+    await page.addInitScript(
+      ({ doc, profile }) => {
+        window.localStorage.setItem("files", JSON.stringify([doc]));
+        window.localStorage.setItem("currentDocument", JSON.stringify(doc));
+        window.localStorage.setItem("profileV3", JSON.stringify(profile));
+      },
+      { doc, profile: defaultProfile }
+    );
+
+    await page.goto("/");
+
+    const preview = page.locator("#preview");
+    await expect(preview).toBeVisible();
+    // Rendering goes through an async markdown-it pass plus a dynamic
+    // `import("dompurify")` — on a cold dev-server compile this can take
+    // longer than the suite's default 5s expect timeout.
+    await expect(preview.locator("h2").first()).toBeVisible({ timeout: 15_000 });
+
+    const before = await preview.evaluate((el) => el.scrollTop);
+
+    // Scroll the editor via a real mouse wheel over its pane — the
+    // scroll-sync wiring (MonacoEditor's onDidScrollChange -> store ->
+    // MarkdownPreview) is driven by Monaco's own scroll events, not a
+    // synthetic one we could dispatch directly.
+    const editorPane = page.getByTestId("editor-pane");
+    const box = await editorPane.boundingBox();
+    if (!box) throw new Error("editor pane not found");
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.wheel(0, 2000);
+
+    await expect(async () => {
+      const after = await preview.evaluate((el) => el.scrollTop);
+      expect(after).toBeGreaterThan(before);
+    }).toPass({ timeout: 5_000 });
   });
 });
 

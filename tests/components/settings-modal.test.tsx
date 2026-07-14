@@ -1,6 +1,6 @@
 import React from "react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SettingsModal } from "@/components/modals/SettingsModal";
 import { useStore } from "@/stores/store";
@@ -55,12 +55,12 @@ describe("SettingsModal", () => {
     expect(nightModeSwitch).toHaveAttribute("aria-checked", "true");
   });
 
-  it("is hidden (but stays mounted for its transition) when settingsOpen is false", () => {
+  it("is not rendered when settingsOpen is false", () => {
     render(<SettingsModal />);
-    // SettingsModal always mounts (same pattern as Sidebar) and toggles
-    // visibility via CSS classes for the slide/fade transition, rather
-    // than conditionally unmounting.
-    expect(screen.getByRole("dialog")).toHaveClass("opacity-0", "pointer-events-none");
+    // Astryx's Dialog primitive owns its own open/close transition (the
+    // native <dialog> element), so SettingsModal now conditionally
+    // unmounts instead of always mounting and toggling CSS classes.
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("toggles auto-save setting", async () => {
@@ -166,13 +166,16 @@ describe("SettingsModal", () => {
     expect(useStore.getState().settingsOpen).toBe(false);
   });
 
-  it("closes modal when backdrop is clicked", async () => {
-    const user = userEvent.setup();
+  it("closes modal when backdrop is clicked", () => {
     openSettings();
     render(<SettingsModal />);
 
-    const backdrop = screen.getByRole("dialog").querySelector("[aria-hidden='true']")!;
-    await user.click(backdrop);
+    // Astryx's Dialog uses the native <dialog> element's ::backdrop
+    // pseudo-element (not a separate DOM node) and detects a backdrop
+    // click by checking event.target === event.currentTarget — i.e. a
+    // click landing on the <dialog> element itself, not a descendant.
+    // Firing the click directly on the dialog node reproduces that.
+    fireEvent.click(screen.getByRole("dialog"));
 
     expect(useStore.getState().settingsOpen).toBe(false);
   });

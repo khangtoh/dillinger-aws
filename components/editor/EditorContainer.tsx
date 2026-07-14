@@ -7,9 +7,11 @@ import { Navbar } from "@/components/navbar/Navbar";
 import { LogoBar } from "@/components/ads/LogoBar";
 import { DocumentTitle } from "@/components/editor/DocumentTitle";
 import { MonacoEditor } from "@/components/editor/MonacoEditor";
+import { FormattingToolbar } from "@/components/editor/FormattingToolbar";
 import { MarkdownPreview } from "@/components/preview/MarkdownPreview";
 import { SettingsModal } from "@/components/modals/SettingsModal";
 import { KeyboardShortcuts } from "@/components/ui/KeyboardShortcuts";
+import { CommandPaletteRoot } from "@/components/editor/CommandPaletteRoot";
 import { useToast } from "@/components/ui/Toast";
 import { useStore } from "@/stores/store";
 import { EditorSkeleton } from "@/components/ui/Skeleton";
@@ -61,6 +63,7 @@ function EditorContent() {
   const isDirty = useStore((state) => state.isDirty);
   const shortcutsOpen = useStore((state) => state.shortcutsOpen);
   const toggleShortcuts = useStore((state) => state.toggleShortcuts);
+  const toggleCommandPalette = useStore((state) => state.toggleCommandPalette);
   const { notify } = useToast();
   const { upload } = useImageUpload();
 
@@ -138,6 +141,11 @@ function EditorContent() {
         e.preventDefault();
         setZenMode(!zenMode);
       }
+      // Cmd/Ctrl + K for the command palette
+      if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === "k") {
+        e.preventDefault();
+        toggleCommandPalette();
+      }
       // Escape to exit zen mode
       if (e.key === "Escape" && zenMode) {
         setZenMode(false);
@@ -155,7 +163,7 @@ function EditorContent() {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [zenMode, setZenMode, toggleShortcuts]);
+  }, [zenMode, setZenMode, toggleShortcuts, toggleCommandPalette]);
 
   useEffect(() => {
     if (!isDirty) return;
@@ -226,9 +234,12 @@ function EditorContent() {
           <div
             className={`${
               previewVisible ? "w-full sm:w-1/2 shadow-none sm:shadow-[1px_0_0_0_#E8E8E8]" : "w-full"
-            } border-r border-border-light`}
+            } border-r border-border-light flex flex-col min-h-0`}
           >
-            <MonacoEditor />
+            <FormattingToolbar />
+            <div className="flex-1 min-h-0">
+              <MonacoEditor />
+            </div>
           </div>
 
           {/* Preview Panel */}
@@ -243,6 +254,7 @@ function EditorContent() {
 
       <SettingsModal />
       <KeyboardShortcuts isOpen={shortcutsOpen} onClose={toggleShortcuts} />
+      <CommandPaletteRoot />
     </div>
   );
 }

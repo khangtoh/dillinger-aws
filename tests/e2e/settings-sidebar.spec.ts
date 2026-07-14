@@ -240,7 +240,7 @@ test.describe("Sidebar", () => {
 
     await page.getByRole("button", { name: "Delete Document" }).click();
 
-    const deleteDialog = page.getByRole("dialog", { name: "Delete Document" });
+    const deleteDialog = page.getByRole("alertdialog", { name: "Delete Document" });
     await expect(deleteDialog).toBeVisible();
     await expect(deleteDialog).toContainText("Alpha.md");
 
@@ -258,7 +258,7 @@ test.describe("Sidebar", () => {
 
     await page.getByRole("button", { name: "Delete Document" }).click();
 
-    const deleteDialog = page.getByRole("dialog", { name: "Delete Document" });
+    const deleteDialog = page.getByRole("alertdialog", { name: "Delete Document" });
     await expect(deleteDialog).toBeVisible();
 
     await page.getByRole("button", { name: "Cancel" }).click();
@@ -274,8 +274,10 @@ test.describe("Sidebar", () => {
     await toggleButton.click();
     await expect(page.locator("aside")).toBeVisible();
 
+    // Closed sidebar is translated off-screen, not unmounted — the slide
+    // animation requires it to stay in the DOM.
     await toggleButton.click();
-    await expect(page.locator("aside")).toHaveCount(0);
+    await expect(page.locator("aside")).not.toBeInViewport();
   });
 
   test("Services section is collapsed by default", async ({ page }) => {
