@@ -79,22 +79,80 @@ Source reviews:
       until 2026-10-21. Target: **Next.js 16** (latest stable at decision
       time: `16.2.10`), with React/React DOM 19 (Next 16's required peer).
       Source: https://nextjs.org/support-policy
-- [ ] Create a dedicated framework-upgrade branch.
-- [ ] Update Next.js, React, React DOM, ESLint configuration, and compatible
-      type packages together.
-- [ ] Regenerate the lockfile from the reviewed dependency set.
-- [ ] Run the official Next.js codemods required for the selected major.
-- [ ] Resolve compile and runtime API changes without weakening CSP, CSRF,
-      OAuth-state, validation, or export sanitization controls.
-- [ ] Run TypeScript checks on a clean dependency install.
-- [ ] Run the complete unit test suite on a clean dependency install.
-- [ ] Run a production Next.js build.
-- [ ] Run browser tests for editor, preview, CSP, upload, and export behavior.
-- [ ] Run OAuth start/callback negative tests for every implemented provider.
+- [x] Create a dedicated framework-upgrade branch. Done on this session's
+      designated branch, `claude/modernized-dillinger-requirements-tg5vc5`
+      (already isolated from `main`), rather than a second nested branch.
+- [x] Update Next.js, React, React DOM, ESLint configuration, and compatible
+      type packages together. `next@16.2.10`, `react@19.2.7`,
+      `react-dom@19.2.7`, `eslint@^9` + `eslint-config-next@16.2.10`
+      (ESLint 9 flat config, migrated from `.eslintrc.json`),
+      `@types/react@19.2.17`, `@types/react-dom@19.2.3`.
+- [x] Regenerate the lockfile from the reviewed dependency set.
+      `package-lock.json` regenerated via `npm install` from a clean
+      `node_modules`.
+- [x] Run the official Next.js codemods required for the selected major.
+      Ran `@next/codemod` upgrade + individual transforms: renamed
+      `middleware.ts` to `proxy.ts` (Next 16 Middleware→Proxy rename),
+      `next-lint-to-eslint-cli`, `next-async-request-api` (no-op — app
+      already used `await cookies()`/`await headers()`), `remove-*`,
+      `app-dir-runtime-config-experimental-edge`,
+      `next-experimental-turbo-to-turbopack` (no-op).
+- [x] Resolve compile and runtime API changes without weakening CSP, CSRF,
+      OAuth-state, validation, or export sanitization controls. Fixed:
+      `next.config.mjs` moved `serverComponentsExternalPackages` to the
+      stable `serverExternalPackages` key; `app/globals.css` moved the
+      katex `@import` above the `@tailwind` directives (strict CSS
+      `@import`-ordering under Turbopack); `app/page.tsx` extracted its
+      `ssr:false` dynamic import into a new Client Component
+      (`components/editor/EditorLoader.tsx`) since Turbopack no longer
+      allows `ssr:false` inside a Server Component; 5 OAuth hooks
+      (useBitbucket/useDropbox/useGitHub/useGoogleDrive/useOneDrive) moved
+      a ref assignment into `useEffect` per the new `react-hooks/refs`
+      rule, with no behavior change. `proxy.ts`'s CSP/nonce/security-header
+      logic is byte-identical to the old `middleware.ts` aside from the
+      function rename. Also fixed a pre-existing, upgrade-unrelated
+      duplicate `const body` declaration in
+      `app/api/google-drive/save/route.ts` that was failing `tsc` and
+      blocking the codemod's parser.
+- [x] Run TypeScript checks on a clean dependency install. 0 new errors;
+      the 46 pre-existing errors in `tests/components/github-modal.test.tsx`
+      (already noted in spec/13) are byte-for-byte identical to the
+      `main` baseline (diffed against a throwaway worktree).
+- [x] Run the complete unit test suite on a clean dependency install. 0 new
+      failures; the same 10 pre-existing failures (navbar export dropdown,
+      settings-modal dialog-role render, toast auto-dismiss timing) fail
+      identically on `main` before this upgrade.
+- [x] Run a production Next.js build. Succeeds under Turbopack
+      (`next build`); Next.js auto-updated `tsconfig.json`
+      (`jsx: react-jsx`, `target: ES2017` — both required by Next 16).
+- [x] Run browser tests for editor, preview, CSP, upload, and export
+      behavior. Full Playwright suite run (`npx playwright test`): 0 new
+      failures; the same 8 pre-existing failures (settings/sidebar close
+      transitions, one image-in-preview timing case) fail identically on
+      `main`.
+- [~] Run OAuth start/callback negative tests for every implemented
+      provider. GitHub has dedicated coverage
+      (`tests/routes/github.route.test.ts`, `tests/hooks/useGitHub.test.ts`)
+      and passes unchanged. Dropbox/Google Drive/OneDrive/Bitbucket have no
+      equivalent dedicated OAuth negative tests in the suite today — a
+      **pre-existing test-coverage gap**, not something this upgrade
+      introduced or (within this pass) closed.
 - [ ] Build the Lambda container image and scan it before deployment.
-- [ ] Deploy the upgrade to staging through the OIDC workflow.
+      **Blocked in this environment**: Docker is available here, but there
+      is no AWS/ECR credential or image scanner configured in this sandbox
+      to do this meaningfully — deferred to an environment with the
+      Phase 1 AWS bootstrap.
+- [ ] Deploy the upgrade to staging through the OIDC workflow. **Blocked**:
+      no AWS CLI or credentials are configured in this sandbox (checked:
+      `aws` binary absent, `~/.aws` has no credentials). Requires the
+      environment where Phase 1's AWS bootstrap was performed.
 - [ ] Smoke-test the Function URL and CloudFront path after deployment.
+      **Blocked on the above** — nothing is deployed yet.
 - [ ] Record rollback instructions and the last known-good image digest.
+      **Blocked on the above** — no image has been built/pushed from this
+      upgrade yet. Last known-good digest before this upgrade is whatever
+      `staging` is currently serving (see spec/13's outstanding note: it
+      predates even the Phase 13 Monaco fix).
 
 ## P1 - Harden CI/CD credential exposure
 
