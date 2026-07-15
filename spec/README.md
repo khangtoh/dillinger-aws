@@ -41,6 +41,7 @@ model.
 | 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | Phase 9 + 10 |
 | 12 | [12-security-hardening.md](12-security-hardening.md) | Close repository, AWS, credential, and operational security findings | Phase 7 + 8 + 10 + 11 |
 | 13 | [13-editor-selection-highlight-bug.md](13-editor-selection-highlight-bug.md) | Bug: Monaco selection/occurrence highlighting was invisible | None (client-side editor bug) |
+| 14 | [14-dependency-requirements.md](14-dependency-requirements.md) | npm dependency requirements audit: pinned vs. installable vs. vulnerable | None (framework major bump stays scoped to Phase 12 P0) |
 
 ## Status
 
@@ -84,6 +85,13 @@ model.
   was missing highlight colors in the custom Monaco themes, not a config
   or CDN issue. **Not yet deployed** to the live `staging` Function URL;
   requires a tenant redeploy.
+- Dependency requirements audit (`spec/14-dependency-requirements.md`):
+  **audited, not yet patched** (2026-07-15) — 32 known `npm audit`
+  findings at baseline; a blanket `npm audit fix` was found to break the
+  Vitest JSX transform (incidental `vite` major bump) and was reverted.
+  Safe in-range patch list identified; `markdown-it-toc` and `breakdance`
+  have no upstream fix and need an owner/review-date decision. The
+  Next.js major-version upgrade itself stays scoped to Phase 12 P0.
 
 ## Non-goals for v1
 
