@@ -71,8 +71,14 @@ Source reviews:
 
 ## P0 - Move to a supported application stack
 
-- [ ] Select a currently supported Next.js major using the official support
-      policy and record the target version.
+- [x] Select a currently supported Next.js major using the official support
+      policy and record the target version. **Decision (2026-07-15):**
+      current app version 14.2.35 reached end-of-life 2025-10-26 (no
+      security patches). Next.js 16 is Active LTS (full support: features,
+      bug fixes, security); Next.js 15 is Maintenance LTS (security-only)
+      until 2026-10-21. Target: **Next.js 16** (latest stable at decision
+      time: `16.2.10`), with React/React DOM 19 (Next 16's required peer).
+      Source: https://nextjs.org/support-policy
 - [ ] Create a dedicated framework-upgrade branch.
 - [ ] Update Next.js, React, React DOM, ESLint configuration, and compatible
       type packages together.
