@@ -41,6 +41,7 @@ model.
 | 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | Phase 9 + 10 |
 | 12 | [12-security-hardening.md](12-security-hardening.md) | Close repository, AWS, credential, and operational security findings | Phase 7 + 8 + 10 + 11 |
 | 13 | [13-editor-selection-highlight-bug.md](13-editor-selection-highlight-bug.md) | Bug: Monaco selection/occurrence highlighting was invisible | None (client-side editor bug) |
+| 14 | [14-color-theme-modernization/README.md](14-color-theme-modernization/README.md) | Full rebrand: new color theme replacing all current Dillinger brand colors, split per UI component | None (client-side styling only) |
 
 ## Status
 
@@ -84,6 +85,18 @@ model.
   was missing highlight colors in the custom Monaco themes, not a config
   or CDN issue. **Not yet deployed** to the live `staging` Function URL;
   requires a tenant redeploy.
+- Color theme modernization (`spec/14-color-theme-modernization/`):
+  **specced, not started** — full rebrand moving entirely off the current
+  plum/teal (`#35D7BB`) accent and slate chrome palette onto a new
+  semantic-token design system (CSS custom properties + a real
+  light/dark/system `ThemeProvider`, closing a gap between `CLAUDE.md`'s
+  documented theme support and actual behavior). Split into 8 sub-specs
+  by UI component area (design tokens/infra, app chrome, editor surface,
+  preview/markdown rendering, modals, UI primitives, marketing pages,
+  final verification/rollout) so they can be picked up independently once
+  the foundational token sub-spec (14a) lands — same file-ownership
+  pattern as Phase 11's four parallel orchestrator modules. Final palette
+  values are pending user sign-off (see 14a's "Open input needed").
 
 ## Non-goals for v1
 
