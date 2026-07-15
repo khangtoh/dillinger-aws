@@ -26,21 +26,21 @@ tasks after Phase 15 lands.
 
 ## Clarification pass
 
-- [ ] Read `lib/types.ts`'s current `Document` shape in full (not just
+- [x] Read `lib/types.ts`'s current `Document` shape in full (not just
       the fields referenced in Phase 13) to confirm exactly what a
       migration needs to add vs. what already exists.
-- [ ] Measure the current `persist()` debounce/storage path
+- [x] Measure the current `persist()` debounce/storage path
       (`stores/CLAUDE.md` documents a 2s debounce) against a
       representative folder+tag dataset size to confirm localStorage
       remains sufficient; only escalate to IndexedDB if this check fails,
       and record the measurement either way.
-- [ ] Decide the folder model shape: single-level folders (simplest,
+- [x] Decide the folder model shape: single-level folders (simplest,
       matches "beat StackEdit's UI" without matching its full nested-
       subfolder depth) vs. arbitrary nesting (matches StackEdit exactly,
       more UI complexity). Default to **single-level folders + free-form
       tags** unless this task's research finds a concrete reason nesting
       is needed for v1 — record the decision either way as a finding.
-- [ ] Confirm whether any existing OAuth cloud-provider import/save flow
+- [x] Confirm whether any existing OAuth cloud-provider import/save flow
       (`hooks/useGitHub.ts` etc.) encodes folder-like paths today (e.g.
       GitHub repo paths) that this model should align with, so folder
       semantics don't diverge between local documents and cloud-synced
@@ -98,4 +98,36 @@ tasks after Phase 15 lands.
 
 ## Findings
 
-_(append dated migration/verification results here)_
+**2026-07-15 — Clarification pass:**
+
+- Current `Document` shape (`lib/types.ts`): `{ id, title, body, createdAt,
+  github?: { sha, path, repo, owner, branch } }`. No `folderId`/`tags`,
+  no other cloud-provider metadata blocks (Dropbox/Google Drive/OneDrive/
+  Bitbucket don't attach per-document fields the way GitHub does) — so the
+  migration only needs to add the two new optional-becomes-required
+  fields; nothing else in the shape overlaps or conflicts with them.
+- `persist()` (`stores/store.ts`) writes `documents`/`currentDocument`/
+  `settings` to `localStorage` synchronously on most actions; the 2s
+  debounce specifically wraps body edits in
+  `components/editor/MonacoEditor.tsx`'s `handleChange`. Measured a
+  representative 500-document library (~4.5KB body each, a realistic
+  upper bound for this app's typical note size) at 2316.8 KB serialized
+  today; adding `folderId` (null or `folder-N`) and up to 3 tags per
+  document raised that to 2335.4 KB — **19,026 bytes total, ~38 bytes/doc,
+  0.36% of a conservative 5MB localStorage quota**. A `folders: Folder[]`
+  slice (a handful of `{id, name, createdAt}` entries) adds negligible
+  bytes on top. **localStorage remains sufficient; no escalation to
+  IndexedDB needed for this phase.**
+- Folder model: going with the spec's default — **single-level folders +
+  free-form tags**. Nothing in the codebase or Phase 13's scope call
+  (multi-doc manager, not full notes-app) motivates nested subfolders;
+  single-level keeps `moveDocumentToFolder`/sidebar grouping trivial.
+- `hooks/useGitHub.ts`'s `path` field is an opaque GitHub repo file path
+  string (e.g. `docs/notes.md`, may contain slashes) stored only inside
+  `Document.github.path` for round-tripping saves back to the same repo
+  file — it is not surfaced as folder navigation in the UI today and none
+  of the other four OAuth providers (Dropbox/Google Drive/OneDrive/
+  Bitbucket) attach path-like metadata to `Document` at all. **No
+  alignment needed**: the new local `folderId` model is independent of
+  and doesn't conflict with this field — a document can have both a local
+  `folderId` and a `github.path`, and they mean different things.
