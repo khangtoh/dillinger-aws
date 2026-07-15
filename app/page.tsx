@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import nextDynamic from "next/dynamic";
-import { EditorSkeleton } from "@/components/ui/Skeleton";
+import { Editor } from "@/components/editor/EditorLoader";
 
 export const metadata: Metadata = {
   title: "Markdown Editor — Online, Free, with Live Preview | Dillinger",
@@ -22,14 +21,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
-
-const Editor = nextDynamic(
-  () => import("@/components/editor/EditorContainer").then((mod) => mod.EditorContainer),
-  {
-    ssr: false,
-    loading: () => <EditorSkeleton />,
-  }
-);
 
 const HOMEPAGE_FEATURES = [
   {

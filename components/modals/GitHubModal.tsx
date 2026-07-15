@@ -58,6 +58,7 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
   useEffect(() => {
     if (isOpen && github.isConnected) {
       github.fetchOrgs();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormState({
         step: "orgs",
         commitMessage: "",

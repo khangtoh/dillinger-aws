@@ -52,6 +52,7 @@ export function OneDriveModal({ isOpen, onClose, mode }: OneDriveModalProps) {
   useEffect(() => {
     if (isOpen && oneDrive.isConnected) {
       oneDrive.fetchFiles("root");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNewFileName(currentDocument?.title || "document");
       setSelectedFileId(null);
     }

@@ -14,6 +14,7 @@ export function DocumentTitle() {
   const [title, setTitle] = useState("");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTitle(currentDocument?.title || "");
   }, [currentDocument?.title]);
 

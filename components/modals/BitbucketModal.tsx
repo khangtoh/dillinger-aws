@@ -56,6 +56,7 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
   useEffect(() => {
     if (isOpen && bitbucket.isConnected) {
       bitbucket.fetchWorkspaces();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormState({
         newFileName: currentDocument?.title || "document",
         commitMessage: "",

@@ -16,6 +16,7 @@ export function MarkdownPreview() {
   useEffect(() => {
     const body = currentDocument?.body;
     if (!body) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSanitizedHtml("");
       return;
     }

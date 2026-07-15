@@ -2,12 +2,12 @@
 
 import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
-import { middleware } from "@/middleware";
+import { proxy } from "@/proxy";
 
-describe("security middleware", () => {
+describe("security proxy", () => {
   it("sets browser security headers with a per-request CSP nonce", () => {
-    const first = middleware(new NextRequest("https://example.com/"));
-    const second = middleware(new NextRequest("https://example.com/"));
+    const first = proxy(new NextRequest("https://example.com/"));
+    const second = proxy(new NextRequest("https://example.com/"));
     const firstCsp = first.headers.get("Content-Security-Policy");
     const secondCsp = second.headers.get("Content-Security-Policy");
 
@@ -20,7 +20,7 @@ describe("security middleware", () => {
   });
 
   it("marks API responses as non-cacheable", () => {
-    const response = middleware(
+    const response = proxy(
       new NextRequest("https://example.com/api/github/status")
     );
     expect(response.headers.get("Cache-Control")).toBe("no-store");

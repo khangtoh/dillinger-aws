@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     const delimiter = `\r\n--${boundary}\r\n`;
     const closeDelimiter = `\r\n--${boundary}--`;
 
-    const body =
+    const multipartBody =
       delimiter +
       "Content-Type: application/json; charset=UTF-8\r\n\r\n" +
       JSON.stringify(metadata) +
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": `multipart/related; boundary=${boundary}`,
       },
-      body,
+      body: multipartBody,
     });
 
     if (!response.ok) {

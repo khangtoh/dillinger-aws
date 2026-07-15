@@ -52,6 +52,7 @@ export function GoogleDriveModal({ isOpen, onClose, mode }: GoogleDriveModalProp
   useEffect(() => {
     if (isOpen && googleDrive.isConnected) {
       googleDrive.fetchFiles("root");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNewFileName(currentDocument?.title || "document");
       setSelectedFileId(null);
     }

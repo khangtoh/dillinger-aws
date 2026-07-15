@@ -35,7 +35,9 @@ export function useOneDrive() {
   });
 
   const stateRef = useRef(state);
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  });
 
   // Check connection status on mount
   useEffect(() => {

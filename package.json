@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "start:test": "next start -H 127.0.0.1 -p 3005",
-    "lint": "next lint",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "vitest run",

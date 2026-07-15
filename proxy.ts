@@ -18,7 +18,7 @@ function contentSecurityPolicy(nonce: string): string {
   ].join("; ");
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const nonce = btoa(crypto.randomUUID());
   const csp = contentSecurityPolicy(nonce);
   const requestHeaders = new Headers(request.headers);

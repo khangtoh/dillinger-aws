@@ -51,6 +51,7 @@ export function DropboxModal({ isOpen, onClose, mode }: DropboxModalProps) {
   useEffect(() => {
     if (isOpen && dropbox.isConnected) {
       dropbox.fetchFiles("");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNewFileName(currentDocument?.title || "document");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

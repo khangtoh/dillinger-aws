@@ -75,7 +75,9 @@ export function useGitHub() {
 
   // Use ref to access current state in callbacks without stale closures
   const stateRef = useRef(state);
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  });
 
   const { notify } = useToast();
 
@@ -97,6 +99,7 @@ export function useGitHub() {
 
   // Check connection status on mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     checkStatus();
   }, [checkStatus]);
 
