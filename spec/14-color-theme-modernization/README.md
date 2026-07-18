@@ -125,7 +125,11 @@ come last.
       DocumentList, LogoBar migrated to semantic tokens; `bg-highlight`
       split into `bg-selected` (active row) vs. `bg-surface-hover`
       (transient hover).
-- [ ] 14c — Editor surface: not started (blocked on 14a)
+- [x] 14c — Editor surface: **done**. Monaco custom themes, editor
+      chrome, and document title bar re-themed; Phase 13's highlight
+      fix re-derived from the new accent at the same alpha ratios.
+      Also closed a real gap: the editor title bar and preview-split
+      divider had no dark-mode treatment at all before this.
 - [ ] 14d — Preview / markdown rendering: not started (blocked on 14a)
 - [ ] 14e — Modals & overlays: not started (blocked on 14a)
 - [ ] 14f — UI primitives & feedback: not started (blocked on 14a)

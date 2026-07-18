@@ -45,7 +45,7 @@ export function DocumentTitle() {
   if (!currentDocument) return null;
 
   return (
-    <div className="h-14 bg-bg-primary flex items-center px-4 border-b border-border-light">
+    <div className="h-14 bg-bg-canvas flex items-center px-4 border-b border-border-subtle">
       {isEditing ? (
         <div className="flex items-center gap-2 flex-1">
           <label htmlFor="document-title" className="sr-only">Document title</label>
@@ -57,15 +57,15 @@ export function DocumentTitle() {
             onChange={(e) => setTitle(e.target.value)}
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-white px-2 py-1 rounded border border-border-light
+            className="flex-1 bg-bg-canvas px-2 py-1 rounded border border-border-subtle
                        text-text-primary
-                       focus:border-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                       focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           />
           <button
             onClick={handleSave}
             aria-label="Save title"
-            className="text-plum hover:opacity-70 transition-opacity rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+            className="text-accent hover:opacity-70 transition-opacity rounded
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <Check size={20} />
           </button>
@@ -77,7 +77,7 @@ export function DocumentTitle() {
           </h2>
           <span
             aria-live="polite"
-            className={`text-xs text-text-muted ml-2 transition-opacity duration-200 ${isDirty ? "" : "opacity-50"}`}
+            className={`text-xs text-text-secondary ml-2 transition-opacity duration-200 ${isDirty ? "" : "opacity-50"}`}
           >
             {isDirty ? "Unsaved" : "Saved"}
           </span>
@@ -85,8 +85,8 @@ export function DocumentTitle() {
             onClick={() => setIsEditing(true)}
             aria-label="Edit title"
             title="Rename document"
-            className="text-text-muted hover:text-plum transition-colors rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+            className="text-text-secondary hover:text-accent transition-colors rounded
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <Edit2 size={16} />
           </button>

@@ -31,18 +31,18 @@ const DropZoneOverlay = memo(function DropZoneOverlay({
 
   return (
     <div
-      className="absolute inset-0 z-modal bg-bg-primary/90 flex items-center justify-center pointer-events-none"
+      className="absolute inset-0 z-modal bg-bg-canvas/90 flex items-center justify-center pointer-events-none"
       aria-hidden="true"
     >
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="size-20 rounded-full bg-plum/20 flex items-center justify-center">
-          <Upload size={40} className="text-plum" />
+        <div className="size-20 rounded-full bg-accent/20 flex items-center justify-center">
+          <Upload size={40} className="text-accent" />
         </div>
         <div>
-          <p className="text-xl font-semibold text-text-invert">
+          <p className="text-xl font-semibold text-text-inverse">
             Drop your file here
           </p>
-          <p className="text-text-muted mt-1">
+          <p className="text-text-secondary mt-1">
             Supports markdown, HTML, and image files
           </p>
         </div>
@@ -177,7 +177,7 @@ function EditorContent() {
   if (zenMode) {
     return (
       <div
-        className="h-dvh bg-bg-primary flex items-center justify-center relative animate-fade-in"
+        className="h-dvh bg-bg-canvas flex items-center justify-center relative animate-fade-in"
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -188,13 +188,13 @@ function EditorContent() {
         <div className="w-full max-w-3xl h-full py-12 px-4 relative">
           <button
             onClick={() => setZenMode(false)}
-            className="absolute top-4 right-4 text-text-muted hover:text-text-invert transition-colors rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+            className="absolute top-4 right-4 text-text-secondary hover:text-text-inverse transition-colors rounded
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             aria-label="Exit zen mode"
           >
             <X size={24} />
           </button>
-          <div className="h-full border border-border-light rounded-lg overflow-hidden">
+          <div className="h-full border border-border-subtle rounded-lg overflow-hidden">
             <MonacoEditor />
           </div>
         </div>
@@ -225,15 +225,15 @@ function EditorContent() {
           {/* Editor Panel */}
           <div
             className={`${
-              previewVisible ? "w-full sm:w-1/2 shadow-none sm:shadow-[1px_0_0_0_#E8E8E8]" : "w-full"
-            } border-r border-border-light`}
+              previewVisible ? "w-full sm:w-1/2 shadow-none sm:shadow-[1px_0_0_0_rgb(var(--color-border-subtle))]" : "w-full"
+            } border-r border-border-subtle`}
           >
             <MonacoEditor />
           </div>
 
           {/* Preview Panel */}
           {previewVisible && (
-            <div className="hidden sm:block w-1/2 bg-[#FAFBFC]">
+            <div className="hidden sm:block w-1/2 bg-bg-surface">
               <MarkdownPreview />
             </div>
           )}
