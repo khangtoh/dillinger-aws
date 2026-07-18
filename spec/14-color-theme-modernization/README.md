@@ -137,7 +137,10 @@ come last.
       `enableNightMode`/`useResolvedTheme` theme-detection path
       entirely as dead weight. Missing checkbox `accent-color` added
       for both themes.
-- [ ] 14e — Modals & overlays: not started (blocked on 14a)
+- [x] 14e — Modals & overlays: **done**. All 7 modals re-themed;
+      introduced the `danger` token for destructive actions and applied
+      it consistently (including Sidebar's delete/unlink buttons, which
+      predated this phase's `plum` grep since they never used `plum`).
 - [ ] 14f — UI primitives & feedback: not started (blocked on 14a)
 - [ ] 14g — Marketing & content pages: not started (blocked on 14a)
 - [ ] 14h — Verification & rollout: not started (blocked on 14b–14g)

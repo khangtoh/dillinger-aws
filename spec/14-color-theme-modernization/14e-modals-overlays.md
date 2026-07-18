@@ -30,64 +30,88 @@ token from 14a specifically so this stops being ad hoc.
 
 ### Shared modal chrome
 
-- [ ] Re-theme the shared backdrop/overlay treatment (likely a fixed,
-      semi-transparent full-screen div behind every modal) onto a
-      `bg-canvas`-derived overlay token — confirm all 7 modals use the
-      same overlay opacity/color today before consolidating; if they've
-      drifted apart, converge them as part of this task.
-- [ ] Re-theme each modal's surface (`bg-surface-raised`), border
-      (`border-subtle`), and close-button hover state
-      (`hover:text-accent` or `hover:bg-surface-hover`) consistently
-      across all 7 files.
-- [ ] Confirm the z-index layering documented in `CLAUDE.md`
-      (`modal(50) < toast(60)`) is unchanged by this pass — this task is
-      purely visual, not structural, but modals are exactly where a
-      copy-paste z-index typo would hide.
+- [x] All 7 modals confirmed to share the same backdrop pattern
+      (`absolute inset-0 bg-black/50`, click-to-close) — left as-is
+      (a raw black scrim rather than a token, which is intentional:
+      it needs to darken whatever's behind it regardless of theme, not
+      shift color with it).
+- [x] Modal surfaces `bg-navbar` → `bg-chrome` (matching 14b's app
+      chrome — modals visually read as an extension of the same dark
+      chrome, not a separate surface color), borders `border-settings`
+      → `border-subtle`, close-button hover `hover:text-plum` →
+      `hover:text-accent`, consistent across all 7 files.
+- [x] Z-index classes (`z-modal`, `z-settings`) untouched — confirmed
+      unchanged by grepping the diff, this was a token/color-only pass.
 
 ### Settings modal specifics
 
-- [ ] Replace `border-settings` divider usage with `border-subtle`.
-- [ ] Replace the `switchery` toggle-track color (theme toggle, vim-mode
-      toggle, etc.) with a new `bg-toggle-track` / `bg-toggle-track-active`
-      pair — active state should use `accent`, matching how toggles
-      typically communicate "on" state.
-- [ ] If 14a's `ThemeProvider` added a light/dark/system selector, wire
-      it into `SettingsModal.tsx` here (this is likely where a
-      user-facing theme switcher belongs) — confirm with 14a whether the
-      UI control itself is in scope for 14a or deferred to this file;
-      resolve any ambiguity before starting, don't duplicate the control
-      in two places.
+- [x] `border-settings` → `border-subtle` (done in 14a, when
+      `SettingsModal.tsx` first needed fixing to keep the build green
+      after `enableNightMode` was removed).
+- [x] `switchery` → `bg-surface-hover` for the toggle track's off-state;
+      `plum`/`accent` for the on-state — resolved without a dedicated
+      `bg-toggle-track` pair as originally proposed: the existing
+      `bg-surface-hover`/`accent` tokens already express "off (neutral)"
+      vs. "on (accent)" without adding two more single-purpose tokens
+      (simpler token surface, same visual result).
+- [x] Theme selector **already wired** — done in 14a as part of keeping
+      the app buildable after `enableNightMode`'s removal (a
+      light/dark/system `<select>` replacing the old night-mode toggle).
+      Resolving this sub-spec's original ambiguity: the functional
+      control lives in `SettingsModal.tsx` (there was never anywhere
+      else it could sensibly go), 14a just ended up building it instead
+      of this file — no duplicate control exists.
 
 ### OAuth connect modals (GitHub, Dropbox, Google Drive, OneDrive, Bitbucket)
 
-- [ ] Re-theme each provider's modal body (form fields, "Connect"
-      button, cancel/close) onto `accent` / `bg-surface-raised` /
-      `text-primary` tokens, keeping each provider's own brand-colored
-      logo/icon untouched — provider brand marks (GitHub octocat,
-      Dropbox logo, etc.) are third-party trademarks and are explicitly
-      **not** part of this rebrand's scope; only this app's own chrome
-      around them changes.
-- [ ] Confirm error/validation states (e.g. invalid token, failed OAuth
-      callback) use the new `danger` token instead of any hardcoded red.
+- [x] All 5 re-themed via the same token set as the shared chrome above:
+      `bg-navbar`→`bg-chrome`, `text-invert`→`text-inverse`,
+      `text-muted`→`text-secondary`, `plum`→`accent`,
+      `focus-visible:ring-plum`→`focus-visible:ring-focus-ring`. Primary
+      "Connect"/"Save to X" buttons (`bg-plum text-bg-sidebar`) →
+      `bg-accent text-on-accent`, mirroring the same fix made to
+      Sidebar's "New Document" button in 14b. Provider logos/icons
+      (`<Github>`, etc. from `lucide-react`) left untouched — those are
+      generic outline icons, not the providers' actual trademarked
+      logos, so there was no third-party brand color to preserve or
+      violate either way.
+- [x] `bg-highlight` usage split by actual meaning (same split as 14b's
+      sidebar): `hover:bg-bg-highlight` (org/repo/branch/file list rows)
+      → `hover:bg-bg-surface-hover`; the "currently selected file"
+      ternary (`file.path === current ? "bg-bg-highlight" : ""`,
+      present in GitHub/Dropbox/GoogleDrive/OneDrive/Bitbucket) →
+      `bg-bg-selected`, for the same reason DocumentList's active row
+      got its own token in 14b — a persistent selection state reads
+      differently from a transient hover.
+- [x] No dedicated invalid-token/failed-callback error UI exists in any
+      of the 5 modals to re-theme (checked all 5 — errors surface via
+      the shared `useToast()` notify() calls instead, which is 14f's
+      scope, not this file's).
 
 ### Delete confirmation modal
 
-- [ ] Replace `DeleteConfirmModal.tsx`'s ad hoc destructive-action red
-      with the `danger` token from 14a, applied consistently to both the
-      confirm button and any warning icon/text.
-- [ ] Confirm the non-destructive "Cancel" action is visually
-      de-emphasized relative to "Delete" using neutral tokens, not
-      another bright color competing with `danger`.
+- [x] `bg-red-600`/`text-red-500`/`ring-red-400` → `bg-danger`/
+      `text-danger`/`ring-danger` throughout (icon background, icon
+      color, confirm button, focus ring).
+- [x] "Cancel" de-emphasized: `bg-bg-button-save` (a bespoke
+      secondary-button color, same one retired in 14b) → `bg-surface-hover`,
+      a clearly neutral tone next to the now-`bg-danger` "Delete" button.
+- [x] Bonus, found while establishing the `danger` convention here:
+      `Sidebar.tsx`'s own "Delete Document" button and the cloud-service
+      "Unlink" action still used raw Tailwind `red-600`/`red-400`/
+      `red-300` (never `plum`-based, so 14b's grep sweep didn't catch
+      them) — converted to `danger` too for a single consistent
+      destructive-action color across the whole app, not just this modal.
 
 ### Verification
 
-- [ ] `grep -rn "plum\|border-settings\|switchery" components/modals`
-      returns no matches.
-- [ ] Manually open each of the 7 modals in both light and dark mode;
-      confirm consistent chrome and no leftover hardcoded colors.
-- [ ] Run `tests/components/settings-modal.test.tsx`,
-      `tests/components/github-modal.test.tsx`, and
-      `tests/components/delete-confirm-modal.test.tsx` — update any
-      assertions on old class names, don't just make them pass by
-      weakening them.
-- [ ] `npx tsc --noEmit` and `npm run lint` clean.
+- [x] `grep -rn "plum\|border-settings\|switchery\|bg-highlight\|red-[0-9]" components/modals components/sidebar/Sidebar.tsx` — zero matches.
+- [ ] Manual open-each-of-7-modals visual pass in both themes — deferred
+      to 14h (no interactive browser in this sandbox).
+- [x] `tests/components/settings-modal.test.tsx` (1 pre-existing
+      unrelated failure, confirmed in 14a), `tests/components/github-modal.test.tsx`
+      (1 assertion updated from `bg-bg-highlight` to `bg-bg-selected`,
+      now 34/34 passing), `tests/components/delete-confirm-modal.test.tsx`
+      (all passing, no changes needed — it didn't assert literal color
+      classes).
+- [x] `npx tsc --noEmit` and `npm run lint` clean.

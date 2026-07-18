@@ -55,22 +55,22 @@ export function DeleteConfirmModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-bg-navbar rounded-lg shadow-xl w-full max-w-sm p-6">
+      <div className="relative bg-bg-chrome rounded-lg shadow-xl w-full max-w-sm p-6">
         <div className="flex flex-col items-center text-center">
-          <div className="size-12 rounded-full bg-red-600/20 flex items-center justify-center mb-4">
-            <AlertTriangle size={24} className="text-red-500" />
+          <div className="size-12 rounded-full bg-danger/20 flex items-center justify-center mb-4">
+            <AlertTriangle size={24} className="text-danger" />
           </div>
 
           <h2
             id="delete-modal-title"
-            className="text-lg font-semibold text-text-invert mb-2 text-balance"
+            className="text-lg font-semibold text-text-inverse mb-2 text-balance"
           >
             Delete Document
           </h2>
 
           <p
             id="delete-modal-description"
-            className="text-text-muted text-sm mb-6"
+            className="text-text-secondary text-sm mb-6"
           >
             Are you sure you want to delete &quot;{documentTitle}&quot;? This action cannot be undone.
           </p>
@@ -79,17 +79,17 @@ export function DeleteConfirmModal({
             <button
               ref={cancelRef}
               onClick={onClose}
-              className="flex-1 bg-bg-button-save text-text-invert py-2 px-4 rounded font-medium
+              className="flex-1 bg-bg-surface-hover text-text-inverse py-2 px-4 rounded font-medium
                          hover:opacity-90 transition-opacity
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
-              className="flex-1 bg-red-600 text-white py-2 px-4 rounded font-medium
-                         hover:bg-red-700 transition-colors
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+              className="flex-1 bg-danger text-text-on-accent py-2 px-4 rounded font-medium
+                         hover:opacity-90 transition-opacity
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
             >
               Delete
             </button>

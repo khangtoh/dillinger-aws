@@ -606,7 +606,7 @@ describe("GitHubModal", () => {
 
       // The check icon should be present for the selected file
       const fileButton = screen.getByText("README.md").closest("button");
-      expect(fileButton?.className).toContain("bg-bg-highlight");
+      expect(fileButton?.className).toContain("bg-bg-selected");
     });
   });
 });

@@ -103,30 +103,30 @@ export function GoogleDriveModal({ isOpen, onClose, mode }: GoogleDriveModalProp
         aria-labelledby="google-drive-connect-title"
       >
         <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
-        <div className="relative bg-bg-navbar rounded-lg shadow-xl w-full max-w-md p-6">
+        <div className="relative bg-bg-chrome rounded-lg shadow-xl w-full max-w-md p-6">
           <button
             ref={closeButtonRef}
             onClick={onClose}
             aria-label="Close"
-            className="absolute top-4 right-4 text-text-invert hover:text-plum rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+            className="absolute top-4 right-4 text-text-inverse hover:text-accent rounded
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X size={20} />
           </button>
 
           <div className="text-center">
-            <HardDrive size={48} className="mx-auto text-text-invert mb-4" aria-hidden="true" />
-            <h2 id="google-drive-connect-title" className="text-xl font-semibold text-text-invert mb-2 text-balance">
+            <HardDrive size={48} className="mx-auto text-text-inverse mb-4" aria-hidden="true" />
+            <h2 id="google-drive-connect-title" className="text-xl font-semibold text-text-inverse mb-2 text-balance">
               Connect to Google Drive
             </h2>
-            <p className="text-text-muted mb-6">
+            <p className="text-text-secondary mb-6">
               Connect your Google Drive account to import and save markdown files.
             </p>
             <button
               onClick={googleDrive.connect}
-              className="bg-plum text-bg-sidebar px-6 py-2 rounded font-medium
+              className="bg-accent text-text-on-accent px-6 py-2 rounded font-medium
                          hover:opacity-90 transition-opacity
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
             >
               Connect Google Drive
             </button>
@@ -144,22 +144,22 @@ export function GoogleDriveModal({ isOpen, onClose, mode }: GoogleDriveModalProp
       aria-labelledby="google-drive-modal-title"
     >
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
-      <div className="relative bg-bg-navbar rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+      <div className="relative bg-bg-chrome rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border-settings">
+        <div className="flex items-center justify-between p-4 border-b border-border-subtle">
           <div className="flex items-center gap-2">
             {googleDrive.pathHistory.length > 0 && (
               <button
                 onClick={googleDrive.navigateBack}
                 aria-label="Go back"
-                className="text-text-invert hover:text-plum rounded
-                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                className="text-text-inverse hover:text-accent rounded
+                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
                 <ArrowLeft size={20} />
               </button>
             )}
-            <HardDrive size={24} className="text-text-invert" aria-hidden="true" />
-            <h2 id="google-drive-modal-title" className="text-lg font-semibold text-text-invert text-balance">
+            <HardDrive size={24} className="text-text-inverse" aria-hidden="true" />
+            <h2 id="google-drive-modal-title" className="text-lg font-semibold text-text-inverse text-balance">
               {mode === "import" ? "Import from Google Drive" : "Save to Google Drive"}
             </h2>
           </div>
@@ -167,8 +167,8 @@ export function GoogleDriveModal({ isOpen, onClose, mode }: GoogleDriveModalProp
             ref={closeButtonRef}
             onClick={onClose}
             aria-label="Close"
-            className="text-text-invert hover:text-plum rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+            className="text-text-inverse hover:text-accent rounded
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X size={20} />
           </button>
@@ -177,8 +177,8 @@ export function GoogleDriveModal({ isOpen, onClose, mode }: GoogleDriveModalProp
         {/* Content */}
         <div className="flex-1 overflow-auto p-4">
           {mode === "save" && (
-            <div className="mb-4 p-3 bg-bg-highlight rounded">
-              <label htmlFor="google-drive-filename" className="block text-sm text-text-muted mb-1">
+            <div className="mb-4 p-3 bg-bg-surface-hover rounded">
+              <label htmlFor="google-drive-filename" className="block text-sm text-text-secondary mb-1">
                 File name
               </label>
               <input
@@ -187,15 +187,15 @@ export function GoogleDriveModal({ isOpen, onClose, mode }: GoogleDriveModalProp
                 value={newFileName}
                 onChange={(e) => setNewFileName(e.target.value)}
                 placeholder="document.md"
-                className="w-full bg-bg-navbar text-text-invert px-3 py-2 rounded
-                           border border-border-settings
-                           focus:border-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                className="w-full bg-bg-chrome text-text-inverse px-3 py-2 rounded
+                           border border-border-subtle
+                           focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
               />
             </div>
           )}
 
           {googleDrive.files.length === 0 ? (
-            <p className="text-text-muted text-center py-4">
+            <p className="text-text-secondary text-center py-4">
               No files found
             </p>
           ) : (
@@ -204,15 +204,15 @@ export function GoogleDriveModal({ isOpen, onClose, mode }: GoogleDriveModalProp
                 <button
                   key={item.id}
                   onClick={() => handleItemClick(item)}
-                  className={`w-full text-left px-3 py-2 rounded text-text-invert
-                             hover:bg-bg-highlight flex items-center gap-2
-                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum
-                             ${selectedFileId === item.id ? "bg-bg-highlight" : ""}`}
+                  className={`w-full text-left px-3 py-2 rounded text-text-inverse
+                             hover:bg-bg-surface-hover flex items-center gap-2
+                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring
+                             ${selectedFileId === item.id ? "bg-bg-selected" : ""}`}
                 >
                   {item.isFolder ? (
-                    <Folder size={16} className="text-text-muted" aria-hidden="true" />
+                    <Folder size={16} className="text-text-secondary" aria-hidden="true" />
                   ) : (
-                    <FileText size={16} className="text-text-muted" aria-hidden="true" />
+                    <FileText size={16} className="text-text-secondary" aria-hidden="true" />
                   )}
                   <span>{item.name}</span>
                 </button>
@@ -223,12 +223,12 @@ export function GoogleDriveModal({ isOpen, onClose, mode }: GoogleDriveModalProp
 
         {/* Footer */}
         {mode === "save" && (
-          <div className="p-4 border-t border-border-settings">
+          <div className="p-4 border-t border-border-subtle">
             <button
               onClick={handleSave}
-              className="w-full bg-plum text-bg-sidebar py-2 px-4 rounded font-medium
+              className="w-full bg-accent text-text-on-accent py-2 px-4 rounded font-medium
                          hover:opacity-90 transition-opacity flex items-center justify-center gap-2
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
             >
               <Save size={18} />
               Save to Google Drive

@@ -129,30 +129,30 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
         aria-labelledby="github-connect-title"
       >
         <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
-        <div className="relative bg-bg-navbar rounded-lg shadow-xl w-full max-w-md p-6">
+        <div className="relative bg-bg-chrome rounded-lg shadow-xl w-full max-w-md p-6">
           <button
             ref={closeButtonRef}
             onClick={onClose}
             aria-label="Close"
-            className="absolute top-4 right-4 text-text-invert hover:text-plum rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+            className="absolute top-4 right-4 text-text-inverse hover:text-accent rounded
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X size={20} />
           </button>
 
           <div className="text-center">
-            <Github size={48} className="mx-auto text-text-invert mb-4" aria-hidden="true" />
-            <h2 id="github-connect-title" className="text-xl font-semibold text-text-invert mb-2 text-balance">
+            <Github size={48} className="mx-auto text-text-inverse mb-4" aria-hidden="true" />
+            <h2 id="github-connect-title" className="text-xl font-semibold text-text-inverse mb-2 text-balance">
               Connect to GitHub
             </h2>
-            <p className="text-text-muted mb-6">
+            <p className="text-text-secondary mb-6">
               Connect your GitHub account to import and save markdown files.
             </p>
             <button
               onClick={github.connect}
-              className="bg-plum text-bg-sidebar px-6 py-2 rounded font-medium
+              className="bg-accent text-text-on-accent px-6 py-2 rounded font-medium
                          hover:opacity-90 transition-opacity
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
             >
               Connect GitHub
             </button>
@@ -170,22 +170,22 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
       aria-labelledby="github-modal-title"
     >
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
-      <div className="relative bg-bg-navbar rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+      <div className="relative bg-bg-chrome rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border-settings">
+        <div className="flex items-center justify-between p-4 border-b border-border-subtle">
           <div className="flex items-center gap-2">
             {formState.step !== "orgs" && (
               <button
                 onClick={goBack}
                 aria-label="Go back"
-                className="text-text-invert hover:text-plum rounded
-                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                className="text-text-inverse hover:text-accent rounded
+                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
                 <ArrowLeft size={20} />
               </button>
             )}
-            <Github size={24} className="text-text-invert" aria-hidden="true" />
-            <h2 id="github-modal-title" className="text-lg font-semibold text-text-invert text-balance">
+            <Github size={24} className="text-text-inverse" aria-hidden="true" />
+            <h2 id="github-modal-title" className="text-lg font-semibold text-text-inverse text-balance">
               {mode === "import" ? "Import from GitHub" : "Save to GitHub"}
             </h2>
           </div>
@@ -193,15 +193,15 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
             ref={closeButtonRef}
             onClick={onClose}
             aria-label="Close"
-            className="text-text-invert hover:text-plum rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+            className="text-text-inverse hover:text-accent rounded
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Breadcrumb */}
-        <div className="px-4 py-2 text-sm text-text-muted flex items-center gap-1 border-b border-border-settings">
+        <div className="px-4 py-2 text-sm text-text-secondary flex items-center gap-1 border-b border-border-subtle">
           {github.current.owner && (
             <>
               <span>{github.current.owner}</span>
@@ -229,11 +229,11 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
                 <button
                   key={org.login}
                   onClick={() => handleOrgSelect(org.login)}
-                  className="w-full text-left px-3 py-2 rounded text-text-invert
-                             hover:bg-bg-highlight flex items-center justify-between"
+                  className="w-full text-left px-3 py-2 rounded text-text-inverse
+                             hover:bg-bg-surface-hover flex items-center justify-between"
                 >
                   <span>{org.login}</span>
-                  <ChevronRight size={16} className="text-text-muted" />
+                  <ChevronRight size={16} className="text-text-secondary" />
                 </button>
               ))}
             </div>
@@ -245,19 +245,19 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
                 <button
                   key={repo.name}
                   onClick={() => handleRepoSelect(repo.name)}
-                  className="w-full text-left px-3 py-2 rounded text-text-invert
-                             hover:bg-bg-highlight flex items-center justify-between"
+                  className="w-full text-left px-3 py-2 rounded text-text-inverse
+                             hover:bg-bg-surface-hover flex items-center justify-between"
                 >
                   <div className="flex items-center gap-2">
-                    <Folder size={16} className="text-text-muted" />
+                    <Folder size={16} className="text-text-secondary" />
                     <span>{repo.name}</span>
                     {repo.private && (
-                      <span className="text-xs bg-bg-highlight px-1.5 py-0.5 rounded">
+                      <span className="text-xs bg-bg-surface-hover px-1.5 py-0.5 rounded">
                         Private
                       </span>
                     )}
                   </div>
-                  <ChevronRight size={16} className="text-text-muted" />
+                  <ChevronRight size={16} className="text-text-secondary" />
                 </button>
               ))}
             </div>
@@ -269,11 +269,11 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
                 <button
                   key={branch.name}
                   onClick={() => handleBranchSelect(branch.name)}
-                  className="w-full text-left px-3 py-2 rounded text-text-invert
-                             hover:bg-bg-highlight flex items-center justify-between"
+                  className="w-full text-left px-3 py-2 rounded text-text-inverse
+                             hover:bg-bg-surface-hover flex items-center justify-between"
                 >
                   <span>{branch.name}</span>
-                  <ChevronRight size={16} className="text-text-muted" />
+                  <ChevronRight size={16} className="text-text-secondary" />
                 </button>
               ))}
             </div>
@@ -282,8 +282,8 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
           {formState.step === "files" && (
             <div className="space-y-1">
               {mode === "save" && (
-                <div className="mb-4 p-3 bg-bg-highlight rounded">
-                  <label htmlFor="github-filename" className="block text-sm text-text-muted mb-1">
+                <div className="mb-4 p-3 bg-bg-surface-hover rounded">
+                  <label htmlFor="github-filename" className="block text-sm text-text-secondary mb-1">
                     File name
                   </label>
                   <input
@@ -292,11 +292,11 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
                     value={formState.newFileName}
                     onChange={(e) => setFormState((prev) => ({ ...prev, newFileName: e.target.value }))}
                     placeholder="document.md"
-                    className="w-full bg-bg-navbar text-text-invert px-3 py-2 rounded
-                               border border-border-settings
-                               focus:border-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                    className="w-full bg-bg-chrome text-text-inverse px-3 py-2 rounded
+                               border border-border-subtle
+                               focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                   />
-                  <label htmlFor="github-commit-message" className="block text-sm text-text-muted mb-1 mt-3">
+                  <label htmlFor="github-commit-message" className="block text-sm text-text-secondary mb-1 mt-3">
                     Commit message
                   </label>
                   <input
@@ -305,15 +305,15 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
                     value={formState.commitMessage}
                     onChange={(e) => setFormState((prev) => ({ ...prev, commitMessage: e.target.value }))}
                     placeholder="Update document"
-                    className="w-full bg-bg-navbar text-text-invert px-3 py-2 rounded
-                               border border-border-settings
-                               focus:border-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                    className="w-full bg-bg-chrome text-text-inverse px-3 py-2 rounded
+                               border border-border-subtle
+                               focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                   />
                 </div>
               )}
 
               {github.files.length === 0 ? (
-                <p className="text-text-muted text-center py-4">
+                <p className="text-text-secondary text-center py-4">
                   No markdown files found
                 </p>
               ) : (
@@ -321,16 +321,16 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
                   <button
                     key={file.path}
                     onClick={() => handleFileSelect(file.path)}
-                    className={`w-full text-left px-3 py-2 rounded text-text-invert
-                               hover:bg-bg-highlight flex items-center justify-between
-                               ${github.current.path === file.path ? "bg-bg-highlight" : ""}`}
+                    className={`w-full text-left px-3 py-2 rounded text-text-inverse
+                               hover:bg-bg-surface-hover flex items-center justify-between
+                               ${github.current.path === file.path ? "bg-bg-selected" : ""}`}
                   >
                     <div className="flex items-center gap-2">
-                      <FileText size={16} className="text-text-muted" />
+                      <FileText size={16} className="text-text-secondary" />
                       <span>{file.path}</span>
                     </div>
                     {github.current.path === file.path && (
-                      <Check size={16} className="text-plum" />
+                      <Check size={16} className="text-accent" />
                     )}
                   </button>
                 ))
@@ -341,12 +341,12 @@ export function GitHubModal({ isOpen, onClose, mode }: GitHubModalProps) {
 
         {/* Footer */}
         {mode === "save" && formState.step === "files" && (
-          <div className="p-4 border-t border-border-settings">
+          <div className="p-4 border-t border-border-subtle">
             <button
               onClick={handleSave}
-              className="w-full bg-plum text-bg-sidebar py-2 px-4 rounded font-medium
+              className="w-full bg-accent text-text-on-accent py-2 px-4 rounded font-medium
                          hover:opacity-90 transition-opacity flex items-center justify-center gap-2
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
             >
               <Save size={18} />
               Save to GitHub

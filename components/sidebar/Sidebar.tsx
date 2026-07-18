@@ -190,9 +190,9 @@ export function Sidebar() {
           <button
             onClick={handleDeleteClick}
             disabled={documents.length <= 1}
-            className={`w-full bg-red-600 text-text-inverse py-2 px-4 rounded font-medium
+            className={`w-full bg-danger text-text-on-accent py-2 px-4 rounded font-medium
                        flex items-center justify-center gap-2
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome
                        ${documents.length <= 1 ? "opacity-60 cursor-not-allowed" : "hover:opacity-90 active:scale-[0.97] transition-all"}`}
           >
             <Trash2 size={18} />
@@ -400,8 +400,8 @@ const ServiceButton = memo(function ServiceButton({
         <button
           onClick={onDisconnect}
           aria-label={`Unlink ${label}`}
-          className="text-xs text-red-400 hover:text-red-300 rounded px-1
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+          className="text-xs text-danger hover:opacity-80 rounded px-1
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
         >
           Unlink
         </button>
