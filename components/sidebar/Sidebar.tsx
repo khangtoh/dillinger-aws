@@ -119,7 +119,7 @@ export function Sidebar() {
         aria-hidden="true"
       />
       <aside
-        className={`fixed sm:relative w-sidebar shrink-0 bg-bg-sidebar h-dvh flex flex-col z-sidebar
+        className={`fixed sm:relative w-sidebar shrink-0 bg-bg-chrome h-dvh flex flex-col z-sidebar
                     transition-all duration-250
                     ${sidebarOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0 sm:-ml-[270px]"}`}
         style={{ transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)" }}
@@ -168,21 +168,21 @@ export function Sidebar() {
         </nav>
 
         {/* Actions */}
-        <div className="p-4 space-y-3 border-t border-border-settings">
+        <div className="p-4 space-y-3 border-t border-border-subtle">
           <button
             onClick={createDocument}
-            className="w-full bg-plum text-bg-sidebar py-2 px-4 rounded font-medium
+            className="w-full bg-accent text-text-on-accent py-2 px-4 rounded font-medium
                        hover:opacity-90 active:scale-[0.97] transition-all flex items-center justify-center gap-2
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-sidebar"
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
           >
             <Plus size={18} />
             New Document
           </button>
           <button
             onClick={handleSave}
-            className="w-full bg-bg-button-save text-text-invert py-2 px-4 rounded font-medium
+            className="w-full bg-bg-surface-hover text-text-inverse py-2 px-4 rounded font-medium
                        hover:opacity-90 active:scale-[0.97] transition-all flex items-center justify-center gap-2
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-sidebar"
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
           >
             <Save size={18} />
             Save Session
@@ -190,9 +190,9 @@ export function Sidebar() {
           <button
             onClick={handleDeleteClick}
             disabled={documents.length <= 1}
-            className={`w-full bg-red-600 text-text-invert py-2 px-4 rounded font-medium
+            className={`w-full bg-red-600 text-text-inverse py-2 px-4 rounded font-medium
                        flex items-center justify-center gap-2
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-sidebar
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome
                        ${documents.length <= 1 ? "opacity-60 cursor-not-allowed" : "hover:opacity-90 active:scale-[0.97] transition-all"}`}
           >
             <Trash2 size={18} />
@@ -258,8 +258,8 @@ function CollapsibleSection({
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-controls={panelId}
-        className="w-full flex items-center justify-between py-2 text-text-muted text-xs uppercase tracking-wider rounded
-                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+        className="w-full flex items-center justify-between py-2 text-text-secondary text-xs uppercase tracking-wider rounded
+                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
       >
         <span className="flex items-center gap-2">
           {icon}
@@ -318,8 +318,8 @@ function CloudServiceMenu({
         <button
           key={service.target}
           onClick={() => onSelect(service.target)}
-          className="w-full flex items-center gap-2 py-2 px-2 text-dropdown-link hover:text-text-invert text-sm rounded hover:bg-bg-highlight
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+          className="w-full flex items-center gap-2 py-2 px-2 text-text-secondary hover:text-text-inverse text-sm rounded hover:bg-bg-surface-hover
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
           {service.icon}
           <span>{service.label}</span>
@@ -392,7 +392,7 @@ const ServiceButton = memo(function ServiceButton({
 }) {
   return (
     <div className="flex items-center justify-between py-2 px-2 text-sm">
-      <div className="flex items-center gap-2 text-dropdown-link">
+      <div className="flex items-center gap-2 text-text-secondary">
         {icon}
         <span>{label}</span>
       </div>
@@ -409,8 +409,8 @@ const ServiceButton = memo(function ServiceButton({
         <button
           onClick={onConnect}
           aria-label={`Link ${label}`}
-          className="text-xs text-plum hover:opacity-80 rounded px-1
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+          className="text-xs text-accent hover:opacity-80 rounded px-1
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
           Link
         </button>

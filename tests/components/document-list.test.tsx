@@ -78,9 +78,9 @@ describe("DocumentList", () => {
     const selectedButton = screen.getByRole("button", { name: /Selected\.md/ });
     const otherButton = screen.getByRole("button", { name: /Other\.md/ });
 
-    expect(selectedButton.className).toContain("bg-bg-highlight");
-    expect(selectedButton.className).toContain("text-text-invert");
-    expect(otherButton.className).not.toContain("text-text-invert");
+    expect(selectedButton.className).toContain("bg-bg-selected");
+    expect(selectedButton.className).toContain("text-text-inverse");
+    expect(otherButton.className).not.toContain("text-text-inverse");
   });
 
   it("selects a document when clicked", async () => {

@@ -16,8 +16,8 @@ export function DocumentList() {
             onClick={() => selectDocument(doc.id)}
             className={`w-full text-left px-3 py-2 rounded flex items-center gap-2 text-sm transition-colors ${
               currentDocument?.id === doc.id
-                ? "bg-bg-highlight text-text-invert"
-                : "text-dropdown-link hover:bg-bg-highlight/50"
+                ? "bg-bg-selected text-text-inverse"
+                : "text-text-secondary hover:bg-bg-surface-hover/50"
             }`}
           >
             <FileText size={16} />

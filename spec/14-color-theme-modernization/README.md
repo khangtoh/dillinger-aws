@@ -121,7 +121,10 @@ come last.
       the README's proposed palette as-is (pending human design
       review). Legacy tokens still present in `tailwind.config.ts`,
       removed in 14h once every consumer migrates.
-- [ ] 14b — App chrome & navigation: not started (blocked on 14a)
+- [x] 14b — App chrome & navigation: **done**. Navbar, Sidebar,
+      DocumentList, LogoBar migrated to semantic tokens; `bg-highlight`
+      split into `bg-selected` (active row) vs. `bg-surface-hover`
+      (transient hover).
 - [ ] 14c — Editor surface: not started (blocked on 14a)
 - [ ] 14d — Preview / markdown rendering: not started (blocked on 14a)
 - [ ] 14e — Modals & overlays: not started (blocked on 14a)

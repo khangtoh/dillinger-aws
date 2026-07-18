@@ -162,18 +162,18 @@ export function Navbar() {
   }, [upload, insertMarkdownAtCursor]);
 
   return (
-    <nav className="h-14 bg-bg-navbar flex items-center justify-between px-4 z-navbar">
+    <nav className="h-14 bg-bg-chrome flex items-center justify-between px-4 z-navbar">
       {/* Left side */}
       <div className="flex items-center gap-4">
         <button
           onClick={toggleSidebar}
           aria-label="Toggle sidebar"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97]
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar rounded"
+          className="text-text-inverse hover:text-accent transition-all active:scale-[0.97]
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome rounded"
         >
           <Menu size={24} />
         </button>
-        <span className="text-plum font-bold text-xl tracking-wide hidden sm:block">
+        <span className="text-accent font-bold text-xl tracking-wide hidden sm:block">
           DILLINGER
         </span>
       </div>
@@ -184,9 +184,9 @@ export function Navbar() {
           onClick={() => importInputRef.current?.click()}
           aria-label="Import file"
           title="Import file"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] px-3 py-2
+          className="text-text-inverse hover:text-accent transition-all active:scale-[0.97] px-3 py-2
                      flex items-center gap-1 text-sm rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
         >
           <Upload size={18} />
           <span className="hidden sm:inline">Import</span>
@@ -196,9 +196,9 @@ export function Navbar() {
           onClick={() => imageInputRef.current?.click()}
           aria-label="Insert image"
           title="Insert image"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] px-3 py-2
+          className="text-text-inverse hover:text-accent transition-all active:scale-[0.97] px-3 py-2
                      flex items-center gap-1 text-sm rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
         >
           <ImagePlus size={18} />
           <span className="hidden sm:inline">Image</span>
@@ -211,9 +211,9 @@ export function Navbar() {
             aria-expanded={exportOpen}
             aria-haspopup="menu"
             aria-label="Export document"
-            className="text-text-invert hover:text-plum transition-all active:scale-[0.97] px-3 py-2
+            className="text-text-inverse hover:text-accent transition-all active:scale-[0.97] px-3 py-2
                        flex items-center gap-1 text-sm rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
           >
             <Download size={18} />
             <span className="hidden sm:inline">Export as</span>
@@ -222,14 +222,14 @@ export function Navbar() {
             <div
               role="menu"
               aria-label="Export formats"
-              className="absolute right-0 top-full mt-1 bg-bg-navbar rounded shadow-lg py-1 min-w-[150px] animate-fade-in"
+              className="absolute right-0 top-full mt-1 bg-bg-chrome rounded shadow-lg py-1 min-w-[150px] animate-fade-in"
             >
               <button
                 role="menuitem"
                 onClick={() => handleExport("markdown")}
-                className="w-full px-4 py-2 text-left text-text-invert hover:bg-bg-highlight
+                className="w-full px-4 py-2 text-left text-text-inverse hover:bg-bg-surface-hover
                            flex items-center gap-2 text-sm
-                           focus-visible:outline-none focus-visible:bg-bg-highlight"
+                           focus-visible:outline-none focus-visible:bg-bg-surface-hover"
               >
                 <FileText size={16} />
                 Markdown
@@ -237,9 +237,9 @@ export function Navbar() {
               <button
                 role="menuitem"
                 onClick={() => handleExport("html", { styled: false })}
-                className="w-full px-4 py-2 text-left text-text-invert hover:bg-bg-highlight
+                className="w-full px-4 py-2 text-left text-text-inverse hover:bg-bg-surface-hover
                            flex items-center gap-2 text-sm
-                           focus-visible:outline-none focus-visible:bg-bg-highlight"
+                           focus-visible:outline-none focus-visible:bg-bg-surface-hover"
               >
                 <FileCode size={16} />
                 HTML
@@ -247,9 +247,9 @@ export function Navbar() {
               <button
                 role="menuitem"
                 onClick={() => handleExport("html", { styled: true })}
-                className="w-full px-4 py-2 text-left text-text-invert hover:bg-bg-highlight
+                className="w-full px-4 py-2 text-left text-text-inverse hover:bg-bg-surface-hover
                            flex items-center gap-2 text-sm
-                           focus-visible:outline-none focus-visible:bg-bg-highlight"
+                           focus-visible:outline-none focus-visible:bg-bg-surface-hover"
               >
                 <FileCode size={16} />
                 Styled HTML
@@ -257,9 +257,9 @@ export function Navbar() {
               <button
                 role="menuitem"
                 onClick={() => handleExport("pdf")}
-                className="w-full px-4 py-2 text-left text-text-invert hover:bg-bg-highlight
+                className="w-full px-4 py-2 text-left text-text-inverse hover:bg-bg-surface-hover
                            flex items-center gap-2 text-sm
-                           focus-visible:outline-none focus-visible:bg-bg-highlight"
+                           focus-visible:outline-none focus-visible:bg-bg-surface-hover"
               >
                 <FileType size={16} />
                 PDF
@@ -274,8 +274,8 @@ export function Navbar() {
           aria-label={previewVisible ? "Hide preview" : "Show preview"}
           title={previewVisible ? "Hide preview" : "Show preview"}
           aria-pressed={previewVisible}
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] p-2 rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+          className="text-text-inverse hover:text-accent transition-all active:scale-[0.97] p-2 rounded
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
         >
           {previewVisible ? <Eye size={20} /> : <EyeOff size={20} />}
         </button>
@@ -285,8 +285,8 @@ export function Navbar() {
           onClick={() => setZenMode(true)}
           aria-label="Enter zen mode"
           title="Zen mode (⌘⇧Z)"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] p-2 rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+          className="text-text-inverse hover:text-accent transition-all active:scale-[0.97] p-2 rounded
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
         >
           <Maximize2 size={20} />
         </button>
@@ -296,8 +296,8 @@ export function Navbar() {
           onClick={toggleSettings}
           aria-label="Open settings"
           title="Settings"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] p-2 rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+          className="text-text-inverse hover:text-accent transition-all active:scale-[0.97] p-2 rounded
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
         >
           <Settings size={20} />
         </button>
@@ -306,8 +306,8 @@ export function Navbar() {
           onClick={toggleShortcuts}
           title="Keyboard shortcuts (?)"
           aria-label="Keyboard shortcuts"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97] p-2 rounded
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar"
+          className="text-text-inverse hover:text-accent transition-all active:scale-[0.97] p-2 rounded
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome"
         >
           <HelpCircle size={20} />
         </button>

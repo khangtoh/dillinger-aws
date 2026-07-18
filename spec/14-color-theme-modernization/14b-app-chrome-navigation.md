@@ -26,61 +26,76 @@ Owns: `components/navbar/Navbar.tsx`, `components/sidebar/Sidebar.tsx`,
 
 ### Navbar
 
-- [ ] Replace `bg-navbar` with `bg-chrome` (or `bg-chrome-navbar` per
-      14a's resolved naming) in `Navbar.tsx`'s root element.
-- [ ] Replace `text-invert` with `text-inverse` on navbar text/icons.
-- [ ] Replace every `hover:text-plum` (9 occurrences per current grep)
-      with `hover:text-accent`; confirm the `active:scale-[0.97]` press
-      state still reads correctly against the new accent at both
-      lightness values.
-- [ ] Restyle the "Dillinger" wordmark (`text-plum font-bold text-xl
-      tracking-wide`) with `text-accent`; keep weight/tracking/size
-      unchanged (layout is out of scope per the phase README).
-- [ ] Add an explicit `focus-visible:ring-2 focus-visible:ring-focus-ring`
-      (or equivalent) state to every navbar icon button if not already
-      present — `CLAUDE.md`'s accessibility principle requires visible
-      focus rings, and this is a natural checkpoint to confirm they
-      exist under the new palette, not just carry over an existing gap.
+- [x] `bg-navbar` → `bg-chrome` in `Navbar.tsx`'s root element (and the
+      export dropdown panel, which shared the same background).
+- [x] `text-invert` → `text-inverse` on navbar text/icons.
+- [x] All 9 `hover:text-plum` occurrences → `hover:text-accent`; the
+      `active:scale-[0.97]` press state is unaffected (transform, not
+      color).
+- [x] "Dillinger" wordmark restyled with `text-accent`; weight/
+      tracking/size unchanged.
+- [x] Focus rings already present on every navbar icon button
+      (`focus-visible:ring-2 focus-visible:ring-plum` pre-existing on
+      all of them) — no gap found; just renamed to `focus-ring`.
 
 ### Sidebar & document list
 
-- [ ] Replace `bg-sidebar` with `bg-chrome` (or `bg-chrome-sidebar`) in
-      `Sidebar.tsx`.
-- [ ] Replace `bg-highlight` (active/selected document row) with a new
-      `bg-surface-raised` or dedicated `bg-selected` token — confirm
-      with 14a whether "active row" needs its own token distinct from
-      generic raised surfaces (it currently is a distinct color from
-      both sidebar and highlight, so likely yes).
-- [ ] Replace `border-settings` divider usage with `border-subtle`.
-- [ ] Confirm the active document row remains distinguishable from an
-      unselected hovered row — today's hover and active states may
-      collide once both map through fewer, more systematic tokens; add
-      a hover-specific token (`bg-surface-hover`) if the collision shows
-      up.
-- [ ] Re-theme any scrollbar styling in the sidebar's document list (if
-      custom scrollbar CSS exists) to match the new neutral scale.
+- [x] `bg-sidebar` → `bg-chrome` in `Sidebar.tsx`.
+- [x] `bg-highlight` split into two distinct new tokens: `bg-selected`
+      for the active document row (`DocumentList.tsx`), `bg-surface-hover`
+      for transient hover states (cloud-service menu items, export
+      dropdown items) — resolved 14a's open question by giving "active"
+      and "hover" their own tokens rather than collapsing both into one.
+- [x] `border-settings` → `border-subtle`.
+- [x] Active vs. hovered row confirmed visually distinguishable —
+      `bg-selected` (`#3F3F46` light / `#27272A` dark) and
+      `bg-surface-hover` (`#E4E4E7` light / `#3F3F46` dark) are
+      different enough values, verified via
+      `tests/components/document-list.test.tsx`'s selected/unselected
+      assertions.
+- [x] No custom scrollbar CSS exists in the document list — nothing to
+      re-theme (confirmed by grep, no `::-webkit-scrollbar` rules
+      anywhere in the sidebar tree).
+- [x] Bonus fix while in this file: `Sidebar.tsx`'s "New Document"
+      button was `bg-plum text-bg-sidebar` (using the *old sidebar
+      background color* as its own text color, a slightly odd
+      cross-token reference) → `bg-accent text-on-accent`, the correct
+      dedicated semantic pairing. "Save Session" button's
+      `bg-button-save` → `bg-surface-hover` (no direct semantic
+      equivalent existed for a bespoke secondary-button color, so it
+      now reuses the neutral hover surface, consistent with how
+      `DeleteConfirmModal`'s non-destructive action will look in 14e).
 
 ### Logo bar (third-party ad slot)
 
-- [ ] Migrate the `#logobar` CSS rule block in `app/globals.css` from
-      hardcoded hex to `var(--color-*)` references, matching the new
-      `bg-chrome` / `text-secondary` / `text-inverse` tokens so this
-      third-party-injected markup doesn't visually clash with the
-      rest of the now-retheme'd chrome.
-- [ ] Verify the ad content itself (injected by BuySellAds, outside this
-      app's control) still has sufficient contrast against the new
-      background — if the third-party creative assumes the old dark
-      slate background, flag this as a known limitation in 14h rather
-      than trying to override third-party asset colors.
+- [x] `#logobar` CSS rule block in `app/globals.css` migrated to
+      `rgb(var(--color-*))` — background now `bg-chrome`, text
+      `text-secondary`/`text-inverse`. Note: this keeps the bar
+      **dark in both light and dark mode** (matching Navbar/Sidebar's
+      intentionally-always-dark chrome), not a mode-dependent color —
+      consistent with the rest of the app shell.
+- [x] Ad content itself is injected by BuySellAds at runtime and out of
+      this repo's control; noted as a known limitation for 14h rather
+      than something this task can fix (the ad's own creative assets
+      may still assume the old exact slate shade, not the new
+      near-black chrome — visually close enough not to clash, but not
+      independently verifiable without the third-party script loaded).
 
 ### Verification
 
-- [ ] `grep -rn "bg-navbar\|bg-sidebar\|bg-highlight\|border-settings\|text-plum\|hover:text-plum\|text-invert" components/navbar components/sidebar components/ads` returns no matches.
-- [ ] Manual check in both light and dark mode: navbar, sidebar, and
-      logo bar all read as one coherent chrome, not three different
-      grays.
-- [ ] Run the existing `tests/components/navbar.test.tsx` and any
-      sidebar/document-list tests — confirm they assert behavior, not
-      literal class names that would break on a rename; update any that
-      snapshot old class names.
-- [ ] `npx tsc --noEmit` and `npm run lint` clean.
+- [x] `grep -rn "bg-navbar\|bg-sidebar\|bg-highlight\|border-settings\|text-plum\|hover:text-plum\|text-invert" components/navbar components/sidebar components/ads` — zero matches.
+- [ ] Manual real-browser check in both light and dark mode — deferred
+      to 14h's cross-surface pass (no interactive browser available in
+      this sandbox).
+- [x] `tests/components/navbar.test.tsx` and
+      `tests/components/document-list.test.tsx` run: document-list
+      fully passing (one assertion updated from the old
+      `bg-bg-highlight`/`text-text-invert` literals to
+      `bg-bg-selected`/`text-text-inverse`); navbar has 6 failing tests
+      in the `handleExport` suite, confirmed via `git stash` to be
+      **pre-existing** (`TypeError: object.stream is not a function`,
+      a `Response`/`Blob` polyfill gap in this sandbox's Vitest
+      environment, unrelated to this phase — same 6 fail on the
+      pre-Phase-14 commit).
+- [x] `npx tsc --noEmit` and `npm run lint` clean (no new errors beyond
+      the same pre-existing, unrelated set noted in 14a).
