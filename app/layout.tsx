@@ -65,6 +65,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=JSON.parse(localStorage.getItem("profileV3")||"{}");var p=s.themePreference||"system";var dark=p==="dark"||(p==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",dark);}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className={`${sourceSans.variable} font-sans`}>
         <Providers>
           {children}

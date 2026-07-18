@@ -12,6 +12,8 @@ export interface Document {
   };
 }
 
+export type ThemePreference = "light" | "dark" | "system";
+
 export interface UserSettings {
   enableAutoSave: boolean;
   enableWordsCount: boolean;
@@ -19,7 +21,7 @@ export interface UserSettings {
   enableScrollSync: boolean;
   tabSize: number;
   keybindings: "default" | "vim" | "emacs";
-  enableNightMode: boolean;
+  themePreference: ThemePreference;
   enableGitHubComment: boolean;
 }
 
@@ -30,7 +32,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   enableScrollSync: true,
   tabSize: 4,
   keybindings: "default",
-  enableNightMode: false,
+  themePreference: "system",
   enableGitHubComment: true,
 };
 
@@ -82,7 +84,7 @@ Link to any page with [inline links](https://dillinger.io) or use [reference-sty
 
 Images use a similar syntax:
 
-![Placeholder](https://placehold.co/600x200/2B2F36/35D7BB?text=Your+Image+Here)
+![Placeholder](https://placehold.co/600x200/18181B/6C5CE7?text=Your+Image+Here)
 
 [dillinger]: https://dillinger.io
 

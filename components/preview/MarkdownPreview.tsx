@@ -2,13 +2,15 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useStore } from "@/stores/store";
+import { useResolvedTheme } from "@/components/providers/ThemeProvider";
 import { renderMarkdown } from "@/lib/markdown";
 
 export function MarkdownPreview() {
   const containerRef = useRef<HTMLDivElement>(null);
   const currentDocument = useStore((state) => state.currentDocument);
   const enableScrollSync = useStore((state) => state.settings.enableScrollSync);
-  const enableNightMode = useStore((state) => state.settings.enableNightMode);
+  const resolvedTheme = useResolvedTheme();
+  const enableNightMode = resolvedTheme === "dark";
   const editorScrollPercent = useStore((state) => state.editorScrollPercent);
   const editorTopLine = useStore((state) => state.editorTopLine);
   const [sanitizedHtml, setSanitizedHtml] = useState("");

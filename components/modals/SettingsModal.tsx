@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useStore } from "@/stores/store";
 import { X } from "lucide-react";
+import type { ThemePreference } from "@/lib/types";
 
 export function SettingsModal() {
   const settingsOpen = useStore((state) => state.settingsOpen);
@@ -45,19 +46,19 @@ export function SettingsModal() {
       />
 
       <div
-        className={`absolute right-0 top-0 h-full w-80 bg-bg-navbar shadow-xl
+        className={`absolute right-0 top-0 h-full w-80 bg-bg-chrome shadow-xl
                     transition-transform duration-300
                     ${settingsOpen ? "translate-x-0" : "translate-x-full"}`}
         style={{ transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)" }}
       >
-        <div className="flex items-center justify-between p-4 border-b border-border-settings">
-          <h2 id="settings-title" className="text-text-invert font-semibold text-balance">Settings</h2>
+        <div className="flex items-center justify-between p-4 border-b border-border-subtle/40">
+          <h2 id="settings-title" className="text-text-inverse font-semibold text-balance">Settings</h2>
           <button
             ref={closeButtonRef}
             onClick={toggleSettings}
             aria-label="Close settings"
-            className="text-text-invert hover:text-plum transition-colors rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+            className="text-text-inverse hover:text-accent transition-colors rounded
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X size={20} />
           </button>
@@ -88,14 +89,6 @@ export function SettingsModal() {
             onChange={(v) => updateSettings({ enableCharactersCount: v })}
           />
 
-          {/* Night Mode */}
-          <SettingToggle
-            id="night-mode"
-            label="Night Mode"
-            checked={settings.enableNightMode}
-            onChange={(v) => updateSettings({ enableNightMode: v })}
-          />
-
           {/* Scroll Sync */}
           <SettingToggle
             id="scroll-sync"
@@ -104,15 +97,33 @@ export function SettingsModal() {
             onChange={(v) => updateSettings({ enableScrollSync: v })}
           />
 
+          {/* Theme */}
+          <div className="flex items-center justify-between">
+            <label htmlFor="theme-preference" className="text-text-inverse text-sm">Theme</label>
+            <select
+              id="theme-preference"
+              value={settings.themePreference}
+              onChange={(e) =>
+                updateSettings({ themePreference: e.target.value as ThemePreference })
+              }
+              className="bg-bg-surface-hover text-text-inverse px-2 py-1 rounded text-sm
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+            >
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+
           {/* Tab Size */}
           <div className="flex items-center justify-between">
-            <label htmlFor="tab-size" className="text-text-invert text-sm">Tab Size</label>
+            <label htmlFor="tab-size" className="text-text-inverse text-sm">Tab Size</label>
             <select
               id="tab-size"
               value={settings.tabSize}
               onChange={(e) => updateSettings({ tabSize: Number(e.target.value) })}
-              className="bg-bg-highlight text-text-invert px-2 py-1 rounded text-sm
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+              className="bg-bg-surface-hover text-text-inverse px-2 py-1 rounded text-sm
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <option value={2}>2</option>
               <option value={4}>4</option>
@@ -122,7 +133,7 @@ export function SettingsModal() {
 
           {/* Keybindings */}
           <div className="flex items-center justify-between">
-            <label htmlFor="keybindings" className="text-text-invert text-sm">Keybindings</label>
+            <label htmlFor="keybindings" className="text-text-inverse text-sm">Keybindings</label>
             <select
               id="keybindings"
               value={settings.keybindings}
@@ -131,8 +142,8 @@ export function SettingsModal() {
                   keybindings: e.target.value as "default" | "vim" | "emacs",
                 })
               }
-              className="bg-bg-highlight text-text-invert px-2 py-1 rounded text-sm
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+              className="bg-bg-surface-hover text-text-inverse px-2 py-1 rounded text-sm
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <option value="default">Default</option>
               <option value="vim">Vim</option>
@@ -158,15 +169,15 @@ function SettingToggle({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <label htmlFor={id} className="text-text-invert text-sm">{label}</label>
+      <label htmlFor={id} className="text-text-inverse text-sm">{label}</label>
       <button
         id={id}
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`w-12 h-6 rounded-full relative transition-colors
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar ${
-          checked ? "bg-plum" : "bg-switchery"
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-chrome ${
+          checked ? "bg-accent" : "bg-bg-surface-hover"
         }`}
       >
         <span

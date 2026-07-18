@@ -3,9 +3,58 @@
 @tailwind utilities;
 @import "katex/dist/katex.min.css";
 
+/*
+ * Phase 14 design tokens (spec/14-color-theme-modernization/14a-design-tokens-foundation.md).
+ * Values are space-separated RGB channels so Tailwind's `rgb(var(--color-*) / <alpha-value>)`
+ * mapping in tailwind.config.ts can apply opacity modifiers (e.g. `bg-accent/20`).
+ */
+:root {
+  --color-accent: 108 92 231;
+  --color-accent-hover: 90 75 209;
+  --color-accent-emphasis: 74 58 189;
+  --color-bg-canvas: 255 255 255;
+  --color-bg-surface: 244 244 245;
+  --color-bg-surface-raised: 255 255 255;
+  --color-bg-surface-hover: 228 228 231;
+  --color-bg-chrome: 24 24 27;
+  --color-bg-selected: 63 63 70;
+  --color-text-primary: 24 24 27;
+  --color-text-secondary: 113 113 122;
+  --color-text-inverse: 250 250 250;
+  --color-text-on-accent: 255 255 255;
+  --color-border-subtle: 228 228 231;
+  --color-border-strong: 161 161 170;
+  --color-focus-ring: 108 92 231;
+  --color-success: 34 197 94;
+  --color-warning: 245 158 11;
+  --color-danger: 239 68 68;
+}
+
+:root.dark {
+  --color-accent: 129 116 240;
+  --color-accent-hover: 108 92 231;
+  --color-accent-emphasis: 149 138 245;
+  --color-bg-canvas: 17 17 19;
+  --color-bg-surface: 24 24 27;
+  --color-bg-surface-raised: 39 39 42;
+  --color-bg-surface-hover: 63 63 70;
+  --color-bg-chrome: 9 9 11;
+  --color-bg-selected: 39 39 42;
+  --color-text-primary: 250 250 250;
+  --color-text-secondary: 161 161 170;
+  --color-text-inverse: 250 250 250;
+  --color-text-on-accent: 255 255 255;
+  --color-border-subtle: 63 63 70;
+  --color-border-strong: 113 113 122;
+  --color-focus-ring: 129 116 240;
+  --color-success: 74 222 128;
+  --color-warning: 251 191 36;
+  --color-danger: 248 113 113;
+}
+
 body {
-  background: #ffffff;
-  color: #373D49;
+  background: rgb(var(--color-bg-canvas));
+  color: rgb(var(--color-text-primary));
 }
 
 /* Preview Styles */

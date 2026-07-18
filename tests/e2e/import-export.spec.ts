@@ -26,7 +26,7 @@ test.beforeEach(async ({ page }) => {
         enableScrollSync: true,
         tabSize: 4,
         keybindings: "default",
-        enableNightMode: false,
+        themePreference: "system",
         enableGitHubComment: true,
       })
     );

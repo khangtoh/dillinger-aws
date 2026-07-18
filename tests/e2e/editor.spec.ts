@@ -21,7 +21,7 @@ const defaultProfile = {
   enableScrollSync: true,
   tabSize: 4,
   keybindings: "default",
-  enableNightMode: false,
+  themePreference: "system",
   enableGitHubComment: true,
 };
 

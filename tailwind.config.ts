@@ -10,13 +10,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Legacy Dillinger brand tokens — retired by Phase 14
+        // (spec/14-color-theme-modernization/). Removed once every
+        // consumer migrates to the semantic tokens below (14h).
         plum: "#35D7BB",
         "bg-primary": "#ffffff",
         "bg-sidebar": "#2B2F36",
         "bg-navbar": "#373D49",
         "bg-highlight": "#1D212A",
         "bg-button-save": "#4A5261",
-        "text-primary": "#373D49",
         "text-invert": "#ffffff",
         "text-muted": "#A0AABF",
         "border-light": "#E8E8E8",
@@ -24,6 +26,29 @@ const config: Config = {
         "icon-default": "#D3DAEA",
         "dropdown-link": "#D0D6E2",
         switchery: "#4B5363",
+
+        // Phase 14 semantic tokens — backed by CSS custom properties in
+        // app/globals.css (:root / :root.dark), so the same class name
+        // resolves to the correct value for the active theme.
+        accent: "rgb(var(--color-accent) / <alpha-value>)",
+        "accent-hover": "rgb(var(--color-accent-hover) / <alpha-value>)",
+        "accent-emphasis": "rgb(var(--color-accent-emphasis) / <alpha-value>)",
+        "bg-canvas": "rgb(var(--color-bg-canvas) / <alpha-value>)",
+        "bg-surface": "rgb(var(--color-bg-surface) / <alpha-value>)",
+        "bg-surface-raised": "rgb(var(--color-bg-surface-raised) / <alpha-value>)",
+        "bg-surface-hover": "rgb(var(--color-bg-surface-hover) / <alpha-value>)",
+        "bg-chrome": "rgb(var(--color-bg-chrome) / <alpha-value>)",
+        "bg-selected": "rgb(var(--color-bg-selected) / <alpha-value>)",
+        "text-primary": "rgb(var(--color-text-primary) / <alpha-value>)",
+        "text-secondary": "rgb(var(--color-text-secondary) / <alpha-value>)",
+        "text-inverse": "rgb(var(--color-text-inverse) / <alpha-value>)",
+        "text-on-accent": "rgb(var(--color-text-on-accent) / <alpha-value>)",
+        "border-subtle": "rgb(var(--color-border-subtle) / <alpha-value>)",
+        "border-strong": "rgb(var(--color-border-strong) / <alpha-value>)",
+        "focus-ring": "rgb(var(--color-focus-ring) / <alpha-value>)",
+        success: "rgb(var(--color-success) / <alpha-value>)",
+        warning: "rgb(var(--color-warning) / <alpha-value>)",
+        danger: "rgb(var(--color-danger) / <alpha-value>)",
       },
       fontFamily: {
         sans: ['"Source Sans Pro"', '"Helvetica Neue"', "Helvetica", "Arial", "sans-serif"],

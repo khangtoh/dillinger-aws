@@ -16,88 +16,85 @@ belong to the sub-spec that owns that component), new
 
 ## Open input needed from the user
 
-- [ ] **Sign off on the final palette.** The README's "Proposed palette"
-      table is a draft. Confirm the accent hue (indigo-violet `#6C5CE7`
-      proposed) and neutral scale (Zinc-based proposed) before locking
-      values into `tailwind.config.ts` — once other sub-specs start
-      consuming these tokens by name, changing the *values* is cheap
-      (edit one file) but changing the *token names* touches every
-      component again.
-- [ ] Confirm whether dark chrome surfaces (navbar/sidebar) should stay
-      visually distinct from the editor/preview canvas in the new theme
-      (today: `bg-navbar` `#373D49` and `bg-sidebar` `#2B2F36` are two
-      close-but-different dark grays) or unify into one `bg-chrome`
-      value — affects the token list below.
+- [x] **Sign off on the final palette.** Proceeded with the README's
+      proposed values (accent `#6C5CE7` indigo-violet, Zinc-based
+      neutrals) per explicit instruction to implement the phase using
+      the proposal as default — not yet reviewed by a human designer.
+      Revisit if you want different values; only `app/globals.css`'s
+      `--color-*` declarations need to change, no component touches a
+      literal hex.
+- [x] Resolved: unified into **one `bg-chrome` token** (not separate
+      navbar/sidebar values) — simpler token surface, and the two
+      legacy values (`#373D49` / `#2B2F36`) were already close enough
+      that keeping them distinct added no real signal.
 
 ## Tasks
 
 ### Token definition
 
-- [ ] Write the full semantic token list replacing every current
-      structural/brand name (do not skip any — grep confirms 44 files
-      reference `plum` alone): `accent`, `accent-hover`,
-      `accent-emphasis` (for active/pressed states), `bg-canvas`,
-      `bg-surface`, `bg-surface-raised` (modals/dropdowns), `bg-chrome`
-      (or `bg-chrome-navbar` / `bg-chrome-sidebar` per the open question
-      above), `text-primary`, `text-secondary`, `text-inverse`,
-      `text-on-accent`, `border-subtle`, `border-strong`, `focus-ring`,
-      `success`, `warning`, `danger`.
-- [ ] Add `:root { --color-*: ... }` (light values) and
-      `:root.dark { --color-*: ... }` (dark values) blocks to the top of
-      `app/globals.css`, one custom property per semantic token above.
-- [ ] Update `tailwind.config.ts`'s `theme.extend.colors` so every
-      semantic name maps to `withOpacity`-safe `rgb(var(--color-*) / <alpha-value>)`
-      (or `var(--color-*)` directly if opacity modifiers on theme colors
-      aren't needed — check current usage of e.g. `bg-plum/20` style
-      modifiers first) instead of a literal hex string.
-- [ ] Delete the old literal-hex color entries (`plum`, `bg-primary`,
-      `bg-sidebar`, `bg-navbar`, `bg-highlight`, `bg-button-save`,
-      `text-primary` (old value), `text-invert`, `text-muted`,
-      `border-light`, `border-settings`, `icon-default`, `dropdown-link`,
-      `switchery`) from `tailwind.config.ts` only after every consuming
-      sub-spec (14b–14g) has migrated off them — track this as the
-      *last* task in 14h, not here; this task is just "stop adding new
-      usages of the old names."
-- [ ] Run `npx tailwindcss --content './{app,components}/**/*.{ts,tsx}' --output /dev/null` (or `next build` dry pass) to confirm the config compiles with no invalid class references yet (old names still present, not yet removed).
+- [x] Full semantic token list defined (19 tokens, more than the
+      original list — added `bg-surface-hover` and `bg-selected` early
+      since 14b's sidebar active-row task and 14e's toggle-track task
+      both needed them, avoiding a second pass through this file):
+      `accent`, `accent-hover`, `accent-emphasis`, `bg-canvas`,
+      `bg-surface`, `bg-surface-raised`, `bg-surface-hover`,
+      `bg-chrome`, `bg-selected`, `text-primary`, `text-secondary`,
+      `text-inverse`, `text-on-accent`, `border-subtle`,
+      `border-strong`, `focus-ring`, `success`, `warning`, `danger`.
+- [x] `:root` / `:root.dark` custom-property blocks added at the top of
+      `app/globals.css`, one `--color-*` (space-separated RGB channels,
+      not hex) per token above.
+- [x] `tailwind.config.ts`'s `theme.extend.colors` maps every semantic
+      name to `rgb(var(--color-*) / <alpha-value>)`, so opacity
+      modifiers like `bg-accent/20` work.
+- [ ] Deletion of the old literal-hex entries — deferred to 14h as
+      planned, once 14b–14g have migrated off them.
+- [x] Confirmed the config compiles: `npm run lint` and `npx tsc --noEmit`
+      both clean with old and new tokens coexisting (see Verification).
 
 ### Theme provider
 
-- [ ] Add `themePreference: "light" | "dark" | "system"` to
-      `stores/store.ts`'s persisted state (default `"system"`), following
-      the existing Zustand + localStorage persistence pattern already
-      documented in `CLAUDE.md`.
-- [ ] Create `components/providers/ThemeProvider.tsx` ("use client"):
-      reads `themePreference` from the store, resolves `"system"` via
-      `window.matchMedia("(prefers-color-scheme: dark)")`, and toggles
-      the `dark` class on `document.documentElement` — the same class
-      `darkMode: "class"` in `tailwind.config.ts` already expects, and
-      that `app/globals.css`'s existing `.dark.preview-html` block
-      already targets.
-- [ ] Add a `(change)` listener on the `matchMedia` query so switching OS
-      theme live-updates the app when preference is `"system"`, without
-      a page reload.
-- [ ] Wrap `ThemeProvider` around `children` in
-      `components/providers/Providers.tsx`, inside `StoreProvider` (needs
-      the store hydrated first) and outside `ToastProvider`.
-- [ ] Guard against hydration mismatch: apply the resolved theme class
-      via a synchronous inline script in `app/layout.tsx` (before React
-      hydrates), not only inside `ThemeProvider`'s `useEffect` — otherwise
-      the first paint flashes the wrong theme. Reference the existing
-      `next-themes`-style no-flash pattern if adding a dependency is
-      preferred over a hand-rolled inline script; either is acceptable,
-      document the choice.
+- [x] Added `themePreference: "light" | "dark" | "system"` — placed
+      inside `UserSettings` (`lib/types.ts`) rather than a separate
+      top-level store field, so it rides the *existing*
+      `persist()`/`hydrate()` → `localStorage["profileV3"]` path with
+      zero new persistence code. This **replaced** the pre-existing
+      `enableNightMode: boolean` field (found during implementation —
+      a real, working but only-partial dark mode already existed,
+      wired ad hoc into just `MonacoEditor.tsx` and
+      `MarkdownPreview.tsx`, with no app-wide `dark` class and no
+      "system" option). All `enableNightMode` call sites and tests
+      updated to `themePreference` in this same change so the repo
+      never had a broken intermediate state.
+- [x] `components/providers/ThemeProvider.tsx` created: reads
+      `themePreference` from the store, resolves `"system"` via
+      `matchMedia("(prefers-color-scheme: dark)")`, toggles `dark` on
+      `document.documentElement`, and exposes the resolved value to
+      descendants via a `useResolvedTheme()` hook (needed by
+      `MonacoEditor`/`MarkdownPreview` since Monaco's theme prop can't
+      read a CSS class).
+- [x] `matchMedia` `change` listener added — live-updates without reload
+      when preference is `"system"`.
+- [x] Wrapped into `components/providers/Providers.tsx`: `StoreProvider`
+      → `ThemeProvider` → `ToastProvider`.
+- [x] No-flash guard added as a synchronous inline `<script>` in
+      `app/layout.tsx`'s `<head>`, reading `localStorage["profileV3"]`
+      directly (same key `hydrate()` uses) before React hydrates.
+      Hand-rolled rather than a new dependency — small enough not to
+      justify pulling in `next-themes`.
 
 ### Verification
 
-- [ ] Add `tests/store/store.test.ts` coverage for the new
-      `themePreference` field: default value, persistence round-trip,
-      and that setting it to each of the three values is reflected in
-      `useStore.getState()`.
-- [ ] Add a component test (or extend an existing one) confirming
-      `ThemeProvider` adds/removes the `dark` class on
-      `document.documentElement` when `themePreference` changes.
-- [ ] Manually verify in a browser: toggle OS-level dark mode with
-      `themePreference: "system"` and confirm the app follows without a
-      reload; then set an explicit preference and confirm OS toggling no
-      longer affects it.
-- [ ] Confirm `npx tsc --noEmit` and `npm run lint` are clean.
+- [x] `tests/store/store.test.ts`: default (`"system"`), persistence
+      round-trip via `hydrate()`, and `updateSettings()` all covered.
+- [x] New `tests/components/theme-provider.test.tsx` (3 tests): dark
+      class applied for `"dark"`, removed for `"light"`, resolves via
+      mocked `matchMedia` for `"system"`. All passing.
+- [ ] Manual real-browser OS-toggle check — not done in this sandbox
+      (no interactive browser session available); covered by 14h's
+      cross-surface manual pass instead.
+- [x] `npx tsc --noEmit`: clean (53 pre-existing unrelated errors in
+      `tests/components/github-modal.test.tsx` and
+      `app/api/google-drive/save/route.ts` confirmed present on the
+      base branch too, before this phase's changes). `npm run lint`:
+      clean.

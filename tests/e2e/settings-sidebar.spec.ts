@@ -22,7 +22,7 @@ const defaultProfile = {
   enableScrollSync: true,
   tabSize: 4,
   keybindings: "default",
-  enableNightMode: false,
+  themePreference: "system",
   enableGitHubComment: true,
 };
 
@@ -62,17 +62,19 @@ test.describe("Settings modal", () => {
     await expect(page.getByRole("dialog", { name: "Settings" })).toBeVisible();
   });
 
-  test("toggles night mode", async ({ page }) => {
+  test("changes theme preference", async ({ page }) => {
     await page.getByRole("button", { name: "Open settings" }).click();
 
-    const nightModeSwitch = page.getByRole("switch", { name: "Night Mode" });
-    await expect(nightModeSwitch).toHaveAttribute("aria-checked", "false");
+    const themeSelect = page.locator("#theme-preference");
+    await expect(themeSelect).toHaveValue("system");
 
-    await nightModeSwitch.click();
-    await expect(nightModeSwitch).toHaveAttribute("aria-checked", "true");
+    await themeSelect.selectOption("dark");
+    await expect(themeSelect).toHaveValue("dark");
+    await expect(page.locator("html")).toHaveClass(/dark/);
 
-    await nightModeSwitch.click();
-    await expect(nightModeSwitch).toHaveAttribute("aria-checked", "false");
+    await themeSelect.selectOption("light");
+    await expect(themeSelect).toHaveValue("light");
+    await expect(page.locator("html")).not.toHaveClass(/dark/);
   });
 
   test("changes tab size", async ({ page }) => {
@@ -158,7 +160,7 @@ test.describe("Settings modal", () => {
   test("settings persist across page reload", async ({ page }) => {
     await page.getByRole("button", { name: "Open settings" }).click();
 
-    await page.getByRole("switch", { name: "Night Mode" }).click();
+    await page.locator("#theme-preference").selectOption("dark");
     await page.locator("#tab-size").selectOption("2");
     await page.locator("#keybindings").selectOption("vim");
     await page.getByRole("switch", { name: "Auto Save" }).click();
@@ -166,16 +168,13 @@ test.describe("Settings modal", () => {
     // Wait for store to persist settings to localStorage
     await page.waitForFunction(() => {
       const profile = JSON.parse(localStorage.getItem("profileV3") || "{}");
-      return profile.enableNightMode === true && profile.enableAutoSave === false;
+      return profile.themePreference === "dark" && profile.enableAutoSave === false;
     });
 
     await page.reload();
 
     await page.getByRole("button", { name: "Open settings" }).click();
-    await expect(page.getByRole("switch", { name: "Night Mode" })).toHaveAttribute(
-      "aria-checked",
-      "true"
-    );
+    await expect(page.locator("#theme-preference")).toHaveValue("dark");
     await expect(page.locator("#tab-size")).toHaveValue("2");
     await expect(page.locator("#keybindings")).toHaveValue("vim");
     await expect(page.getByRole("switch", { name: "Auto Save" })).toHaveAttribute(

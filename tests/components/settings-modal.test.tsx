@@ -46,13 +46,13 @@ describe("SettingsModal", () => {
 
     expect(screen.getByRole("dialog", { name: "Settings" })).toBeVisible();
 
-    const nightModeSwitch = screen.getByRole("switch", { name: "Night Mode" });
-    expect(nightModeSwitch).toHaveAttribute("aria-checked", "false");
+    const themeSelect = screen.getByLabelText("Theme");
+    expect(themeSelect).toHaveValue("system");
 
-    await user.click(nightModeSwitch);
+    await user.selectOptions(themeSelect, "dark");
 
-    expect(useStore.getState().settings.enableNightMode).toBe(true);
-    expect(nightModeSwitch).toHaveAttribute("aria-checked", "true");
+    expect(useStore.getState().settings.themePreference).toBe("dark");
+    expect(themeSelect).toHaveValue("dark");
   });
 
   it("does not render when settingsOpen is false", () => {
@@ -181,7 +181,7 @@ describe("SettingsModal", () => {
         settingsOpen: true,
         settings: {
           ...useStore.getState().settings,
-          enableNightMode: true,
+          themePreference: "dark" as const,
           enableAutoSave: false,
           enableScrollSync: true,
           enableWordsCount: false,
@@ -195,7 +195,7 @@ describe("SettingsModal", () => {
 
     render(<SettingsModal />);
 
-    expect(screen.getByRole("switch", { name: "Night Mode" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByLabelText("Theme")).toHaveValue("dark");
     expect(screen.getByRole("switch", { name: "Auto Save" })).toHaveAttribute("aria-checked", "false");
     expect(screen.getByRole("switch", { name: "Scroll Sync" })).toHaveAttribute("aria-checked", "true");
     expect(screen.getByRole("switch", { name: "Word Count" })).toHaveAttribute("aria-checked", "false");

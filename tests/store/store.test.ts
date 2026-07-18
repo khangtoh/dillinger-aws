@@ -210,14 +210,14 @@ describe("useStore", () => {
     it("can update multiple settings at once", () => {
       useStore.getState().updateSettings({
         keybindings: "vim",
-        enableNightMode: true,
+        themePreference: "dark",
         enableScrollSync: false,
       });
 
       const state = useStore.getState();
 
       expect(state.settings.keybindings).toBe("vim");
-      expect(state.settings.enableNightMode).toBe(true);
+      expect(state.settings.themePreference).toBe("dark");
       expect(state.settings.enableScrollSync).toBe(false);
     });
   });
@@ -406,13 +406,13 @@ describe("useStore", () => {
       localStorage.setItem("files", JSON.stringify([doc]));
       localStorage.setItem("currentDocument", JSON.stringify(doc));
       // Store only one key - all others should come from defaults
-      localStorage.setItem("profileV3", JSON.stringify({ enableNightMode: true }));
+      localStorage.setItem("profileV3", JSON.stringify({ themePreference: "dark" }));
 
       useStore.getState().hydrate();
 
       const { settings } = useStore.getState();
 
-      expect(settings.enableNightMode).toBe(true);
+      expect(settings.themePreference).toBe("dark");
       expect(settings.tabSize).toBe(DEFAULT_SETTINGS.tabSize);
       expect(settings.keybindings).toBe(DEFAULT_SETTINGS.keybindings);
       expect(settings.enableAutoSave).toBe(DEFAULT_SETTINGS.enableAutoSave);

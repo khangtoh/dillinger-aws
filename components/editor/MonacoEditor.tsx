@@ -4,6 +4,7 @@ import { useRef, useCallback, useEffect, useMemo } from "react";
 import Editor, { OnMount, OnChange } from "@monaco-editor/react";
 import type * as Monaco from "monaco-editor";
 import { useStore } from "@/stores/store";
+import { useResolvedTheme } from "@/components/providers/ThemeProvider";
 import { countDocumentStats } from "@/lib/document";
 import { useImageUpload } from "@/hooks/useImageUpload";
 
@@ -12,7 +13,8 @@ export function MonacoEditor() {
   const keybindingRef = useRef<{ dispose: () => void } | null>(null);
   const keybindingStatusRef = useRef<HTMLDivElement>(null);
   const currentDocument = useStore((state) => state.currentDocument);
-  const enableNightMode = useStore((state) => state.settings.enableNightMode);
+  const resolvedTheme = useResolvedTheme();
+  const enableNightMode = resolvedTheme === "dark";
   const enableAutoSave = useStore((state) => state.settings.enableAutoSave);
   const tabSize = useStore((state) => state.settings.tabSize);
   const keybindings = useStore((state) => state.settings.keybindings);

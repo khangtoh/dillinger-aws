@@ -116,7 +116,11 @@ come last.
 
 ## Status
 
-- [ ] 14a — Design tokens & theme infrastructure: not started
+- [x] 14a — Design tokens & theme infrastructure: **done**. New semantic
+      token set + `ThemeProvider` (light/dark/system) merged; consumed
+      the README's proposed palette as-is (pending human design
+      review). Legacy tokens still present in `tailwind.config.ts`,
+      removed in 14h once every consumer migrates.
 - [ ] 14b — App chrome & navigation: not started (blocked on 14a)
 - [ ] 14c — Editor surface: not started (blocked on 14a)
 - [ ] 14d — Preview / markdown rendering: not started (blocked on 14a)
