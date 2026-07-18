@@ -4,8 +4,8 @@
   "description": "The last Markdown editor you'll ever need",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1E2127",
-  "theme_color": "#35D7BB",
+  "background_color": "#111113",
+  "theme_color": "#6C5CE7",
   "icons": [
     {
       "src": "/icon-192x192.png",

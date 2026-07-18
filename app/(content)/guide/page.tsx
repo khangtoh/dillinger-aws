@@ -103,13 +103,13 @@ export default function GuidePage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
       <h1 className="text-4xl font-bold mb-4">Markdown Guide</h1>
-      <p className="text-text-muted text-lg mb-4 max-w-2xl">
+      <p className="text-text-secondary text-lg mb-4 max-w-2xl">
         A complete reference for markdown syntax. Every example works in
         Dillinger — open the editor and try them.
       </p>
       <Link
         href="/"
-        className="inline-block text-plum hover:underline text-sm font-medium mb-12"
+        className="inline-block text-accent hover:underline text-sm font-medium mb-12"
       >
         Open the Editor to try these examples
       </Link>
@@ -118,30 +118,30 @@ export default function GuidePage() {
         {SECTIONS.map((section) => (
           <section key={section.title} id={section.title.toLowerCase().replace(/\s+/g, "-")}>
             <h2 className="text-2xl font-bold mb-3">{section.title}</h2>
-            <p className="text-text-muted mb-4">{section.description}</p>
-            <pre className="bg-bg-highlight text-icon-default rounded-lg p-4 text-sm font-mono overflow-x-auto">
+            <p className="text-text-secondary mb-4">{section.description}</p>
+            <pre className="bg-bg-surface text-text-secondary rounded-lg p-4 text-sm font-mono overflow-x-auto">
               <code>{section.syntax.replace(/\\n/g, "\n")}</code>
             </pre>
           </section>
         ))}
       </div>
 
-      <div className="mt-16 pt-8 border-t border-border-light">
+      <div className="mt-16 pt-8 border-t border-border-subtle">
         <h2 className="text-2xl font-bold mb-3">Try it live</h2>
-        <p className="text-text-muted mb-6">
+        <p className="text-text-secondary mb-6">
           Dillinger renders all of these formats in real time. Paste any example
           into the editor and see the preview instantly.
         </p>
         <div className="flex gap-4">
           <Link
             href="/"
-            className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+            className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
           >
             Open the Editor
           </Link>
           <Link
             href="/features"
-            className="inline-block border border-border-light px-6 py-3 rounded font-medium hover:bg-border-light/20 transition-colors"
+            className="inline-block border border-border-subtle px-6 py-3 rounded font-medium hover:bg-border-subtle/20 transition-colors"
           >
             See All Features
           </Link>

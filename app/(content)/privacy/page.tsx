@@ -14,9 +14,9 @@ export default function PrivacyPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-16">
       <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
-      <p className="text-text-muted text-sm mb-12">Last updated: {LAST_UPDATED}</p>
+      <p className="text-text-secondary text-sm mb-12">Last updated: {LAST_UPDATED}</p>
 
-      <div className="space-y-10 text-text-muted leading-relaxed">
+      <div className="space-y-10 text-text-secondary leading-relaxed">
         <section className="space-y-3">
           <h2 className="text-xl font-semibold text-text-primary">The short version</h2>
           <p>
@@ -101,7 +101,7 @@ export default function PrivacyPage() {
               href="https://github.com/joemccann/dillinger"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-plum hover:underline"
+              className="text-accent hover:underline"
             >
               github.com/joemccann/dillinger
             </a>
@@ -110,10 +110,10 @@ export default function PrivacyPage() {
         </section>
       </div>
 
-      <div className="mt-16 pt-8 border-t border-border-light text-center">
+      <div className="mt-16 pt-8 border-t border-border-subtle text-center">
         <Link
           href="/"
-          className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+          className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
         >
           Back to the Editor
         </Link>

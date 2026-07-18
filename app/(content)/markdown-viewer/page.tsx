@@ -63,9 +63,9 @@ export default function MarkdownViewerPage() {
       />
 
       <h1 className="text-4xl font-bold mb-4">Markdown Viewer</h1>
-      <p className="text-text-muted text-lg mb-4 max-w-2xl">
+      <p className="text-text-secondary text-lg mb-4 max-w-2xl">
         A free online Markdown viewer that opens and renders any{" "}
-        <code className="bg-bg-highlight text-icon-default rounded px-1.5 py-0.5 text-base font-mono">
+        <code className="bg-bg-surface text-text-secondary rounded px-1.5 py-0.5 text-base font-mono">
           .md
         </code>{" "}
         file directly in your browser. Drop in a file or paste your text and see
@@ -73,7 +73,7 @@ export default function MarkdownViewerPage() {
       </p>
       <Link
         href="/"
-        className="inline-block text-plum hover:underline text-sm font-medium mb-12"
+        className="inline-block text-accent hover:underline text-sm font-medium mb-12"
       >
         Open the viewer and render your Markdown
       </Link>
@@ -83,9 +83,9 @@ export default function MarkdownViewerPage() {
           <h2 className="text-2xl font-bold mb-3">
             View and render a .md file in your browser
           </h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             Markdown is plain text on disk, so a raw{" "}
-            <code className="bg-bg-highlight text-icon-default rounded px-1.5 py-0.5 text-sm font-mono">
+            <code className="bg-bg-surface text-text-secondary rounded px-1.5 py-0.5 text-sm font-mono">
               .md
             </code>{" "}
             file shows hash symbols, asterisks, and pipe characters instead of
@@ -95,7 +95,7 @@ export default function MarkdownViewerPage() {
             pane renders the document — headings become headings, lists become
             lists, and code blocks gain syntax highlighting.
           </p>
-          <p className="text-text-muted">
+          <p className="text-text-secondary">
             Because everything runs client-side, there is no upload step and no
             waiting. The moment your file lands in the editor, the rendered view
             is ready to read, scroll, and copy.
@@ -106,9 +106,9 @@ export default function MarkdownViewerPage() {
           <h2 className="text-2xl font-bold mb-3">
             Drag and drop or paste to preview instantly
           </h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             There are two fast ways to view Markdown. Drag a{" "}
-            <code className="bg-bg-highlight text-icon-default rounded px-1.5 py-0.5 text-sm font-mono">
+            <code className="bg-bg-surface text-text-secondary rounded px-1.5 py-0.5 text-sm font-mono">
               .md
             </code>{" "}
             file from your desktop straight onto the editor pane, or copy raw
@@ -116,7 +116,7 @@ export default function MarkdownViewerPage() {
             snippet — and paste it in. Either way, the preview updates the
             instant the content lands.
           </p>
-          <pre className="bg-bg-highlight text-icon-default rounded-lg p-4 text-sm font-mono overflow-x-auto">
+          <pre className="bg-bg-surface text-text-secondary rounded-lg p-4 text-sm font-mono overflow-x-auto">
             <code>{`# Project Title
 
 A short **description** of what this does.
@@ -136,7 +136,7 @@ npm install dillinger
           <h2 className="text-2xl font-bold mb-3">
             GitHub-flavored Markdown support
           </h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             Most Markdown you encounter in the wild is GitHub-flavored Markdown
             (GFM), and Dillinger renders it faithfully. That means tables with
             aligned columns, task lists with checkable boxes, fenced code blocks
@@ -151,7 +151,7 @@ npm install dillinger
           <h2 className="text-2xl font-bold mb-3">
             Live preview that updates as you type
           </h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             Dillinger is more than a static renderer. The editor and preview sit
             side by side, and the rendered output updates in real time as you
             type or edit. View a file first, then fix a typo, restructure a list,
@@ -165,12 +165,12 @@ npm install dillinger
           <h2 className="text-2xl font-bold mb-3">
             Export or print the rendered output
           </h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             Viewing is only the first step. Once your document is rendered you
             can export it as clean HTML or as a PDF, or open your browser&apos;s
             print dialog to save the styled preview. This makes Dillinger useful
             for turning a raw{" "}
-            <code className="bg-bg-highlight text-icon-default rounded px-1.5 py-0.5 text-sm font-mono">
+            <code className="bg-bg-surface text-text-secondary rounded px-1.5 py-0.5 text-sm font-mono">
               .md
             </code>{" "}
             file into a shareable, polished document without copying the output
@@ -182,7 +182,7 @@ npm install dillinger
           <h2 className="text-2xl font-bold mb-3">
             No install, no signup, no friction
           </h2>
-          <p className="text-text-muted">
+          <p className="text-text-secondary">
             You do not need to install an editor, add a browser extension, or
             create an account to read a Markdown file. Dillinger is a web app —
             open the page, render your content, and you are done. Rendering
@@ -192,34 +192,34 @@ npm install dillinger
         </section>
       </div>
 
-      <div className="mt-16 pt-8 border-t border-border-light">
+      <div className="mt-16 pt-8 border-t border-border-subtle">
         <h2 className="text-2xl font-bold mb-6">Frequently asked questions</h2>
         <div className="space-y-6">
           {FAQ.map((item) => (
             <div key={item.question}>
               <h3 className="text-lg font-semibold mb-2">{item.question}</h3>
-              <p className="text-text-muted">{item.answer}</p>
+              <p className="text-text-secondary">{item.answer}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="mt-16 pt-8 border-t border-border-light">
+      <div className="mt-16 pt-8 border-t border-border-subtle">
         <h2 className="text-2xl font-bold mb-3">Render your Markdown now</h2>
-        <p className="text-text-muted mb-6">
+        <p className="text-text-secondary mb-6">
           Open the editor, drop in a file or paste your text, and see the
           formatted preview instantly. Free, no signup required.
         </p>
         <div className="flex flex-wrap gap-4">
           <Link
             href="/"
-            className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+            className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
           >
             Open the Editor
           </Link>
           <Link
             href="/guide"
-            className="inline-block border border-border-light px-6 py-3 rounded font-medium hover:bg-border-light/20 transition-colors"
+            className="inline-block border border-border-subtle px-6 py-3 rounded font-medium hover:bg-border-subtle/20 transition-colors"
           >
             Markdown Syntax Guide
           </Link>

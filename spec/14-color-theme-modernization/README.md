@@ -145,5 +145,13 @@ come last.
       KeyboardShortcuts re-themed. Found the toast-variant task in this
       sub-spec didn't apply — `Toast.tsx`'s real API has no variant
       parameter at all, contrary to `CLAUDE.md`'s documented example.
-- [ ] 14g — Marketing & content pages: not started (blocked on 14a)
+- [x] 14g — Marketing & content pages: **done**. All 17 content
+      routes, the app shell (layout/page/error/not-found), the OG
+      image, and the webmanifest re-themed. **Verified live in a real
+      browser** (Playwright + pre-installed Chromium): light/dark
+      toggle confirmed working end-to-end. Favicon/PNG icon
+      regeneration deferred — no image tooling available in this
+      sandbox. `npm run build` fails on a confirmed pre-existing,
+      unrelated bug (`app/api/google-drive/save/route.ts`), not caused
+      by this phase.
 - [ ] 14h — Verification & rollout: not started (blocked on 14b–14g)

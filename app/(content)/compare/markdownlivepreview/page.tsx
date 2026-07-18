@@ -34,11 +34,11 @@ const COMPARISON = [
 export default function MarkdownLivePreviewCompare() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
-      <p className="text-plum font-medium text-sm uppercase tracking-wider mb-3">
+      <p className="text-accent font-medium text-sm uppercase tracking-wider mb-3">
         Comparison
       </p>
       <h1 className="text-4xl font-bold mb-4">Dillinger vs Markdown Live Preview</h1>
-      <p className="text-text-muted text-lg mb-12 max-w-2xl">
+      <p className="text-text-secondary text-lg mb-12 max-w-2xl">
         Markdown Live Preview is a minimal, open-source scratchpad for rendering
         a single piece of markdown in your browser. Dillinger is a full
         workflow editor with cloud sync, multiple documents, and the Monaco
@@ -48,9 +48,9 @@ export default function MarkdownLivePreviewCompare() {
       <div className="overflow-x-auto mb-12">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border-light">
+            <tr className="border-b border-border-subtle">
               <th className="text-left py-3 pr-4 font-semibold">Feature</th>
-              <th className="text-left py-3 px-4 font-semibold text-plum">
+              <th className="text-left py-3 px-4 font-semibold text-accent">
                 Dillinger
               </th>
               <th className="text-left py-3 pl-4 font-semibold">Markdown Live Preview</th>
@@ -58,10 +58,10 @@ export default function MarkdownLivePreviewCompare() {
           </thead>
           <tbody>
             {COMPARISON.map((row) => (
-              <tr key={row.feature} className="border-b border-border-light/50">
-                <td className="py-3 pr-4 text-text-muted">{row.feature}</td>
+              <tr key={row.feature} className="border-b border-border-subtle/50">
+                <td className="py-3 pr-4 text-text-secondary">{row.feature}</td>
                 <td className="py-3 px-4">{row.dillinger}</td>
-                <td className="py-3 pl-4 text-text-muted">{row.competitor}</td>
+                <td className="py-3 pl-4 text-text-secondary">{row.competitor}</td>
               </tr>
             ))}
           </tbody>
@@ -70,7 +70,7 @@ export default function MarkdownLivePreviewCompare() {
 
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">When to choose Dillinger</h2>
-        <ul className="space-y-3 text-text-muted">
+        <ul className="space-y-3 text-text-secondary">
           <li>You manage more than one document and need persistence between sessions</li>
           <li>You sync to GitHub, Dropbox, Google Drive, OneDrive, or Bitbucket</li>
           <li>You want the VS Code editing experience with syntax highlighting</li>
@@ -81,23 +81,23 @@ export default function MarkdownLivePreviewCompare() {
 
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">When to choose Markdown Live Preview</h2>
-        <ul className="space-y-3 text-text-muted">
+        <ul className="space-y-3 text-text-secondary">
           <li>You need a quick paste-and-render scratchpad with zero setup</li>
           <li>You want an open-source tool you can self-host or audit</li>
           <li>You only render one snippet at a time and do not need persistence</li>
         </ul>
       </section>
 
-      <div className="pt-8 border-t border-border-light flex gap-4">
+      <div className="pt-8 border-t border-border-subtle flex gap-4">
         <Link
           href="/"
-          className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+          className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
         >
           Try Dillinger Free
         </Link>
         <Link
           href="/compare"
-          className="inline-block border border-border-light px-6 py-3 rounded font-medium hover:bg-border-light/20 transition-colors"
+          className="inline-block border border-border-subtle px-6 py-3 rounded font-medium hover:bg-border-subtle/20 transition-colors"
         >
           More Comparisons
         </Link>

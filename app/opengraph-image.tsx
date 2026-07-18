@@ -10,7 +10,7 @@ export default function Image() {
     (
       <div
         style={{
-          background: "#2B2F36",
+          background: "#18181B",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -22,7 +22,7 @@ export default function Image() {
       >
         <div
           style={{
-            color: "#35D7BB",
+            color: "#6C5CE7",
             fontSize: 72,
             fontWeight: 700,
             letterSpacing: "0.05em",
@@ -33,7 +33,7 @@ export default function Image() {
         </div>
         <div
           style={{
-            color: "#D3DAEA",
+            color: "#FAFAFA",
             fontSize: 32,
             fontWeight: 400,
             marginBottom: 48,
@@ -45,16 +45,16 @@ export default function Image() {
           style={{
             display: "flex",
             gap: 32,
-            color: "#A0AABF",
+            color: "#A1A1AA",
             fontSize: 20,
           }}
         >
           <span>Live Preview</span>
-          <span style={{ color: "#35D7BB" }}>·</span>
+          <span style={{ color: "#6C5CE7" }}>·</span>
           <span>Cloud Sync</span>
-          <span style={{ color: "#35D7BB" }}>·</span>
+          <span style={{ color: "#6C5CE7" }}>·</span>
           <span>AI-Ready</span>
-          <span style={{ color: "#35D7BB" }}>·</span>
+          <span style={{ color: "#6C5CE7" }}>·</span>
           <span>Free</span>
         </div>
       </div>

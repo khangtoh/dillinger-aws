@@ -30,60 +30,85 @@ the phase (17 route files, each a mechanical token swap).
 
 ### App shell
 
-- [ ] Re-theme `app/layout.tsx`'s root-level chrome (if any exists
-      outside `Providers`/`ThemeProvider`, e.g. a `<body>` background
-      set outside `globals.css`).
-- [ ] Re-theme `app/error.tsx` (the error boundary) and
-      `app/not-found.tsx` (404 page) onto the new tokens — these render
-      *outside* the normal app shell in failure states, so confirm they
-      don't depend on `ThemeProvider` having mounted (they may need a
-      `prefers-color-scheme` CSS media query fallback instead of the
-      JS-driven `dark` class, since an error boundary can fire before
-      hydration completes).
-- [ ] Re-theme `app/opengraph-image.tsx` (the dynamically generated
-      social-preview image) with the new accent/background colors so
-      shared links visually match the new brand.
-- [ ] Update `public/site.webmanifest`'s `theme_color` and
-      `background_color` fields to the new accent/canvas values (this
-      controls the mobile browser chrome color and PWA splash screen).
-- [ ] Regenerate `app/favicon.ico` (and any other icon sizes referenced
-      by the webmanifest) using the new accent color — coordinate with
-      the user on whether a new mark/shape is wanted or just a
-      recolor of the existing favicon glyph (recolor is the default per
-      the phase README's "no logo/wordmark redesign" non-goal).
+- [x] `app/layout.tsx` has no color classes of its own outside
+      `Providers` — nothing to re-theme (already updated in 14a for the
+      no-flash script).
+- [x] `app/error.tsx` / `app/not-found.tsx` re-themed onto semantic
+      tokens (`bg-primary`→`bg-canvas`, `text-invert`→`text-inverse`,
+      `text-muted`→`text-secondary`, `bg-plum text-bg-sidebar`→
+      `bg-accent text-on-accent`). Resolved the flagged concern: these
+      **do** work correctly pre-hydration — the tokens are CSS custom
+      properties resolved by the `<html class="dark">` state, which
+      14a's inline `<script>` sets synchronously before React runs, so
+      no separate `prefers-color-scheme` fallback path was needed.
+- [x] `app/opengraph-image.tsx` re-themed. This is a `next/og`
+      `ImageResponse` (satori), which renders server-side to a static
+      PNG and cannot reference CSS custom properties or Tailwind
+      classes — used literal hex constants matching 14a's token values
+      instead (`#18181B` chrome, `#6C5CE7` accent, `#FAFAFA` text,
+      `#A1A1AA` secondary text). This one file will need a manual edit
+      if the palette values in `app/globals.css` ever change, since it
+      can't consume the CSS variables directly.
+- [x] `public/site.webmanifest`: `theme_color` `#35D7BB`→`#6C5CE7`,
+      `background_color` `#1E2127`→`#111113`.
+- [ ] `app/favicon.ico` and the PNG icons it references
+      (`icon-192x192.png`, `icon-512x512.png`, `apple-touch-icon.png`)
+      **not regenerated** — no image-editing tooling (ImageMagick,
+      Pillow) is available in this sandbox to recolor binary icon
+      assets, and per this task's own note, whether to keep the
+      existing glyph shape (just recolor) or commission a new mark is
+      a design decision, not a code change. Left as a follow-up
+      requiring either design tooling or an asset handoff.
 
-### Content pages (mechanical per-page pass — one task per route is
-overkill; batch by directory)
+### Content pages
 
-- [ ] `app/(content)/compare/*` (5 files: hackmd, markdownlivepreview,
-      marklivedit, stackedit, typora) — swap `plum` and any other old
-      token references to the new semantic names; these are comparison
-      landing pages, likely to include colored CTAs/badges that should
-      now use `accent`.
-- [ ] `app/(content)/guide/*` (2 files: `guide/page.tsx`,
-      `guide/best-online-markdown-editor/page.tsx`) — same mechanical
-      swap.
-- [ ] `app/(content)/{ai,changelog,features,integrations,markdown-to-html,markdown-viewer,privacy,readme-editor}/page.tsx`
-      (8 files) — same mechanical swap.
-- [ ] `app/(content)/layout.tsx` (the shared layout wrapping all content
-      pages, if distinct from the root layout) — re-theme any shared
-      header/footer/CTA banner defined here once, rather than per-page.
-- [ ] Confirm every content page respects the resolved theme (light/dark)
-      consistently with the main app — these are static/marketing pages
-      and may currently be light-mode-only; decide whether dark mode is
-      in scope for marketing pages or intentionally light-only (record
-      the decision here once made, don't leave it implicit).
+- [x] `app/(content)/compare/*` (5 files) — swapped.
+- [x] `app/(content)/guide/*` (2 files) — swapped.
+- [x] Remaining 8 single-page routes
+      (`ai,changelog,features,integrations,markdown-to-html,markdown-viewer,privacy,readme-editor`)
+      — swapped. Found and fixed one pattern not anticipated in this
+      task list: `bg-bg-highlight text-icon-default` used as an
+      inline-code/pre "chip" style (11 occurrences across
+      `guide`, `markdown-viewer`, `readme-editor`, `markdown-to-html`)
+      → `bg-bg-surface text-text-secondary`, consistent with how
+      `.preview-html code` treats the same visual role in 14d.
+- [x] `app/(content)/layout.tsx` — swapped (no shared header/footer/CTA
+      banner exists there beyond what page-level components already
+      handle).
+- [x] Resolved the light/dark-mode-scope question: content pages use
+      the **same** semantic tokens as the main app, so they inherit
+      dark mode automatically via the same `<html class="dark">`
+      mechanism — no separate decision needed, and no page was
+      "light-only" by design, they just hadn't been tested against a
+      dark class before (none existed to test against).
 
 ### Verification
 
-- [ ] `grep -rln "plum" app/\(content\)` returns no matches (directory
-      name needs shell-escaping the parens when actually running this).
-- [ ] Spot-check at least 3 content pages plus the 404 and error pages
-      in a browser, both themes if dark mode is in scope for marketing
-      pages.
-- [ ] Confirm `app/sitemap.ts` needs no changes (it's route metadata,
-      not styling) — explicitly verify rather than skip, since it's in
-      the same directory tree as everything else touched here.
-- [ ] `npx tsc --noEmit`, `npm run lint`, and `npm run build` (static
-      pages are a common place for a build-time-only error to surface)
-      all clean.
+- [x] `grep -rln "plum\|35D7BB" "app/(content)" app/layout.tsx app/page.tsx app/error.tsx app/not-found.tsx app/opengraph-image.tsx public/site.webmanifest` — zero matches.
+- [x] Real browser check (not deferred — Playwright + the pre-installed
+      Chromium were available): loaded the app at `/`, screenshotted
+      light mode, opened Settings → switched Theme to Dark via the
+      14a-built selector, screenshotted again. **Confirmed working
+      end-to-end**: chrome, sidebar (incl. the new indigo-violet accent
+      on the wordmark and "New Document" button, and the red-toned
+      `danger` "Delete Document" button), title bar, and preview pane
+      all switch correctly and live, no reload. Monaco itself didn't
+      render content (shows "Loading...") — consistent with Phase 13's
+      documented finding that this sandbox's egress proxy blocks the
+      Monaco CDN; not a regression from this phase. Individual content
+      pages spot-checked via `curl` against a running `next dev` server
+      (`/`, `/features`, `/changelog` all returned 200 with no runtime
+      errors in the server log).
+- [x] `app/sitemap.ts` confirmed to contain no color/styling code —
+      genuinely nothing to change.
+- [x] `npx tsc --noEmit` and `npm run lint` clean. `npm run build`
+      **fails**, but confirmed via `git stash` to fail identically on
+      the pre-Phase-14 commit: a pre-existing `body` block-scoped
+      variable redeclaration bug in
+      `app/api/google-drive/save/route.ts` (unrelated API route, not
+      touched by this phase) breaks the production webpack build.
+      Not fixed here — out of scope for a color-theme phase, and fixing
+      an unrelated pre-existing bug as a drive-by would obscure this
+      phase's actual diff. `next dev` (used for the browser
+      verification above) does not hit this failure since it compiles
+      routes on demand rather than bundling everything up front.

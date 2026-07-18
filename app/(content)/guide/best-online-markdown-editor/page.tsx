@@ -249,13 +249,13 @@ const itemListJsonLd = {
 export default function BestOnlineMarkdownEditorPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
-      <p className="text-plum font-medium text-sm uppercase tracking-wider mb-3">
+      <p className="text-accent font-medium text-sm uppercase tracking-wider mb-3">
         Guide
       </p>
       <h1 className="text-4xl font-bold mb-6">
         Best Online Markdown Editors (2026)
       </h1>
-      <p className="text-text-muted text-lg mb-12 max-w-2xl">
+      <p className="text-text-secondary text-lg mb-12 max-w-2xl">
         A great online markdown editor disappears: it loads instantly, renders a
         live preview as you type, syncs to the cloud you already use, and exports
         cleanly to PDF or HTML when you are done. Most editors get one or two of
@@ -268,7 +268,7 @@ export default function BestOnlineMarkdownEditorPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border-light">
+              <tr className="border-b border-border-subtle">
                 <th className="text-left py-3 pr-4 font-semibold">Editor</th>
                 <th className="text-left py-3 px-4 font-semibold">Best for</th>
                 <th className="text-left py-3 px-4 font-semibold">Free</th>
@@ -279,12 +279,12 @@ export default function BestOnlineMarkdownEditorPage() {
               {TLDR.map((row) => (
                 <tr
                   key={row.editor}
-                  className="border-b border-border-light/50"
+                  className="border-b border-border-subtle/50"
                 >
                   <td className="py-3 pr-4 font-medium">{row.editor}</td>
-                  <td className="py-3 px-4 text-text-muted">{row.bestFor}</td>
-                  <td className="py-3 px-4 text-text-muted">{row.free}</td>
-                  <td className="py-3 pl-4 text-text-muted">{row.cloud}</td>
+                  <td className="py-3 px-4 text-text-secondary">{row.bestFor}</td>
+                  <td className="py-3 px-4 text-text-secondary">{row.free}</td>
+                  <td className="py-3 pl-4 text-text-secondary">{row.cloud}</td>
                 </tr>
               ))}
             </tbody>
@@ -301,23 +301,23 @@ export default function BestOnlineMarkdownEditorPage() {
             <h2 className="text-2xl font-bold mb-2">
               {editor.rank}. {editor.name} — {editor.tagline}
             </h2>
-            <p className="text-text-muted mb-6">{editor.description}</p>
+            <p className="text-text-secondary mb-6">{editor.description}</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-plum mb-3">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-accent mb-3">
                   Pros
                 </h3>
-                <ul className="space-y-2 text-text-muted text-sm">
+                <ul className="space-y-2 text-text-secondary text-sm">
                   {editor.pros.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
               </div>
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-text-muted mb-3">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-text-secondary mb-3">
                   Cons
                 </h3>
-                <ul className="space-y-2 text-text-muted text-sm">
+                <ul className="space-y-2 text-text-secondary text-sm">
                   {editor.cons.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
@@ -330,7 +330,7 @@ export default function BestOnlineMarkdownEditorPage() {
                   href={editor.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-plum hover:underline"
+                  className="text-accent hover:underline"
                 >
                   Visit {editor.name}
                 </a>
@@ -342,10 +342,10 @@ export default function BestOnlineMarkdownEditorPage() {
 
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-4">How to choose</h2>
-        <ul className="space-y-3 text-text-muted">
+        <ul className="space-y-3 text-text-secondary">
           <li>
             If you want to start writing in 1 second with no signup —{" "}
-            <Link href="/" className="text-plum hover:underline">
+            <Link href="/" className="text-accent hover:underline">
               Dillinger
             </Link>
           </li>
@@ -355,7 +355,7 @@ export default function BestOnlineMarkdownEditorPage() {
               href="https://hackmd.io"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-plum hover:underline"
+              className="text-accent hover:underline"
             >
               HackMD
             </a>
@@ -366,7 +366,7 @@ export default function BestOnlineMarkdownEditorPage() {
               href="https://ia.net/writer"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-plum hover:underline"
+              className="text-accent hover:underline"
             >
               iA Writer
             </a>{" "}
@@ -375,7 +375,7 @@ export default function BestOnlineMarkdownEditorPage() {
               href="https://typora.io"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-plum hover:underline"
+              className="text-accent hover:underline"
             >
               Typora
             </a>
@@ -386,14 +386,14 @@ export default function BestOnlineMarkdownEditorPage() {
               href="https://markdownlivepreview.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-plum hover:underline"
+              className="text-accent hover:underline"
             >
               Markdown Live Preview
             </a>
           </li>
           <li>
             If you live in VS Code already —{" "}
-            <Link href="/" className="text-plum hover:underline">
+            <Link href="/" className="text-accent hover:underline">
               Dillinger
             </Link>{" "}
             (uses Monaco)
@@ -407,34 +407,34 @@ export default function BestOnlineMarkdownEditorPage() {
           {FAQ.map((item) => (
             <div key={item.q}>
               <h3 className="text-lg font-semibold mb-2">{item.q}</h3>
-              <p className="text-text-muted">{item.a}</p>
+              <p className="text-text-secondary">{item.a}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <div className="pt-8 border-t border-border-light">
-        <p className="text-text-muted mb-6">
+      <div className="pt-8 border-t border-border-subtle">
+        <p className="text-text-secondary mb-6">
           The fastest way to find your editor is to try the most-recommended one
           first.
         </p>
         <div className="flex gap-4">
           <Link
             href="/"
-            className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+            className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
           >
             Open Dillinger
           </Link>
           <Link
             href="/compare"
-            className="inline-block border border-border-light px-6 py-3 rounded font-medium hover:bg-border-light/20 transition-colors"
+            className="inline-block border border-border-subtle px-6 py-3 rounded font-medium hover:bg-border-subtle/20 transition-colors"
           >
             Compare editors
           </Link>
         </div>
       </div>
 
-      <p className="mt-16 text-sm text-text-muted">Last updated: May 2026</p>
+      <p className="mt-16 text-sm text-text-secondary">Last updated: May 2026</p>
 
       <script
         type="application/ld+json"

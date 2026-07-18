@@ -66,7 +66,7 @@ export default function IntegrationsPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
       <h1 className="text-4xl font-bold mb-4">Integrations</h1>
-      <p className="text-text-muted text-lg mb-12 max-w-2xl">
+      <p className="text-text-secondary text-lg mb-12 max-w-2xl">
         Dillinger connects to five major cloud platforms. Import files, edit
         with live preview, and save back — all from your browser.
       </p>
@@ -76,20 +76,20 @@ export default function IntegrationsPage() {
           <section
             key={integration.name}
             id={integration.name.toLowerCase().replace(/\s+/g, "-")}
-            className="border-b border-border-light pb-12 last:border-0"
+            className="border-b border-border-subtle pb-12 last:border-0"
           >
             <h2 className="text-2xl font-bold mb-3">{integration.name}</h2>
-            <p className="text-text-muted leading-relaxed mb-6">
+            <p className="text-text-secondary leading-relaxed mb-6">
               {integration.description}
             </p>
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-text-muted mb-3">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-text-secondary mb-3">
                 Use cases
               </h3>
-              <ul className="space-y-2 text-text-muted">
+              <ul className="space-y-2 text-text-secondary">
                 {integration.useCases.map((uc) => (
                   <li key={uc} className="flex items-start gap-2">
-                    <span className="text-plum mt-1 shrink-0">-</span>
+                    <span className="text-accent mt-1 shrink-0">-</span>
                     <span>{uc}</span>
                   </li>
                 ))}
@@ -99,17 +99,17 @@ export default function IntegrationsPage() {
         ))}
       </div>
 
-      <div className="mt-12 pt-8 border-t border-border-light text-center">
+      <div className="mt-12 pt-8 border-t border-border-subtle text-center">
         <h2 className="text-2xl font-bold mb-3">
           Connect your first service
         </h2>
-        <p className="text-text-muted mb-6">
+        <p className="text-text-secondary mb-6">
           Open the editor, click the sidebar menu, and link any cloud provider
           in seconds.
         </p>
         <Link
           href="/"
-          className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+          className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
         >
           Open the Editor
         </Link>

@@ -34,11 +34,11 @@ const COMPARISON = [
 export default function TyporaCompare() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
-      <p className="text-plum font-medium text-sm uppercase tracking-wider mb-3">
+      <p className="text-accent font-medium text-sm uppercase tracking-wider mb-3">
         Comparison
       </p>
       <h1 className="text-4xl font-bold mb-4">Dillinger vs Typora</h1>
-      <p className="text-text-muted text-lg mb-12 max-w-2xl">
+      <p className="text-text-secondary text-lg mb-12 max-w-2xl">
         Typora is the most polished desktop markdown experience — a paid native
         app with seamless WYSIWYG editing. Dillinger is the most polished
         web-based markdown experience — free, no install, with built-in cloud
@@ -48,9 +48,9 @@ export default function TyporaCompare() {
       <div className="overflow-x-auto mb-12">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border-light">
+            <tr className="border-b border-border-subtle">
               <th className="text-left py-3 pr-4 font-semibold">Feature</th>
-              <th className="text-left py-3 px-4 font-semibold text-plum">
+              <th className="text-left py-3 px-4 font-semibold text-accent">
                 Dillinger
               </th>
               <th className="text-left py-3 pl-4 font-semibold">Typora</th>
@@ -58,10 +58,10 @@ export default function TyporaCompare() {
           </thead>
           <tbody>
             {COMPARISON.map((row) => (
-              <tr key={row.feature} className="border-b border-border-light/50">
-                <td className="py-3 pr-4 text-text-muted">{row.feature}</td>
+              <tr key={row.feature} className="border-b border-border-subtle/50">
+                <td className="py-3 pr-4 text-text-secondary">{row.feature}</td>
                 <td className="py-3 px-4">{row.dillinger}</td>
-                <td className="py-3 pl-4 text-text-muted">{row.competitor}</td>
+                <td className="py-3 pl-4 text-text-secondary">{row.competitor}</td>
               </tr>
             ))}
           </tbody>
@@ -70,7 +70,7 @@ export default function TyporaCompare() {
 
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">When to choose Dillinger</h2>
-        <ul className="space-y-3 text-text-muted">
+        <ul className="space-y-3 text-text-secondary">
           <li>You want to start writing immediately in the browser — no install, no purchase</li>
           <li>You sync files between devices through GitHub, Dropbox, Google Drive, OneDrive, or Bitbucket</li>
           <li>You prefer a side-by-side editor and live preview over WYSIWYG</li>
@@ -81,7 +81,7 @@ export default function TyporaCompare() {
 
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">When to choose Typora</h2>
-        <ul className="space-y-3 text-text-muted">
+        <ul className="space-y-3 text-text-secondary">
           <li>You write long-form content offline and want a true desktop app</li>
           <li>You prefer seamless WYSIWYG over a separate preview pane</li>
           <li>You need DOCX, EPUB, OpenOffice, or LaTeX export</li>
@@ -90,16 +90,16 @@ export default function TyporaCompare() {
         </ul>
       </section>
 
-      <div className="pt-8 border-t border-border-light flex gap-4">
+      <div className="pt-8 border-t border-border-subtle flex gap-4">
         <Link
           href="/"
-          className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+          className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
         >
           Try Dillinger Free
         </Link>
         <Link
           href="/compare"
-          className="inline-block border border-border-light px-6 py-3 rounded font-medium hover:bg-border-light/20 transition-colors"
+          className="inline-block border border-border-subtle px-6 py-3 rounded font-medium hover:bg-border-subtle/20 transition-colors"
         >
           More Comparisons
         </Link>

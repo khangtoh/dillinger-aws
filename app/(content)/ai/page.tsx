@@ -58,24 +58,24 @@ export default function AIPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
       <div className="mb-16">
-        <p className="text-plum font-medium text-sm uppercase tracking-wider mb-3">
+        <p className="text-accent font-medium text-sm uppercase tracking-wider mb-3">
           AI-Ready Editing
         </p>
         <h1 className="text-4xl font-bold mb-6 leading-tight">
           Every LLM speaks markdown.
           <br />
-          <span className="text-text-muted">
+          <span className="text-text-secondary">
             Dillinger is the editor that speaks it back.
           </span>
         </h1>
-        <p className="text-text-muted text-lg max-w-2xl mb-8">
+        <p className="text-text-secondary text-lg max-w-2xl mb-8">
           Large language models think in markdown. When you write in Dillinger,
           you are writing in the native format of AI — structured, portable, and
           ready for any model or pipeline.
         </p>
         <Link
           href="/"
-          className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+          className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
         >
           Start Writing
         </Link>
@@ -83,7 +83,7 @@ export default function AIPage() {
 
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-8">Why Markdown for AI</h2>
-        <div className="space-y-6 text-text-muted leading-relaxed">
+        <div className="space-y-6 text-text-secondary leading-relaxed">
           <p>
             Markdown is not just a formatting language. It is the universal
             interface between humans and machines. Every major large language
@@ -113,7 +113,7 @@ export default function AIPage() {
           {USE_CASES.map((item) => (
             <div key={item.title} className="space-y-2">
               <h3 className="text-lg font-semibold">{item.title}</h3>
-              <p className="text-text-muted leading-relaxed">
+              <p className="text-text-secondary leading-relaxed">
                 {item.description}
               </p>
             </div>
@@ -126,24 +126,24 @@ export default function AIPage() {
         <div className="grid gap-8 sm:grid-cols-3">
           {REASONS.map((item) => (
             <div key={item.label}>
-              <div className="text-3xl font-bold text-plum">{item.stat}</div>
+              <div className="text-3xl font-bold text-accent">{item.stat}</div>
               <div className="font-medium mt-1">{item.label}</div>
-              <p className="text-text-muted text-sm mt-2">{item.detail}</p>
+              <p className="text-text-secondary text-sm mt-2">{item.detail}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <div className="pt-8 border-t border-border-light text-center">
+      <div className="pt-8 border-t border-border-subtle text-center">
         <h2 className="text-2xl font-bold mb-3">
           Write for humans. Format for machines.
         </h2>
-        <p className="text-text-muted mb-6">
+        <p className="text-text-secondary mb-6">
           Dillinger is free, runs in your browser, and requires no account.
         </p>
         <Link
           href="/"
-          className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+          className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
         >
           Open the Editor
         </Link>

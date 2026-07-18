@@ -102,14 +102,14 @@ export default function MarkdownToHtmlPage() {
       />
 
       <h1 className="text-4xl font-bold mb-4">Markdown to HTML Converter</h1>
-      <p className="text-text-muted text-lg mb-4 max-w-2xl">
+      <p className="text-text-secondary text-lg mb-4 max-w-2xl">
         Turn Markdown into clean, valid HTML in seconds. Paste your Markdown
         into Dillinger and watch the HTML render live — then copy it or export a
         standalone file. Free, no signup, and it runs right in your browser.
       </p>
       <Link
         href="/"
-        className="inline-block text-plum hover:underline text-sm font-medium mb-12"
+        className="inline-block text-accent hover:underline text-sm font-medium mb-12"
       >
         Open the Editor to convert your Markdown
       </Link>
@@ -117,7 +117,7 @@ export default function MarkdownToHtmlPage() {
       <div className="space-y-12">
         <section>
           <h2 className="text-2xl font-bold mb-3">Convert Markdown to clean HTML</h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             Markdown is a plain-text writing format, but browsers, email clients,
             and most publishing platforms speak HTML. A converter bridges the
             two: you write in the simple, readable Markdown syntax, and the tool
@@ -126,7 +126,7 @@ export default function MarkdownToHtmlPage() {
             countless documentation sites, to produce HTML that follows the
             CommonMark and GitHub-flavored Markdown specifications.
           </p>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             Because the conversion is instant and live, there is no
             convert-and-wait step. As you type or paste, the right-hand preview
             updates in real time so you can see exactly how every heading, list,
@@ -136,7 +136,7 @@ export default function MarkdownToHtmlPage() {
 
         <section>
           <h2 className="text-2xl font-bold mb-3">What gets converted</h2>
-          <p className="text-text-muted mb-6">
+          <p className="text-text-secondary mb-6">
             Every common Markdown element maps to a predictable HTML tag. Here is
             how the most-used pieces of Markdown translate into the output you can
             copy or export.
@@ -145,17 +145,17 @@ export default function MarkdownToHtmlPage() {
             {CONVERSIONS.map((item) => (
               <div key={item.title}>
                 <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-                <p className="text-text-muted mb-4">{item.description}</p>
+                <p className="text-text-secondary mb-4">{item.description}</p>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <p className="text-sm font-medium mb-2">Markdown</p>
-                    <pre className="bg-bg-highlight text-icon-default rounded-lg p-4 text-sm font-mono overflow-x-auto">
+                    <pre className="bg-bg-surface text-text-secondary rounded-lg p-4 text-sm font-mono overflow-x-auto">
                       <code>{item.markdown.replace(/\\n/g, "\n")}</code>
                     </pre>
                   </div>
                   <div>
                     <p className="text-sm font-medium mb-2">HTML</p>
-                    <pre className="bg-bg-highlight text-icon-default rounded-lg p-4 text-sm font-mono overflow-x-auto">
+                    <pre className="bg-bg-surface text-text-secondary rounded-lg p-4 text-sm font-mono overflow-x-auto">
                       <code>{item.html.replace(/\\n/g, "\n")}</code>
                     </pre>
                   </div>
@@ -167,15 +167,15 @@ export default function MarkdownToHtmlPage() {
 
         <section>
           <h2 className="text-2xl font-bold mb-3">Copy or export your HTML</h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             Once the preview looks right, getting the HTML out is one click. Copy
             the rendered markup straight to your clipboard to paste into a CMS,
             an email template, or a static-site project. Prefer a file? Export a
-            self-contained <code className="bg-bg-highlight px-1 rounded">.html</code>{" "}
+            self-contained <code className="bg-bg-surface px-1 rounded">.html</code>{" "}
             document you can open in any browser, or export to PDF when you need a
             polished, shareable artifact.
           </p>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             You can also keep working in the original Markdown and re-export at
             any time — Dillinger never locks your content into a proprietary
             format. The Markdown source is always yours to download.
@@ -184,7 +184,7 @@ export default function MarkdownToHtmlPage() {
 
         <section>
           <h2 className="text-2xl font-bold mb-3">Live, private, no signup</h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             There is nothing to install and no account to create. The conversion
             happens entirely in your browser, which means your draft stays on
             your machine unless you deliberately connect a cloud service. That
@@ -192,29 +192,29 @@ export default function MarkdownToHtmlPage() {
             anything you would rather not upload to a third-party server just to
             see some HTML.
           </p>
-          <p className="text-text-muted mb-4">
+          <p className="text-text-secondary mb-4">
             Output is sanitized with DOMPurify before it reaches the preview, so
             the HTML you copy is clean and safe to drop into your own pages.
           </p>
         </section>
       </div>
 
-      <div className="mt-16 pt-8 border-t border-border-light">
+      <div className="mt-16 pt-8 border-t border-border-subtle">
         <h2 className="text-2xl font-bold mb-3">Convert your Markdown now</h2>
-        <p className="text-text-muted mb-6">
+        <p className="text-text-secondary mb-6">
           Paste any Markdown into Dillinger and the HTML appears instantly. Copy
           it, export it, or keep editing — all in one place.
         </p>
         <div className="flex gap-4">
           <Link
             href="/"
-            className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+            className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
           >
             Open the Editor
           </Link>
           <Link
             href="/markdown-viewer"
-            className="inline-block border border-border-light px-6 py-3 rounded font-medium hover:bg-border-light/20 transition-colors"
+            className="inline-block border border-border-subtle px-6 py-3 rounded font-medium hover:bg-border-subtle/20 transition-colors"
           >
             Open the Markdown Viewer
           </Link>

@@ -65,7 +65,7 @@ export default function FeaturesPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
       <h1 className="text-4xl font-bold mb-4">Features</h1>
-      <p className="text-text-muted text-lg mb-12 max-w-2xl">
+      <p className="text-text-secondary text-lg mb-12 max-w-2xl">
         Everything you need to write, preview, and share markdown — nothing you
         do not.
       </p>
@@ -74,18 +74,18 @@ export default function FeaturesPage() {
         {FEATURES.map((feature) => (
           <div key={feature.title} className="space-y-2">
             <h2 className="text-xl font-semibold">{feature.title}</h2>
-            <p className="text-text-muted leading-relaxed">
+            <p className="text-text-secondary leading-relaxed">
               {feature.description}
             </p>
           </div>
         ))}
       </div>
 
-      <div className="mt-16 pt-8 border-t border-border-light text-center">
-        <p className="text-text-muted mb-4">Ready to start writing?</p>
+      <div className="mt-16 pt-8 border-t border-border-subtle text-center">
+        <p className="text-text-secondary mb-4">Ready to start writing?</p>
         <Link
           href="/"
-          className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+          className="inline-block bg-accent text-text-on-accent px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
         >
           Open the Editor
         </Link>

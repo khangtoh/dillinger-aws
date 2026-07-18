@@ -134,7 +134,7 @@ function HomepageSeoContent() {
   return (
     <section
       aria-labelledby="dillinger-home-heading"
-      className="bg-bg-primary text-text-primary px-6 py-16 sm:py-24"
+      className="bg-bg-canvas text-text-primary px-6 py-16 sm:py-24"
     >
       <div className="max-w-4xl mx-auto">
         <h1
@@ -143,7 +143,7 @@ function HomepageSeoContent() {
         >
           Online Markdown Editor with Live Preview
         </h1>
-        <p className="mt-4 text-lg text-text-muted max-w-2xl">
+        <p className="mt-4 text-lg text-text-secondary max-w-2xl">
           Dillinger is a free online markdown editor with live preview, cloud
           sync, and zero signup friction.
         </p>
@@ -179,7 +179,7 @@ function HomepageSeoContent() {
           {HOMEPAGE_FEATURES.map((feature) => (
             <div key={feature.title}>
               <h3 className="text-base font-semibold">
-                <span className="text-plum">{feature.title}.</span>{" "}
+                <span className="text-accent">{feature.title}.</span>{" "}
                 <span className="font-normal text-text-primary">
                   {feature.description}
                 </span>
@@ -195,7 +195,7 @@ function HomepageSeoContent() {
           {HOMEPAGE_FAQS.map((faq) => (
             <div key={faq.question}>
               <dt className="text-lg font-semibold">{faq.question}</dt>
-              <dd className="mt-2 text-text-muted leading-relaxed">
+              <dd className="mt-2 text-text-secondary leading-relaxed">
                 {faq.answer}
               </dd>
             </div>
@@ -205,31 +205,31 @@ function HomepageSeoContent() {
         <div className="mt-16 flex flex-wrap gap-4 text-sm">
           <Link
             href="/features"
-            className="text-plum hover:underline underline-offset-4"
+            className="text-accent hover:underline underline-offset-4"
           >
             Full feature list
           </Link>
           <Link
             href="/guide"
-            className="text-plum hover:underline underline-offset-4"
+            className="text-accent hover:underline underline-offset-4"
           >
             Markdown guide
           </Link>
           <Link
             href="/compare"
-            className="text-plum hover:underline underline-offset-4"
+            className="text-accent hover:underline underline-offset-4"
           >
             Compare alternatives
           </Link>
           <Link
             href="/integrations"
-            className="text-plum hover:underline underline-offset-4"
+            className="text-accent hover:underline underline-offset-4"
           >
             Integrations
           </Link>
           <Link
             href="/ai"
-            className="text-plum hover:underline underline-offset-4"
+            className="text-accent hover:underline underline-offset-4"
           >
             Markdown for AI
           </Link>
