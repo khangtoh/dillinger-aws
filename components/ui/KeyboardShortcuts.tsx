@@ -66,17 +66,17 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="relative bg-bg-navbar rounded-lg shadow-xl p-6 w-96 animate-fade-in">
+      <div className="relative bg-bg-chrome rounded-lg shadow-xl p-6 w-96 animate-fade-in">
         <div className="flex items-center justify-between mb-4">
-          <h2 id="shortcuts-title" className="text-text-invert font-semibold">
+          <h2 id="shortcuts-title" className="text-text-inverse font-semibold">
             Keyboard Shortcuts
           </h2>
           <button
             ref={closeRef}
             onClick={onClose}
             aria-label="Close"
-            className="text-text-invert hover:text-plum transition-colors rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+            className="text-text-inverse hover:text-accent transition-colors rounded
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <X size={20} />
           </button>
@@ -84,7 +84,7 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
         <div className="space-y-4 max-h-[60vh] overflow-y-auto">
           {SHORTCUT_GROUPS.map((group) => (
             <div key={group.title}>
-              <h3 className="text-xs uppercase tracking-wider text-text-muted mb-2">
+              <h3 className="text-xs uppercase tracking-wider text-text-secondary mb-2">
                 {group.title}
               </h3>
               <div className="space-y-2">
@@ -93,12 +93,12 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
                     key={shortcut.action}
                     className="flex items-center justify-between text-sm"
                   >
-                    <span className="text-text-muted">{shortcut.action}</span>
+                    <span className="text-text-secondary">{shortcut.action}</span>
                     <div className="flex items-center gap-1">
                       {shortcut.keys.map((key, i) => (
                         <kbd
                           key={`${shortcut.action}-${i}`}
-                          className="bg-bg-highlight text-text-invert px-2.5 py-0.5 rounded text-xs font-mono min-w-[24px] text-center"
+                          className="bg-bg-surface-hover text-text-inverse px-2.5 py-0.5 rounded text-xs font-mono min-w-[24px] text-center"
                         >
                           {key}
                         </kbd>

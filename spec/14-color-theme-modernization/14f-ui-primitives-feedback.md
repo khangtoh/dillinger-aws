@@ -29,50 +29,65 @@ Owns: `components/ui/Toast.tsx`, `components/ui/Skeleton.tsx`,
 
 ### Toast
 
-- [ ] Map each toast variant to its semantic token: `'success'` →
-      `success`, `'error'` → `danger`, any `'warning'`/`'info'` variant
-      → `warning` / `accent` respectively — confirm the full set of
-      variants `Toast.tsx` actually supports before assuming only
-      `'success'` exists (`CLAUDE.md`'s example only shows one call).
-- [ ] Re-theme the toast surface (`bg-surface-raised`), border, and
-      dismiss-button hover state consistent with modals (14e) for visual
-      coherence between the two overlay types.
-- [ ] Confirm toast entrance/exit animation (`animate-in` /
-      `slide-in-from-right` per `tailwind.config.ts`'s existing keyframes)
-      is unaffected — this phase changes colors, not motion; note this
-      explicitly rather than silently touching animation timing.
-- [ ] Confirm toast contrast holds at the `toast(60)` z-index layer
-      against whatever surface happens to be behind it (could be canvas,
-      a modal, or chrome, since toast renders above everything per
-      `CLAUDE.md`'s z-index scale).
+- [x] **Correction to this spec's own assumption**: `Toast.tsx`'s actual
+      API is `notify(message: string, duration?: number)` — there is no
+      variant parameter at all (no `'success'`/`'error'`/`'warning'`),
+      contrary to what this task list (following `CLAUDE.md`'s example)
+      assumed. Every call site (`useToast().notify(...)`) passes only a
+      message string. No variant-to-token mapping exists to build — this
+      task doesn't apply as written; noted here rather than silently
+      dropped so the gap between `CLAUDE.md`'s documented pattern and
+      actual behavior is visible.
+- [x] Toast surface `bg-navbar` → `bg-chrome` (matching modal chrome
+      from 14e for visual consistency between overlay types), dismiss
+      button `focus-visible:ring-plum` → `focus-visible:ring-focus-ring`.
+- [x] Entrance/exit animation (`animate-in`, the `opacity-0` exit
+      transition) left untouched — confirmed no keyframe/timing values
+      were touched, only color classes.
+- [x] Toast renders via a fixed `bottom-4 right-4 z-toast` container —
+      contrast reasoning: `bg-chrome` is a solid, always-dark
+      background regardless of what's behind it (same chrome-stays-dark
+      property established in 14b), so it doesn't depend on knowing
+      what surface is beneath the toast layer.
 
 ### Skeleton
 
-- [ ] Re-theme the base skeleton color and shimmer/pulse gradient (if
-      any) using new neutral-scale tokens (e.g. `bg-surface` at rest,
-      a lighter/darker neutral stop for the shimmer highlight) —
-      confirm the shimmer remains visible against both light and dark
-      canvas without being distracting.
-- [ ] Confirm `prefers-reduced-motion` handling (already present
-      app-wide per `app/globals.css`'s existing media query) still
-      applies to any skeleton animation after re-theming.
+- [x] Base skeleton `bg-highlight` → `bg-surface-hover`; the sidebar
+      skeleton's chrome background `bg-sidebar`/`bg-navbar` → `bg-chrome`,
+      the canvas background `bg-primary` → `bg-canvas`, title-bar divider
+      `border-light` → `border-subtle`. No separate shimmer gradient
+      exists (`animate-pulse` is Tailwind's built-in opacity pulse, not a
+      moving gradient) — nothing further to re-theme there.
+- [x] `prefers-reduced-motion` handling lives in `app/globals.css`'s
+      existing global media query (untouched by this phase) and applies
+      to `animate-pulse` the same as any other animation — no
+      per-component change needed.
 
 ### Keyboard shortcuts overlay
 
-- [ ] Re-theme the overlay surface, key-cap styling (the small boxed
-      keybinding labels like `Cmd` `Shift` `Z`), and section headers
-      onto `bg-surface-raised` / `border-subtle` / `text-primary` /
-      `text-secondary` tokens.
-- [ ] Confirm key-cap contrast is legible in both themes — these are
-      small text elements and a common place for accessibility contrast
-      failures.
+- [x] Overlay surface `bg-navbar` → `bg-chrome`, header text
+      `text-invert` → `text-inverse`, close button
+      `hover:text-plum`/`focus-visible:ring-plum` → `hover:text-accent`/
+      `focus-visible:ring-focus-ring`, section labels and action text
+      `text-muted` → `text-secondary`, key-cap chips `bg-highlight` →
+      `bg-surface-hover`.
+- [x] Key-cap contrast: `text-inverse` on `bg-surface-hover`, both
+      always-dark-chrome-relative tokens (this overlay lives on
+      `bg-chrome`, itself always dark) — high-contrast by construction
+      in both themes since chrome doesn't invert. Flagged for 14h's
+      formal WCAG check rather than asserted as verified here.
 
 ### Verification
 
-- [ ] `grep -rn "plum" components/ui` returns no matches.
-- [ ] Trigger each toast variant, open the keyboard-shortcuts overlay,
-      and view a loading skeleton state, in both light and dark mode.
-- [ ] Run `tests/components/toast.test.tsx` and
-      `tests/components/skeleton.test.tsx` — update any assertions
-      pinned to old class/color names.
-- [ ] `npx tsc --noEmit` and `npm run lint` clean.
+- [x] `grep -rn "plum\|bg-navbar\|bg-sidebar\|bg-primary\|bg-highlight\|border-light\|text-invert\|text-muted" components/ui` — zero matches.
+- [ ] Manual trigger-toast / open-shortcuts / view-skeleton visual pass
+      in both themes — deferred to 14h (no interactive browser in this
+      sandbox).
+- [x] `tests/components/toast.test.tsx`: 3 pre-existing failures
+      confirmed via `git stash` to exist on the pre-Phase-14 commit too
+      (fake-timer/dismiss-animation related, unrelated to this change).
+      `tests/components/skeleton.test.tsx`: all passing, no assertions
+      on literal class names to update. No `KeyboardShortcuts` test
+      file exists in the repo (confirmed by search) — nothing to update
+      there.
+- [x] `npx tsc --noEmit` and `npm run lint` clean.

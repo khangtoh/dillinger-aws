@@ -59,7 +59,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`bg-bg-navbar text-text-invert px-4 py-3 rounded shadow-lg
+            className={`bg-bg-chrome text-text-inverse px-4 py-3 rounded shadow-lg
                        flex items-center gap-3 transition-opacity duration-150
                        ${exiting.has(toast.id) ? "opacity-0" : "animate-in"}`}
           >
@@ -68,7 +68,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               onClick={() => dismiss(toast.id)}
               aria-label="Dismiss notification"
               className="hover:opacity-70 transition-opacity rounded
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
             >
               <X size={16} />
             </button>

@@ -141,6 +141,9 @@ come last.
       introduced the `danger` token for destructive actions and applied
       it consistently (including Sidebar's delete/unlink buttons, which
       predated this phase's `plum` grep since they never used `plum`).
-- [ ] 14f — UI primitives & feedback: not started (blocked on 14a)
+- [x] 14f — UI primitives & feedback: **done**. Toast, Skeleton,
+      KeyboardShortcuts re-themed. Found the toast-variant task in this
+      sub-spec didn't apply — `Toast.tsx`'s real API has no variant
+      parameter at all, contrary to `CLAUDE.md`'s documented example.
 - [ ] 14g — Marketing & content pages: not started (blocked on 14a)
 - [ ] 14h — Verification & rollout: not started (blocked on 14b–14g)

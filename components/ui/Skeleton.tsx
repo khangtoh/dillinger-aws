@@ -10,7 +10,7 @@ function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "animate-pulse rounded bg-bg-highlight",
+        "animate-pulse rounded bg-bg-surface-hover",
         className
       )}
     />
@@ -19,9 +19,9 @@ function Skeleton({ className }: SkeletonProps) {
 
 export function EditorSkeleton() {
   return (
-    <div className="h-dvh flex overflow-hidden bg-bg-primary">
+    <div className="h-dvh flex overflow-hidden bg-bg-canvas">
       {/* Sidebar skeleton */}
-      <aside className="w-sidebar bg-bg-sidebar h-dvh flex flex-col p-4">
+      <aside className="w-sidebar bg-bg-chrome h-dvh flex flex-col p-4">
         {/* Logo */}
         <Skeleton className="h-8 w-32 mb-6" />
 
@@ -50,7 +50,7 @@ export function EditorSkeleton() {
       {/* Main content skeleton */}
       <main className="flex-1 flex flex-col min-w-0">
         {/* Navbar skeleton */}
-        <div className="h-14 bg-bg-navbar flex items-center px-4 gap-4">
+        <div className="h-14 bg-bg-chrome flex items-center px-4 gap-4">
           <Skeleton className="h-6 w-6" />
           <Skeleton className="h-6 w-6" />
           <div className="flex-1" />
@@ -60,14 +60,14 @@ export function EditorSkeleton() {
         </div>
 
         {/* Document title skeleton */}
-        <div className="h-14 bg-bg-primary flex items-center px-4 border-b border-border-light">
+        <div className="h-14 bg-bg-canvas flex items-center px-4 border-b border-border-subtle">
           <Skeleton className="h-6 w-48" />
         </div>
 
         {/* Editor/preview area */}
         <div className="flex-1 flex">
           {/* Editor pane */}
-          <div className="w-1/2 border-r border-border-light p-4 space-y-2">
+          <div className="w-1/2 border-r border-border-subtle p-4 space-y-2">
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-5/6" />
