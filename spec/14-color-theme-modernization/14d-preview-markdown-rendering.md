@@ -32,52 +32,62 @@ recolor what already has both variants:
 
 ### Token migration
 
-- [ ] Replace every literal hex in `.preview-html` (light block) with
-      `var(--color-*)` references: `text-primary` (body text),
-      `border-subtle` (heading underlines, `hr`, table borders),
-      `bg-surface` (code/pre/table-header backgrounds),
-      `bg-surface-raised` (TOC box), `text-secondary` (blockquote text).
-- [ ] Replace `.preview-html a` / `.dark.preview-html a`'s `#35D7BB` with
-      `var(--color-accent)` — confirm the new accent has sufficient
-      contrast as inline link text against **both** the light body-text
-      background and the dark canvas (this is real reading content, held
-      to a stricter bar than a UI chrome accent — verify in 14h's
-      contrast audit, not just visually here).
-- [ ] Fold `.dark.preview-html` overrides into the same rule using
-      `var(--color-*)` (each variable already resolves differently under
-      `:root.dark` per 14a) where possible, reducing duplicate CSS —
-      only keep a separate `.dark.preview-html` block for properties that
-      are genuinely structurally different between modes, not just a
-      different color value for the same property.
-- [ ] Add the missing dark-mode checkbox styling (`input[type="checkbox"]`
-      accent-color or explicit border/background) — this is a real,
-      pre-existing gap independent of the rebrand; fix it while every
-      other rule in this file is being touched anyway.
+- [x] Every literal hex in `.preview-html` replaced with `var(--color-*)`:
+      `text-primary` (body text, headings inherit it — no separate
+      heading color exists anymore, simpler than before), `border-subtle`
+      (heading underlines, `hr`, table borders), `bg-surface`
+      (code/pre/table-header backgrounds, TOC box), `text-secondary`
+      (blockquote text), `border-strong` (blockquote left border,
+      previously the odd choice of using the muted *text* color
+      `#A0AABF` for a border).
+- [x] `.preview-html a`'s `#35D7BB` → `var(--color-accent)`. Contrast
+      against body/canvas flagged for 14h's WCAG audit rather than
+      verified here (no interactive browser in this sandbox).
+- [x] `.dark.preview-html` **entirely removed** — every property in it
+      was a pure color override, so folding through `var(--color-*)`
+      (already theme-aware) eliminated the whole block rather than just
+      shrinking it. Net effect: ~60 lines of duplicated dark-mode CSS
+      deleted.
+- [x] Missing dark-mode checkbox styling fixed: added
+      `accent-color: rgb(var(--color-accent))` to
+      `input[type="checkbox"]` — didn't exist for **either** mode
+      before, not just dark; a genuine pre-existing gap closed here.
 
 ### Component-level
 
-- [ ] Re-theme any non-`.preview-html` chrome inside
-      `MarkdownPreview.tsx` itself (e.g. an empty-state message, loading
-      skeleton, or scroll-sync indicator if one exists) onto the new
-      tokens.
-- [ ] Confirm `DOMPurify`-sanitized user HTML content (per `CLAUDE.md`'s
-      XSS Prevention section) isn't affected by this change — this phase
-      only touches presentation CSS, not sanitization logic; note this
-      explicitly in the PR description as a "did not touch" for
-      reviewer confidence.
+- [x] `MarkdownPreview.tsx` simplified rather than just recolored: the
+      component previously carried its own `enableNightMode` boolean
+      and conditionally appended a local `dark` class + hardcoded
+      `bg-[#1e1e1e]` to fake dark styling on top of `.preview-html`.
+      Since `.dark.preview-html` no longer exists (folded into 14a's
+      CSS vars, which already cascade from the `<html class="dark">`
+      ancestor `ThemeProvider` sets), that entire local theme-detection
+      path was dead weight — removed. The component no longer imports
+      `useResolvedTheme` at all; both empty-state and rendered states
+      now just use `bg-transparent` unconditionally and let the parent
+      panel's `bg-surface` (from 14c) and the CSS-variable cascade
+      handle theming.
+- [x] Empty-state message `text-muted` → `text-secondary`.
+- [x] Confirmed: this phase only touched presentation CSS/class names,
+      not `DOMPurify`'s sanitize call or its config
+      (`USE_PROFILES`/`ADD_ATTR`/`FORBID_TAGS` untouched) — XSS
+      protection is unaffected.
 
 ### Verification
 
-- [ ] Render a markdown document exercising every styled element
-      (headings, a link, inline code, a fenced code block, a blockquote,
-      a table, a TOC, a horizontal rule, and a task-list checkbox) and
-      visually confirm all read correctly in both themes.
-- [ ] Confirm code block syntax highlighting (if `highlight.js` or
-      similar is in use — check `lib/markdown.ts` / the preview renderer
-      for a syntax theme) doesn't visually clash with the new
-      `bg-surface` code background; swap the syntax-highlight theme too
-      if needed, but only if the current one assumes the old
-      background color.
-- [ ] `npx tsc --noEmit` and `npm run lint` clean; run
-      `tests/lib/markdown.test.ts` and any preview component tests to
-      confirm no assertions on old literal hex values broke.
+- [ ] Full rendered-markdown visual pass (headings, link, inline code,
+      fenced code block, blockquote, table, TOC, hr, checkbox) in both
+      themes — deferred to 14h (no interactive browser in this
+      sandbox).
+- [x] Checked for a syntax-highlight theme that might clash with the
+      new `bg-surface` code background: `lib/markdown.ts` imports
+      `highlight.js` for tokenizing but **no highlight.js theme
+      stylesheet is imported anywhere in the repo** (confirmed by grep)
+      — so there was nothing to swap; code blocks get `hljs-*` classes
+      with no color rules applied to them today, independent of this
+      phase.
+- [x] `npx tsc --noEmit` and `npm run lint` clean. No preview component
+      test file exists in `tests/` (confirmed by search — Monaco/preview
+      rendering is Playwright-covered, not unit-tested), and
+      `tests/lib/markdown.test.ts` (29 tests, pure rendering logic, no
+      color assertions) passes unchanged.

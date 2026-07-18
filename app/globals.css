@@ -57,12 +57,19 @@ body {
   color: rgb(var(--color-text-primary));
 }
 
-/* Preview Styles */
+/*
+ * Preview styles. Colors reference the Phase 14 tokens directly via
+ * var(--color-*), which already resolve differently under :root.dark
+ * (see the token blocks above) — so a single rule covers both themes
+ * for every property that's *only* a color change. A separate
+ * `.dark.preview-html` override only exists below where dark mode is
+ * structurally different, not just a different shade of the same thing.
+ */
 .preview-html {
   font-family: Georgia, Cambria, serif;
   font-size: 14px;
   line-height: 1.7;
-  color: #373D49;
+  color: rgb(var(--color-text-primary));
 }
 
 .preview-html h1,
@@ -77,8 +84,8 @@ body {
   margin-bottom: 0.5em;
 }
 
-.preview-html h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid #E8E8E8; }
-.preview-html h2 { font-size: 1.5em; margin-top: 2em; padding-bottom: 0.2em; border-bottom: 1px solid #E8E8E8; }
+.preview-html h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid rgb(var(--color-border-subtle)); }
+.preview-html h2 { font-size: 1.5em; margin-top: 2em; padding-bottom: 0.2em; border-bottom: 1px solid rgb(var(--color-border-subtle)); }
 .preview-html h3 { font-size: 1.25em; }
 .preview-html h4 { font-size: 1em; }
 
@@ -87,7 +94,7 @@ body {
 }
 
 .preview-html a {
-  color: #35D7BB;
+  color: rgb(var(--color-accent));
   text-decoration: none;
 }
 
@@ -97,14 +104,14 @@ body {
 
 .preview-html code {
   font-family: "Ubuntu Mono", Monaco, monospace;
-  background: #F5F7FA;
+  background: rgb(var(--color-bg-surface));
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-size: 0.9em;
 }
 
 .preview-html pre {
-  background: #F5F7FA;
+  background: rgb(var(--color-bg-surface));
   padding: 1em;
   border-radius: 3px;
   overflow-x: auto;
@@ -117,12 +124,12 @@ body {
 }
 
 .preview-html blockquote {
-  border-left: 4px solid #A0AABF;
+  border-left: 4px solid rgb(var(--color-border-strong));
   padding-left: 1em;
   margin-left: 0;
   margin-bottom: 1em;
   font-style: italic;
-  color: #666;
+  color: rgb(var(--color-text-secondary));
 }
 
 .preview-html ul,
@@ -147,18 +154,18 @@ body {
 
 .preview-html .table-striped tbody tr:nth-child(odd) td,
 .preview-html .table-striped tbody tr:nth-child(odd) th {
-  background: #f9f9f9;
+  background: rgb(var(--color-bg-surface) / 0.6);
 }
 
 .preview-html th,
 .preview-html td {
-  border: 1px solid #E8E8E8;
+  border: 1px solid rgb(var(--color-border-subtle));
   padding: 0.5em;
   text-align: left;
 }
 
 .preview-html th {
-  background: #F5F7FA;
+  background: rgb(var(--color-bg-surface));
   font-weight: 600;
 }
 
@@ -175,9 +182,9 @@ body {
 
 .preview-html .toc {
   padding: 1rem 1.25rem;
-  border: 1px solid #E8E8E8;
+  border: 1px solid rgb(var(--color-border-subtle));
   border-radius: 6px;
-  background: #F5F7FA;
+  background: rgb(var(--color-bg-surface));
   margin-bottom: 1.5rem;
 }
 
@@ -187,76 +194,16 @@ body {
 
 .preview-html hr {
   border: none;
-  border-top: 1px solid #E8E8E8;
+  border-top: 1px solid rgb(var(--color-border-subtle));
   margin: 2em 0;
 }
 
-/* Checkbox styling */
+/* Checkbox styling — accent-color did not previously exist for either
+   theme; this is a real fix, not just a rebrand (task list gap noted in
+   spec/14-color-theme-modernization/14d-preview-markdown-rendering.md). */
 .preview-html input[type="checkbox"] {
   margin-right: 0.5em;
-}
-
-/* Dark Mode Styles */
-.dark.preview-html {
-  color: #d4d4d4;
-}
-
-.dark.preview-html h1,
-.dark.preview-html h2,
-.dark.preview-html h3,
-.dark.preview-html h4,
-.dark.preview-html h5,
-.dark.preview-html h6 {
-  color: #e8e8e8;
-}
-
-.dark.preview-html h1 {
-  border-bottom-color: #444;
-}
-
-.dark.preview-html h2 {
-  border-bottom-color: #444;
-}
-
-.dark.preview-html a {
-  color: #35D7BB;
-}
-
-.dark.preview-html code {
-  background: #2d2d2d;
-  color: #d4d4d4;
-}
-
-.dark.preview-html pre {
-  background: #2d2d2d;
-}
-
-.dark.preview-html blockquote {
-  border-left-color: #555;
-  color: #aaa;
-}
-
-.dark.preview-html th,
-.dark.preview-html td {
-  border-color: #444;
-}
-
-.dark.preview-html th {
-  background: #2d2d2d;
-}
-
-.dark.preview-html .table-striped tbody tr:nth-child(odd) td,
-.dark.preview-html .table-striped tbody tr:nth-child(odd) th {
-  background: #252525;
-}
-
-.dark.preview-html .toc {
-  background: #2d2d2d;
-  border-color: #444;
-}
-
-.dark.preview-html hr {
-  border-top-color: #444;
+  accent-color: rgb(var(--color-accent));
 }
 
 /* BuySellAds LogoBar */

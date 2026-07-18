@@ -2,15 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useStore } from "@/stores/store";
-import { useResolvedTheme } from "@/components/providers/ThemeProvider";
 import { renderMarkdown } from "@/lib/markdown";
 
 export function MarkdownPreview() {
   const containerRef = useRef<HTMLDivElement>(null);
   const currentDocument = useStore((state) => state.currentDocument);
   const enableScrollSync = useStore((state) => state.settings.enableScrollSync);
-  const resolvedTheme = useResolvedTheme();
-  const enableNightMode = resolvedTheme === "dark";
   const editorScrollPercent = useStore((state) => state.editorScrollPercent);
   const editorTopLine = useStore((state) => state.editorTopLine);
   const [sanitizedHtml, setSanitizedHtml] = useState("");
@@ -76,11 +73,9 @@ export function MarkdownPreview() {
       <div
         id="preview"
         data-testid="preview-pane"
-        className={`h-full flex items-center justify-center ${
-          enableNightMode ? 'bg-[#1e1e1e]' : 'bg-transparent'
-        }`}
+        className="h-full flex items-center justify-center bg-transparent"
       >
-        <p className="text-text-muted text-sm">Start typing to see a preview</p>
+        <p className="text-text-secondary text-sm">Start typing to see a preview</p>
       </div>
     );
   }
@@ -90,9 +85,7 @@ export function MarkdownPreview() {
       ref={containerRef}
       id="preview"
       data-testid="preview-pane"
-      className={`preview-html h-full overflow-auto p-6 ${
-        enableNightMode ? 'dark bg-[#1e1e1e]' : 'bg-transparent'
-      }`}
+      className="preview-html h-full overflow-auto p-6 bg-transparent"
       dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />
   );

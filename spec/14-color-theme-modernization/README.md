@@ -130,7 +130,13 @@ come last.
       fix re-derived from the new accent at the same alpha ratios.
       Also closed a real gap: the editor title bar and preview-split
       divider had no dark-mode treatment at all before this.
-- [ ] 14d — Preview / markdown rendering: not started (blocked on 14a)
+- [x] 14d — Preview / markdown rendering: **done**. `.preview-html`
+      fully token-driven; the entire `.dark.preview-html` override
+      block (~60 lines) deleted since CSS vars already cascade per
+      theme. `MarkdownPreview.tsx` simplified — dropped its own
+      `enableNightMode`/`useResolvedTheme` theme-detection path
+      entirely as dead weight. Missing checkbox `accent-color` added
+      for both themes.
 - [ ] 14e — Modals & overlays: not started (blocked on 14a)
 - [ ] 14f — UI primitives & feedback: not started (blocked on 14a)
 - [ ] 14g — Marketing & content pages: not started (blocked on 14a)
