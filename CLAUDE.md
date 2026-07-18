@@ -407,7 +407,8 @@ Current coverage: **98% statements, 91% branches, 99.5% functions, 98% lines** (
 | `.env.local.example` | Required environment variables |
 | `app/layout.tsx` | Root layout with providers |
 | `components/editor/EditorContainer.tsx` | Main app shell |
-| `.impeccable.md` | Design system & context |
+| `app/globals.css` | Design tokens (CSS custom properties), theme values |
+| `spec/14-color-theme-modernization/` | Design system & color-theme rollout record |
 | `vitest.config.ts` | Vitest test runner config |
 | `vitest.setup.ts` | Test environment setup (mocks) |
 | `playwright.config.ts` | E2E test config |
@@ -426,10 +427,10 @@ Developers, technical writers, and content creators who need a distraction-free,
 
 ### Design Principles
 1. **Content is king.** Every UI element exists to serve the writing experience.
-2. **Quiet confidence.** Plum accent (#35D7BB) is the single bright voice in a neutral palette.
+2. **Quiet confidence.** Indigo-violet accent (#6C5CE7 light / #8174F0 dark) is the single bright voice in a neutral Zinc-based palette.
 3. **Polished, not decorated.** Quality is in spacing, alignment, transitions, typography — never ornament.
 4. **Progressive disclosure.** Show what's needed, hide what isn't.
 5. **Accessible by default.** WCAG AA minimum. Focus rings, contrast, keyboard nav, reduced-motion.
 
 ### Theme Modes
-Full support for light, dark, and system-preference modes. The plum accent (#35D7BB) remains constant across all themes. See `.impeccable.md` for full design system reference.
+Full support for light, dark, and system-preference modes, driven by `components/providers/ThemeProvider.tsx` and `settings.themePreference` (`"light" | "dark" | "system"`), switchable from Settings. The theme is implemented as CSS custom properties in `app/globals.css` (`:root` / `:root.dark`), mapped to semantic Tailwind tokens in `tailwind.config.ts` — `accent`, `bg-canvas`, `bg-surface`, `bg-chrome`, `text-primary`, `text-secondary`, `border-subtle`, `danger`, etc. — rather than literal hex values, so a token name resolves to the correct color for the active theme automatically. The accent hue itself shifts slightly between themes (a lighter, more saturated violet in dark mode) to hold WCAG AA contrast against both a white canvas and near-black chrome; every token pairing in both themes is contrast-checked, not just eyeballed. See `spec/14-color-theme-modernization/` for the full token architecture and rollout record.

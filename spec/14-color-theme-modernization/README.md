@@ -67,19 +67,21 @@ None of the sub-specs below invent their own colors — 14a is the only
 place new hex/OKLCH values get defined. Every other sub-spec consumes
 14a's tokens by name.
 
-## Proposed palette (14a decides the final values — this is the starting proposal)
+## Palette (as shipped — see 14a for the original proposal, 14h for the contrast-audit corrections)
 
-A concrete starting point, so 14a isn't blocked on a blank page. Final
-values are 14a's to lock in (see its "Open input needed" section) —
-treat these as a strong draft, not a commitment:
+Implemented per the original proposal below, with two values corrected
+during 14h's WCAG audit after actually computing contrast ratios
+(originals struck through):
 
-| Role | Proposed value | Notes |
-|---|---|---|
-| Accent (replaces plum) | `#6C5CE7` (indigo-violet) | Distinct hue family from teal/green; keeps the "single bright voice" principle from `CLAUDE.md` |
-| Accent hover/active | `#5A4BD1` | ~10% darker |
-| Neutral scale | Zinc-based (`#09090B` → `#FAFAFA`, 10 stops) | Cooler and less saturated than the current slate-blue (`#373D49` family), reads as more "modern SaaS" per the brand personality goal ("focused, capable, understated") |
-| Dark chrome surfaces | `#18181B` / `#111113` | Replaces `#2B2F36` / `#373D49` |
-| Success / warning / danger | `#22C55E` / `#F59E0B` / `#EF4444` | New — today's app has no consistent semantic status colors (e.g. `DeleteConfirmModal` uses ad hoc red) |
+| Role | Light | Dark | Notes |
+|---|---|---|---|
+| Accent (replaces plum) | `#6C5CE7` | `#8174F0` | Indigo-violet; distinct hue family from the retired teal/green. Dark value is lighter/more saturated for contrast against a near-black canvas. |
+| Accent hover/active | `#5A4BD1` | `#6C5CE7` | ~10% darker than the resting accent, per theme. |
+| Neutral scale | Zinc-based, `#09090B` → `#FAFAFA` | Same, theme-selected | Cooler/less saturated than the retired slate-blue (`#373D49` family). |
+| Chrome (navbar/sidebar/modals) | `#18181B` | `#09090B` | Always dark in both themes, by design — see 14b. |
+| Danger | ~~`#EF4444`~~ → `#DC2626` | `#F87171` | Light value darkened from the original proposal — `#EF4444` measured 3.76:1 against white (fails AA); `#DC2626` measures 4.83:1. |
+| Success / warning | `#22C55E` / `#F59E0B` (light), `#4ADE80` / `#FBBF24` (dark) | | Defined but not yet consumed anywhere live (no component currently needs a success/warning state). |
+| Text-on-accent | `#FFFFFF` | ~~`#FFFFFF`~~ → `#111113` | Dark value changed from a flat white (originally proposed) to near-black — white-on-dark-accent measured 3.69:1 (fails AA); near-black measures 5.11:1. Chosen over darkening the accent itself so the accent's other use as link text (already passing at 5.11:1) stayed untouched. |
 
 ## File ownership (avoids merge conflicts if sub-specs are picked up in parallel)
 
@@ -154,4 +156,17 @@ come last.
       sandbox. `npm run build` fails on a confirmed pre-existing,
       unrelated bug (`app/api/google-drive/save/route.ts`), not caused
       by this phase.
-- [ ] 14h — Verification & rollout: not started (blocked on 14b–14g)
+- [x] 14h — Verification & rollout: **implementation complete, not
+      deployed**. Repo-wide sweep confirms zero remaining references
+      to the old brand color/tokens (`tailwind.config.ts`'s 13 legacy
+      entries removed). A real WCAG contrast audit (computed, not
+      eyeballed) found and fixed two genuine AA failures — light-mode
+      `danger` text and dark-mode `text-on-accent` on the accent
+      button fill — by adjusting token values, not by working around
+      them per-component. `npm run lint`/`tsc`/unit tests all clean
+      (311/321, 10 pre-existing unrelated failures). `npm run
+      build`/`test:e2e`/`verify` could not run — pre-existing,
+      unrelated build bug in `app/api/google-drive/save/route.ts`,
+      confirmed via `git stash` to predate this phase. **Not deployed
+      to `staging`** — no AWS credentials in this sandbox, same
+      constraint as every other phase here.

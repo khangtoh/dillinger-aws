@@ -86,17 +86,24 @@ model.
   or CDN issue. **Not yet deployed** to the live `staging` Function URL;
   requires a tenant redeploy.
 - Color theme modernization (`spec/14-color-theme-modernization/`):
-  **specced, not started** — full rebrand moving entirely off the current
-  plum/teal (`#35D7BB`) accent and slate chrome palette onto a new
-  semantic-token design system (CSS custom properties + a real
-  light/dark/system `ThemeProvider`, closing a gap between `CLAUDE.md`'s
-  documented theme support and actual behavior). Split into 8 sub-specs
-  by UI component area (design tokens/infra, app chrome, editor surface,
-  preview/markdown rendering, modals, UI primitives, marketing pages,
-  final verification/rollout) so they can be picked up independently once
-  the foundational token sub-spec (14a) lands — same file-ownership
-  pattern as Phase 11's four parallel orchestrator modules. Final palette
-  values are pending user sign-off (see 14a's "Open input needed").
+  **implemented (all 8 sub-specs), not yet deployed** — full rebrand off
+  the retired plum/teal (`#35D7BB`) accent and slate chrome palette onto
+  a semantic-token design system (CSS custom properties in
+  `app/globals.css`, mapped through `tailwind.config.ts`; the old
+  literal-hex tokens are now fully removed, not just superseded) plus a
+  real light/dark/system `ThemeProvider`, closing the gap between
+  `CLAUDE.md`'s documented theme support and actual behavior. A
+  repo-wide grep confirms zero remaining references to the old brand
+  color outside historical spec records. A real WCAG contrast audit
+  (computed, not eyeballed) caught and fixed two genuine AA failures at
+  the token level. `lint`/`typecheck`/unit tests clean (311/321, the 10
+  failures pre-existing and confirmed unrelated via `git stash`);
+  `npm run build`/E2E/`verify` could not run in this sandbox — a
+  pre-existing, unrelated build bug in
+  `app/api/google-drive/save/route.ts`, also confirmed pre-existing.
+  **Not deployed to `staging`** — no AWS credentials in this sandbox,
+  the same constraint every other phase here operates under; requires a
+  tenant redeploy once credentials exist, same as Phase 13's fix above.
 
 ## Non-goals for v1
 

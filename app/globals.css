@@ -27,7 +27,7 @@
   --color-focus-ring: 108 92 231;
   --color-success: 34 197 94;
   --color-warning: 245 158 11;
-  --color-danger: 239 68 68;
+  --color-danger: 220 38 38;
 }
 
 :root.dark {
@@ -43,7 +43,7 @@
   --color-text-primary: 250 250 250;
   --color-text-secondary: 161 161 170;
   --color-text-inverse: 250 250 250;
-  --color-text-on-accent: 255 255 255;
+  --color-text-on-accent: 17 17 19;
   --color-border-subtle: 63 63 70;
   --color-border-strong: 113 113 122;
   --color-focus-ring: 129 116 240;

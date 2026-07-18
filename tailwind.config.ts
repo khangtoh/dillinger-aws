@@ -10,23 +10,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Legacy Dillinger brand tokens — retired by Phase 14
-        // (spec/14-color-theme-modernization/). Removed once every
-        // consumer migrates to the semantic tokens below (14h).
-        plum: "#35D7BB",
-        "bg-primary": "#ffffff",
-        "bg-sidebar": "#2B2F36",
-        "bg-navbar": "#373D49",
-        "bg-highlight": "#1D212A",
-        "bg-button-save": "#4A5261",
-        "text-invert": "#ffffff",
-        "text-muted": "#A0AABF",
-        "border-light": "#E8E8E8",
-        "border-settings": "#4F535B",
-        "icon-default": "#D3DAEA",
-        "dropdown-link": "#D0D6E2",
-        switchery: "#4B5363",
-
         // Phase 14 semantic tokens — backed by CSS custom properties in
         // app/globals.css (:root / :root.dark), so the same class name
         // resolves to the correct value for the active theme.

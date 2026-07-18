@@ -17,90 +17,141 @@ sections to describe the new theme instead of the old one.
 
 ### Completeness sweep
 
-- [ ] `grep -rn "35D7BB\|plum\|bg-sidebar\|bg-navbar\|bg-highlight\|bg-button-save\|border-settings\|switchery\|dropdown-link\|icon-default" --include="*.ts" --include="*.tsx" --include="*.css"` across the whole repo returns **zero** matches outside of `spec/13-editor-selection-highlight-bug.md` and this phase's own spec files (historical record, not live code) — this is the single task that proves "moved entirely away from Dillinger's current brand color," not just "added a new one alongside it."
-- [ ] Remove the now-dead literal-hex color entries from
-      `tailwind.config.ts` (the task 14a deferred to here specifically so
-      it wouldn't break 14b–14g mid-migration).
-- [ ] Confirm no component still imports or references a hardcoded hex
-      color string that duplicates a semantic token's value (a common
-      half-migration bug: the class name changed but a `style={{ color:
-      "#..." }}` inline override was missed).
+- [x] Full-repo grep (`35D7BB|plum|bg-sidebar|bg-navbar|bg-highlight|bg-button-save|border-settings|switchery|dropdown-link|icon-default`, `.ts`/`.tsx`/`.css`) returns **zero** matches outside `spec/` (historical record) and one intentional comment in `MonacoEditor.tsx` documenting *why* the old hex was replaced. Also found and fixed two files no earlier sub-spec's file-ownership table covered: `lib/export.ts` (the "styled HTML" export feature's embedded static CSS — 7 hex values) and `app/opengraph-image.tsx`/`public/site.webmanifest` (already caught in 14g). This grep is what actually proves "moved entirely away," not just "added a new one alongside it."
+- [x] Removed the 13 dead legacy-token entries from `tailwind.config.ts`
+      (`plum`, `bg-primary`, `bg-sidebar`, `bg-navbar`, `bg-highlight`,
+      `bg-button-save`, `text-invert`, `text-muted`, `border-light`,
+      `border-settings`, `icon-default`, `dropdown-link`, `switchery`) —
+      confirmed safe only after re-running the completeness grep above
+      showed zero live consumers left.
+- [x] Checked for hardcoded hex duplicating a token value: found and
+      fixed `lib/export.ts` (static export CSS, can't reference CSS
+      vars — recolored with literal hex matching the new light-mode
+      token values, same treatment as the OG image in 14g).
 
 ### Accessibility / contrast audit
 
-- [ ] Run every text/background pairing defined in 14a's token table
-      through a WCAG contrast checker (e.g. the same tool/method used
-      for any prior accessibility work in this repo, or a scriptable
-      contrast-ratio check) for both light and dark mode: body text on
-      canvas, secondary text on canvas, text-inverse on chrome,
-      text-on-accent on accent, link text in the preview pane on its
-      background.
-- [ ] Confirm every pairing meets **WCAG AA** (4.5:1 for normal text,
-      3:1 for large text/UI components) per `CLAUDE.md`'s stated
-      accessibility principle — this is a hard requirement, not
-      best-effort; if the proposed accent fails against one background,
-      that's a finding to take back to 14a's palette, not something to
-      wave through.
-- [ ] Confirm focus rings (`focus-ring` token) are visible against every
-      surface they can appear on (canvas, chrome, surface-raised,
-      accent-colored buttons).
-- [ ] Confirm the `success` / `warning` / `danger` semantic tokens are
-      distinguishable from each other and from `accent` for a
-      deuteranopia/protanopia simulation (common red-green color
-      vision deficiency) — don't rely on color alone to distinguish
-      toast variants; confirm icons/text already carry the meaning
-      redundantly (check `Toast.tsx`'s existing variant icons, if any).
+- [x] **Actually computed** (Python script implementing the WCAG
+      relative-luminance/contrast-ratio formula, not eyeballed) every
+      pairing this task lists, both themes. Two real, measured
+      failures found:
+      - Light-mode `danger` (`#EF4444`) as text on `bg-canvas`: **3.76:1,
+        fails** normal-text AA (needs 4.5:1). Used by Sidebar's
+        "Unlink" link text.
+      - Dark-mode `text-on-accent` (white) on the dark `accent` button
+        fill (`#8174F0`): **3.69:1, fails**.
+- [x] Both fixed at the token source, not worked around per-component:
+      - `--color-danger` (light) darkened `#EF4444` → `#DC2626`
+        (Tailwind red-600) → **4.83:1, passes**. Dark-mode danger
+        (`#F87171`) was already passing (6.82:1), left unchanged.
+      - `--color-text-on-accent` made theme-differentiated instead of
+        a flat white: stays `#FFFFFF` in light mode (already passing,
+        4.86:1), becomes near-black `#111113` in dark mode →
+        **5.11:1, passes** — and because this only changes the
+        *button-text* color, not the accent hue itself, the dark
+        accent's other use as preview-pane link text (5.11:1) was
+        completely unaffected by the fix.
+      - Re-ran the full contrast script after both fixes: **every
+        pairing passes AA**, including the delete-button combinations
+        (`bg-danger` + `text-on-accent`, both themes: 4.83:1 / 6.82:1)
+        and the delete-icon-on-tinted-circle non-text pairing (3.16:1
+        light / 5.57:1 dark, both above the 3:1 non-text threshold).
+- [x] Focus rings: `focus-ring` token traced through every consuming
+      component in 14a–14g — all use `focus-visible:ring-2
+      focus-visible:ring-focus-ring`, resolving to the accent hue in
+      both themes, which is confirmed high-contrast against every
+      surface it appears on per the audit above.
+- [x] `success`/`warning`/`danger` vs. `accent` under color-vision
+      deficiency: not independently simulated (no CVD-simulation
+      tooling in this sandbox), but the risk is moot for the reason
+      14f already found — `Toast.tsx` has no variant system at all (no
+      success/warning/danger toast exists in the actual codebase to
+      color-code), and the only live use of `danger` (destructive
+      buttons, delete icon) always pairs the color with explicit text
+      ("Delete", "Cancel") or an icon (`AlertTriangle`), never color
+      alone.
 
 ### Visual regression / cross-surface coherence
 
-- [ ] Full manual pass through every surface touched by 14b–14g, in
-      both light and dark mode, using the theme-preference toggle added
-      in 14a (not just OS-level dark mode): navbar, sidebar, editor,
-      preview, all 7 modals, toasts, skeletons, keyboard-shortcuts
-      overlay, 404/error pages, and at least 3 marketing content pages.
-- [ ] If Playwright visual/screenshot tests exist for any of these
-      surfaces (check `tests/e2e/`), update baseline screenshots and
-      confirm they pass; if none exist for a given surface, note that as
-      a gap rather than silently skipping verification for it.
-- [ ] Run the full test suite: `npm run verify` (lint + typecheck + unit
-      + E2E per `CLAUDE.md`'s Quick Reference) clean from a fresh
-      install.
-- [ ] Confirm coverage hasn't regressed below the documented baseline
-      (98% statements / 91% branches / 99.5% functions / 98% lines per
-      `CLAUDE.md`) — a pure styling change shouldn't reduce coverage,
-      but renamed class names can break assertions in ways that
-      silently reduce effective test value even if the numeric
-      percentage holds.
+- [x] Manual pass done via real Playwright + this sandbox's
+      pre-installed Chromium (not skipped for lack of a browser, as
+      earlier sub-specs assumed): navbar, sidebar, editor chrome,
+      preview pane, and the light/dark toggle itself all confirmed
+      working live in 14g. Not individually re-screenshotted here:
+      the 7 modals, toasts, skeleton, keyboard-shortcuts overlay,
+      404/error pages — flagging this as a real gap rather than
+      claiming full coverage.
+- [x] No Playwright visual/screenshot-diff tests exist in `tests/e2e/`
+      for any of these surfaces (checked — the E2E suite asserts
+      behavior/DOM state, not pixel screenshots) — nothing to update,
+      and no baseline-image infrastructure exists to add one to
+      within this phase's scope.
+- [x] `npm run lint` and `npx tsc --noEmit`: clean (same pre-existing,
+      unrelated error set throughout this phase). `npm run test:unit`:
+      **311/321 passing**; all 10 failures confirmed via `git stash`
+      against the pre-Phase-14 commit to be pre-existing and
+      unrelated (6 navbar `handleExport` — `Response`/`Blob` polyfill
+      gap; 3 toast — fake-timer/animation timing; 1 settings-modal —
+      dialog-render race). **`npm run test:e2e` / `npm run verify`
+      could not run**: both depend on `npm run build`, which fails on
+      a pre-existing, unrelated bug in
+      `app/api/google-drive/save/route.ts` (confirmed via `git stash`
+      to fail identically before this phase). This is a real
+      limitation of this verification pass, not something to paper
+      over — the E2E suite (which does exercise editor/settings/
+      import-export flows) never actually ran against this phase's
+      changes.
+- [x] Coverage: cannot be measured either, for the same `npm run
+      build` blocker (coverage tooling runs through the same build
+      path). Reasoned instead: no test was deleted, 2 new test files
+      were added (`theme-provider.test.tsx`, its own 3 tests), and
+      every existing test that broke on a renamed class name was
+      fixed to assert the new name, not weakened or removed — so
+      there's no mechanism by which this phase could have reduced
+      effective coverage, even though the exact percentage is
+      unverified.
 
 ### Documentation
 
-- [ ] Update `CLAUDE.md`'s "Design Context" section (Brand Personality,
-      Theme Modes, and the specific "#35D7BB... single bright voice"
-      line) to describe the new palette instead of the old one.
-- [ ] Update or remove the `.impeccable.md` reference in `CLAUDE.md`'s
-      Key Files Reference table if that file doesn't actually exist in
-      the repo (confirmed absent as of this phase being written) — either
-      create it as the actual design-system reference this phase
-      produces, or stop pointing to a nonexistent file.
-- [ ] Update any screenshot or color swatch embedded in `README.md` /
-      `ARCHITECTURE.md` if either references the old brand color
-      visually, not just in prose.
+- [x] `CLAUDE.md`'s Design Principles and Theme Modes sections
+      rewritten: the "#35D7BB... single bright voice" line now
+      describes the new accent and the actual token-driven
+      architecture (naming the CSS-variable/Tailwind-mapping pattern
+      and the WCAG-audit process itself), not just a color swap in
+      prose.
+- [x] `.impeccable.md` reference in the Key Files Reference table
+      removed (file confirmed not to exist) and replaced with two real
+      pointers: `app/globals.css` (the actual token source) and
+      `spec/14-color-theme-modernization/` (the design record).
+- [x] `README.md` and `ARCHITECTURE.md` checked — neither references
+      the old brand color in prose or an embedded swatch; nothing to
+      change.
 
 ### Rollout
 
-- [ ] Confirm this phase's changes are pure client-side styling with no
-      new environment variables, infra changes, or API surface changes
-      — so rollout is a normal deploy through the existing Phase 7 CI/CD
-      pipeline and Phase 11 orchestrator, not a special procedure.
-- [ ] Deploy to the `staging` tenant via the existing deploy workflow and
-      visually confirm the new theme is live, the same way Phase 13's
-      fix is documented as still pending a redeploy in
-      `spec/README.md`'s Status section — update that Status section's
-      Phase 13 entry and add a Phase 14 entry once this phase's changes
-      are actually live, not just merged.
-- [ ] Record a rollback note: reverting this phase is a straightforward
-      revert of the merged PRs (styling-only, no data migration), but
-      call out explicitly if 14a's `themePreference` addition to
-      `stores/store.ts`'s persisted schema needs a compatibility note
-      for users who already have the old (theme-preference-less) schema
-      cached in `localStorage`.
+- [x] Confirmed pure client-side styling: no new environment variables,
+      no infra/CI changes, no API route changes (the two non-component
+      files touched, `lib/export.ts` and `app/opengraph-image.tsx`,
+      are presentation-only — export CSS and a static OG image). Normal
+      deploy path applies, no special procedure needed.
+- [ ] **Not deployed to `staging`** — this implementation pass ran
+      entirely in this sandbox (no AWS credentials available, same
+      constraint every other phase in this repo operates under). The
+      code is committed and ready; deploying is a `provision-tenant.sh`
+      / orchestrator run against real AWS, out of reach here. Not
+      marking this done to avoid the same "merged but not live" gap
+      Phase 13 explicitly called out — `spec/README.md`'s Status
+      section is updated to say exactly this, not more.
+- [x] Rollback note: reverting this phase is a plain revert of these 8
+      commits (14a–14h), styling-only, no data migration. One real
+      compatibility note: 14a's `themePreference` field replaced the
+      old `enableNightMode` boolean inside `UserSettings` rather than
+      living alongside it. A user with an old `profileV3` in
+      `localStorage` (containing `enableNightMode` but no
+      `themePreference`) will simply get the new default
+      (`themePreference: "system"`) via `DEFAULT_SETTINGS` merge in
+      `hydrate()` — their old explicit night-mode choice, if any, is
+      not migrated forward and silently resets to "system." This is a
+      one-time, non-destructive UX papercut (their documents are
+      unaffected), not a data-loss risk, but worth knowing before
+      shipping.
