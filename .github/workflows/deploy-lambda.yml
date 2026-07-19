@@ -17,6 +17,12 @@ name: Deploy Dillinger (staging tenant)
 #   - keep push-triggered but add a `environment: production` block on the
 #     `deploy` job referencing a GitHub Environment with required reviewers,
 #     for a manual-approval gate before each deploy.
+#
+# The `deploy` job's `if:` below is a branch allowlist (workflow_dispatch
+# itself can be run from any branch, but only these actually deploy) —
+# currently `main` plus `claude/dillinger-modernize-specs-lkxwah` (Phase 14
+# color-theme rebrand) so it can be verified against the live staging
+# tenant before merging. Remove the extra branch once merged to main.
 on:
   workflow_dispatch: {}
 
@@ -66,7 +72,7 @@ jobs:
 
   deploy:
     needs: security
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/claude/dillinger-modernize-specs-lkxwah'
     runs-on: ubuntu-latest
     environment: staging
     concurrency:
