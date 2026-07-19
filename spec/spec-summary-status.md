@@ -63,16 +63,35 @@ phase number or count process-document headings as implementation tasks.
 
 | Phase | Scope | Progress | Status |
 |---|---|---:|---|
-| `[NN](relative-link-to-spec)` | Short purpose of the phase | `checked/total` | `Complete`, `Partial`, `Not started`, or a concise qualified status |
+| `[NN](relative-link-to-spec)` | Short purpose of the phase | `checked/total` | Emoji indicator + `Complete`, `Partial`, `Not started`, or a concise qualified status |
+
+### Status emoji indicators
+
+Every Status cell **must begin with exactly one** of these indicators so
+completed phases are visually distinguishable at a glance (GitHub-flavored
+markdown has no color support, so emojis are the highlight mechanism):
+
+| Emoji | Meaning |
+|---|---|
+| ✅ | Complete — every checkbox checked and acceptance language satisfied |
+| 🟡 | Partial — real progress made, unchecked tasks remain |
+| ⬜ | Not started — no checkboxes checked |
+| ⛔ | Blocked — a named dependency or external decision prevents progress |
+
+The emoji is a highlight, not a substitute for evidence-bearing text: the
+written status after it is still required and still controls. ✅ may only be
+used when the phase would qualify as `Complete` under the source-of-truth
+rules above; qualified statuses such as `Operational; verification pending`
+take 🟡 even when the main outcome is live.
 
 Status language should be evidence-bearing. Prefer:
 
-- `Complete`
-- `Complete; later visual decision superseded by Phase 20`
-- `Operational; two deployment-proof tasks remain`
-- `Clarification complete; implementation pending`
-- `Not started`
-- `Blocked by Phase 20 visual acceptance`
+- `✅ Complete`
+- `✅ Complete; later visual decision superseded by Phase 20`
+- `🟡 Operational; two deployment-proof tasks remain`
+- `🟡 Clarification complete; implementation pending`
+- `⬜ Not started`
+- `⛔ Blocked by Phase 20 visual acceptance`
 
 Avoid vague labels such as `Mostly done`, `Looks good`, or `In progress`
 without naming what is complete and what remains.
@@ -135,7 +154,7 @@ handoff format for partial progress.
 
 | Phase | Scope | Progress | Status |
 |---|---|---:|---|
-| [NN](spec/NN-name.md) | Phase purpose | X/Y | Complete/Partial/Not started; concise evidence or caveat |
+| [NN](spec/NN-name.md) | Phase purpose | X/Y | ✅/🟡/⬜/⛔ Complete/Partial/Not started/Blocked; concise evidence or caveat |
 
 | Component or deliverable | Implementation status | Verification or remaining work |
 |---|---|---|

@@ -50,28 +50,33 @@ closing one out.
 
 ## Phases
 
-| # | File | Purpose | Blocking dependency |
-|---|------|---------|----------------------|
-| 1 | [01-aws-account-onboarding.md](01-aws-account-onboarding.md) | Get working AWS credentials in this environment | **User action required** |
-| 2 | [02-architecture-plan.md](02-architecture-plan.md) | Decide how Dillinger maps onto Lambda | None (design only) |
-| 3 | [03-execution-containerize.md](03-execution-containerize.md) | Build the Lambda-compatible container image | Phase 2 |
-| 4 | [04-execution-infra.md](04-execution-infra.md) | Provision AWS infra (ECR, Lambda, Function URL) | Phase 1 + 3 |
-| 5 | [05-execution-oauth-secrets.md](05-execution-oauth-secrets.md) | Wire up optional cloud-storage OAuth integrations | Phase 4 (optional/stretch) |
-| 6 | [06-execution-pdf-export.md](06-execution-pdf-export.md) | Handle Puppeteer/Chromium PDF export on Lambda | Phase 4 (optional/stretch) |
-| 7 | [07-execution-cicd.md](07-execution-cicd.md) | Automate build+deploy on push | Phase 4 |
-| 8 | [08-testing.md](08-testing.md) | Verify the deployment actually works | Phase 4 |
-| 9 | [09-multi-tenancy.md](09-multi-tenancy.md) | Multi-user: isolated single-tenant instance per user | Phase 4 |
-| 10 | [10-gateway.md](10-gateway.md) | Single entry gateway routing to each tenant | Phase 9 |
-| 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | Phase 9 + 10 |
-| 12 | [12-security-hardening.md](12-security-hardening.md) | Close repository, AWS, credential, and operational security findings | Phase 7 + 8 + 10 + 11 |
-| 13 | [13-ui-refresh-requirements.md](13-ui-refresh-requirements.md) | UI-refresh requirements and evaluations: current UI audit, Astryx evaluation, StackEdit gap analysis, product-direction decision, AI-native scope (design only) | None (builds on the live Phase 1-12 milestone) |
-| 14 | [14-astryx-design-system-adoption.md](14-astryx-design-system-adoption.md) | Spike Astryx alongside Tailwind; explicit go/no-go gate | Phase 13 (unblocked 2026-07-12 — Phase 19 landed Next 15.5.20/React 19.2.7/StyleX 0.18.3, dry-run install confirmed clean). **Complete, Go call recorded 2026-07-13.** |
-| 15 | [15-ui-component-migration.md](15-ui-component-migration.md) | Migrate components to Astryx; ship toolbar, scroll-sync, diagrams, command palette, theming | Phase 14 (Go) |
-| 16 | [16-notes-information-architecture.md](16-notes-information-architecture.md) | Folders/tags/search on top of the client-only document model | Phase 13 (data model); Phase 15 (sidebar surface) |
-| 17 | [17-ai-agent-native-features.md](17-ai-agent-native-features.md) | Real AI-native product features: document API contract, in-editor AI actions, follow-on MCP server | Phase 13; AI-3 needs Phase 15's command palette |
-| 18 | [18-ui-verification-and-testing.md](18-ui-verification-and-testing.md) | Prove the UI refresh works live, includes the clean visual rebrand, and closes the StackEdit gap | Phase 15 + 16 + 17 (AI-1/AI-3) + 20 |
-| 19 | [19-incremental-stack-upgrade-for-astryx.md](19-incremental-stack-upgrade-for-astryx.md) | Incrementally land Next 15.5.20, then React 19.2.7, then StyleX 0.18.3 — Astryx's actual minimum requirements | None (executes Phase 12's stack-upgrade item); unblocks Phase 14 |
-| 20 | [20-clean-visual-rebrand.md](20-clean-visual-rebrand.md) | Replace the legacy Dillinger palette, typography, shell, component styling, and Markdown presentation with an owned visual system | Phase 14 + 15; blocks Phase 18 visual acceptance |
+Status column legend (defined in
+[`spec-summary-status.md`](spec-summary-status.md)): ✅ complete ·
+🟡 partial · ⬜ not started · ⛔ blocked. Progress is `checked/total`
+boxes in the phase file; keep both in sync when checking boxes.
+
+| # | File | Purpose | Status | Blocking dependency |
+|---|------|---------|--------|----------------------|
+| 1 | [01-aws-account-onboarding.md](01-aws-account-onboarding.md) | Get working AWS credentials in this environment | ✅ 8/8 | **User action required** |
+| 2 | [02-architecture-plan.md](02-architecture-plan.md) | Decide how Dillinger maps onto Lambda | ✅ 10/10 | None (design only) |
+| 3 | [03-execution-containerize.md](03-execution-containerize.md) | Build the Lambda-compatible container image | 🟡 6/8 | Phase 2 |
+| 4 | [04-execution-infra.md](04-execution-infra.md) | Provision AWS infra (ECR, Lambda, Function URL) | 🟡 9/10 | Phase 1 + 3 |
+| 5 | [05-execution-oauth-secrets.md](05-execution-oauth-secrets.md) | Wire up optional cloud-storage OAuth integrations | ⬜ 0/8 | Phase 4 (optional/stretch) |
+| 6 | [06-execution-pdf-export.md](06-execution-pdf-export.md) | Handle Puppeteer/Chromium PDF export on Lambda | ✅ 7/7 | Phase 4 (optional/stretch) |
+| 7 | [07-execution-cicd.md](07-execution-cicd.md) | Automate build+deploy on push | ✅ 6/6 | Phase 4 |
+| 8 | [08-testing.md](08-testing.md) | Verify the deployment actually works | 🟡 10/12 | Phase 4 |
+| 9 | [09-multi-tenancy.md](09-multi-tenancy.md) | Multi-user: isolated single-tenant instance per user | 🟡 8/14 | Phase 4 |
+| 10 | [10-gateway.md](10-gateway.md) | Single entry gateway routing to each tenant | 🟡 8/12 | Phase 9 |
+| 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | ✅ 2/2 | Phase 9 + 10 |
+| 12 | [12-security-hardening.md](12-security-hardening.md) | Close repository, AWS, credential, and operational security findings | 🟡 14/129 | Phase 7 + 8 + 10 + 11 |
+| 13 | [13-ui-refresh-requirements.md](13-ui-refresh-requirements.md) | UI-refresh requirements and evaluations: current UI audit, Astryx evaluation, StackEdit gap analysis, product-direction decision, AI-native scope (design only) | ✅ 7/7 | None (builds on the live Phase 1-12 milestone) |
+| 14 | [14-astryx-design-system-adoption.md](14-astryx-design-system-adoption.md) | Spike Astryx alongside Tailwind; explicit go/no-go gate | ✅ 22/22 | Phase 13 (unblocked 2026-07-12 — Phase 19 landed Next 15.5.20/React 19.2.7/StyleX 0.18.3, dry-run install confirmed clean). **Complete, Go call recorded 2026-07-13.** |
+| 15 | [15-ui-component-migration.md](15-ui-component-migration.md) | Migrate components to Astryx; ship toolbar, scroll-sync, diagrams, command palette, theming | ✅ 36/36 | Phase 14 (Go) |
+| 16 | [16-notes-information-architecture.md](16-notes-information-architecture.md) | Folders/tags/search on top of the client-only document model | 🟡 4/19 | Phase 13 (data model); Phase 15 (sidebar surface) |
+| 17 | [17-ai-agent-native-features.md](17-ai-agent-native-features.md) | Real AI-native product features: document API contract, in-editor AI actions, follow-on MCP server | ⬜ 0/23 | Phase 13; AI-3 needs Phase 15's command palette |
+| 18 | [18-ui-verification-and-testing.md](18-ui-verification-and-testing.md) | Prove the UI refresh works live, includes the clean visual rebrand, and closes the StackEdit gap | ⛔ 0/17 | Phase 15 + 16 + 17 (AI-1/AI-3) + 20 |
+| 19 | [19-incremental-stack-upgrade-for-astryx.md](19-incremental-stack-upgrade-for-astryx.md) | Incrementally land Next 15.5.20, then React 19.2.7, then StyleX 0.18.3 — Astryx's actual minimum requirements | 🟡 35/43 | None (executes Phase 12's stack-upgrade item); unblocks Phase 14 |
+| 20 | [20-clean-visual-rebrand.md](20-clean-visual-rebrand.md) | Replace the legacy Dillinger palette, typography, shell, component styling, and Markdown presentation with an owned visual system | 🟡 6/44 | Phase 14 + 15; blocks Phase 18 visual acceptance |
 
 ## Status
 
