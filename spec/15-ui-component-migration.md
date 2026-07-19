@@ -8,6 +8,36 @@ test.
 
 Depends on: Phase 14 **Go** decision.
 
+> **Visual requirement superseded and extracted — 2026-07-19.** This phase
+> is a completed component/behavior migration, and its old requirement not to
+> regress the plum brand is retained above as historical evidence only. The
+> user has decided to replace the legacy Dillinger theme completely. Phase 20
+> now owns the visual redesign and Phase 18 cannot close until it is complete.
+> See [`20-clean-visual-rebrand.md`](20-clean-visual-rebrand.md).
+
+### Phase 20 carry-forward inventory
+
+The following completed Phase 15 choices explain why the branch still looks
+like legacy Dillinger and are explicitly extracted into Phase 20 as removal
+or redesign work:
+
+- Navbar `text-text-invert hover:text-plum` overrides retained the old dark
+  bar and accent while swapping button primitives.
+- Modal primary CTAs used `bg-plum text-bg-sidebar` to override Astryx's
+  neutral theme instead of creating an owned replacement theme.
+- `Providers.tsx` still mounts `neutralTheme`; it proves theme mechanics but
+  is not the new product identity.
+- `.preview-html * { color: #373D49; }` and the legacy preview fonts/colors
+  were compatibility fixes, not a final document design.
+- Phase 15's light/dark screenshots prove migrated components remained
+  usable; they are `before` evidence for the rebrand, not final visual-
+  regression baselines.
+
+All shipped functionality, Astryx primitive adoption, persisted theme-mode
+state, accessibility behavior, and test evidence in this file remain valid.
+Do not reimplement them in Phase 20; restyle them through the owned theme and
+new shell, then delete the compatibility overrides.
+
 ## Working rules
 
 - Migrate one component per task group; each group must pass its own

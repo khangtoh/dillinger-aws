@@ -32,6 +32,11 @@ work happened nearby. Follow that chain exactly; don't shortcut it.
    files whose title matches. Requirements live in "Decisions" sections
    (e.g. spec/13's Decisions), the Goal/Depends-on line at the top of
    each phase file, and the Status/Non-goals sections of spec/README.md.
+   When a historical requirement has an explicit dated supersession or
+   extraction notice, the latest decision controls: report the old wording as
+   historical context, not as a second active requirement. Follow its link to
+   the replacement phase (for example, Phase 13's preserve-plum assumption is
+   superseded by Phase 20's clean visual rebrand).
    List every requirement found, one line each, with its exact source
    (file + section).
 
@@ -69,6 +74,11 @@ work happened nearby. Follow that chain exactly; don't shortcut it.
    - If not fully met: list the specific unchecked items blocking it,
      across all mapped specs, in priority/dependency order, so picking
      this back up doesn't require re-deriving where it left off.
+   - Append the mandatory `Spec Summary/Status` section from
+     `spec/spec-summary-status.md`: use the exact
+     `Phase | Scope | Progress | Status` table for every mapped phase,
+     the applicable component/deliverable table, and the required
+     `Overall`, `Evidence`, and `Change state` closing lines.
 
 Do not mark anything "Met" on inference. A requirement is satisfied only
 if its mapped spec's relevant checklist items are actually checked off

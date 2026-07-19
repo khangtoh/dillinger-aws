@@ -1,14 +1,26 @@
 # Phase 18 — UI Refresh Verification & Regression Testing
 
-Goal: prove the whole UI-refresh initiative (Phases 14-17) actually works
-end-to-end — in a real browser, against the live Lambda deployment, not
-just green unit tests — and that it measurably closes the StackEdit gap
-identified in Phase 13 Section C. Mirrors the role Phase 8 played for the
-original Lambda migration.
+Goal: prove the whole UI-refresh initiative (Phases 14-17 plus Phase 20's
+visual replacement) actually works end-to-end — in a real browser, against
+the live Lambda deployment, not just green unit tests — and that it
+measurably closes the StackEdit gap identified in Phase 13 Section C while
+delivering the clean visual break defined in Phase 20. Mirrors the role
+Phase 8 played for the original Lambda migration.
 
 Depends on: Phase 15 (component migration), Phase 16 (folders/tags), and
-Phase 17's AI-1 + AI-3 (AI-2 has its own smoke test in Phase 17 and isn't
-re-gated here). Assumes a live Function URL already exists per Phase 8/9.
+Phase 17's AI-1 + AI-3, plus Phase 20 (clean visual rebrand). AI-2 has its
+own smoke test in Phase 17 and is not re-gated here. Assumes a live Function
+URL already exists per Phase 8/9.
+
+> **Visual requirements extracted — 2026-07-19.** This phase originally
+> treated preservation of the plum accent as its visual acceptance target.
+> That target is superseded. The detailed visual requirements, component and
+> route screenshot matrix, legacy-token removal rules, responsive baselines,
+> and visual definition of done now live in
+> [`20-clean-visual-rebrand.md`](20-clean-visual-rebrand.md). Phase 18 does
+> not duplicate that checklist: it confirms Phase 20 is complete, then
+> verifies the same result against the live Function URL alongside the
+> functional, performance, accessibility, and StackEdit-parity checks here.
 
 ## Working rules
 
@@ -43,16 +55,23 @@ re-gated here). Assumes a live Function URL already exists per Phase 8/9.
 
 ## Visual and theming verification
 
-- [ ] Capture before/after screenshots (light and dark mode) for every
-      component migrated in Phase 15, using the Phase 15 dark-mode
-      screenshots as the "after" baseline for future visual-regression
-      comparison.
-- [ ] Manually verify the plum accent (or Phase 13-approved theme) renders
-      consistently across all migrated components in both modes — no
-      component silently falling back to an Astryx default color.
+- [ ] Confirm every Phase 20 implementation, cleanup, and visual-acceptance
+      checkbox is complete and its Results log contains the token inventory,
+      contrast results, screenshot locations, test results, and branch deploy
+      URL; do not infer completion from this phase's live checks.
+- [ ] Use Phase 20's desktop/tablet/mobile screenshots as the `after`
+      visual-regression baselines. Treat Phase 15's plum-theme screenshots as
+      labeled `before` evidence only.
+- [ ] Against the live deployment, verify the owned Dillinger Astryx theme
+      renders consistently in both modes, no component falls back to
+      `theme-neutral`, and the prohibited legacy tokens/colors do not appear
+      in computed application-chrome styles.
 - [ ] Verify the theme selector added in Phase 15 persists across a full
       page reload and across a fresh browser session against the live
       Function URL (not just localhost).
+- [ ] Record a live before/after verdict that the new palette, typography,
+      application shell, component treatment, and Markdown presentation
+      cannot be mistaken for the legacy Dillinger UI.
 
 ## Live deployment verification
 
@@ -62,8 +81,9 @@ re-gated here). Assumes a live Function URL already exists per Phase 8/9.
       (Phase 7), not a manual credential-based deploy.
 - [ ] Open the live Function URL in a real browser (matching Phase 8's
       method) and confirm: the app loads, Monaco renders, the new toolbar
-      and command palette are present and functional, folders/tags work,
-      and no console errors or failed network requests occur.
+      and command palette are present and functional, folders/tags work, the
+      Phase 20 visual system is present at all target viewport sizes, and no
+      console errors or failed network requests occur.
 - [ ] Measure cold-start and warm-request latency on the UI-refreshed
       build and compare against Phase 8's recorded baseline (Init
       Duration 1437ms cold, ~0.6s warm) — record any regression; a UI
@@ -88,9 +108,9 @@ re-gated here). Assumes a live Function URL already exists per Phase 8/9.
 ## Close-out
 
 - [ ] Once every section above is green/closed, update `spec/README.md`:
-      check off Phases 14-18, add a "UI refresh live" status line with
-      the tenant URL and date, matching the existing "Dillinger is live on
-      AWS Lambda" status-line convention.
+      check off the applicable Phases 14-20, add a "UI refresh and clean
+      visual rebrand live" status line with the tenant URL and date, matching
+      the existing "Dillinger is live on AWS Lambda" status-line convention.
 - [ ] Record final coverage numbers, bundle-size delta (vs. Phase 14's
       baseline), and cold/warm latency numbers in the Results log below.
 

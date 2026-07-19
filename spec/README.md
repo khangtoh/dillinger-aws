@@ -9,13 +9,19 @@ Docker-host/ECS/EC2-style deployment.
 
 ## How this spec set works
 
-- Every file under `spec/` is a phase. Every phase is a flat checklist of
+- Every numbered file under `spec/` is a phase. Every phase is a flat checklist of
   **atomic tasks** — each should be completable in under ~5 minutes.
+  Unnumbered files such as `spec-summary-status.md` are process definitions or
+  supporting records, not implementation phases.
 - Check a box (`- [x]`) only once the task is actually done and, where
   applicable, verified.
+- Every completed, partial, blocked, or documentation-only task handoff must
+  include the canonical `Spec Summary/Status` report defined in
+  [`spec-summary-status.md`](spec-summary-status.md).
 - Work phases in order: a phase's tasks assume prior phases are checked off.
 - A scheduled agent picks up the next unchecked box, does it, verifies it,
-  checks it off, commits, and moves to the next one — repeating until
+  updates its checkbox and required Results/status records, produces the
+  mandatory `Spec Summary/Status` handoff, commits, and moves on — repeating until
   `spec/08-testing.md` is fully checked and a live Function URL is recorded
   below.
 
@@ -29,6 +35,11 @@ model.
 prompt that traces a stated goal through requirements → mapped spec
 phases → actual checkbox state, instead of answering from impression.
 Use it before telling anyone something ships.
+
+**How must agents report spec status?**
+[`spec-summary-status.md`](spec-summary-status.md) — the canonical phase and
+component/deliverable tables, counting rules, closing evidence fields, and
+mandatory completion procedure for every agent handoff.
 
 **What actually happened, session by session?**
 [`agent-session-ledger.md`](agent-session-ledger.md) — a dated log of
@@ -58,8 +69,9 @@ closing one out.
 | 15 | [15-ui-component-migration.md](15-ui-component-migration.md) | Migrate components to Astryx; ship toolbar, scroll-sync, diagrams, command palette, theming | Phase 14 (Go) |
 | 16 | [16-notes-information-architecture.md](16-notes-information-architecture.md) | Folders/tags/search on top of the client-only document model | Phase 13 (data model); Phase 15 (sidebar surface) |
 | 17 | [17-ai-agent-native-features.md](17-ai-agent-native-features.md) | Real AI-native product features: document API contract, in-editor AI actions, follow-on MCP server | Phase 13; AI-3 needs Phase 15's command palette |
-| 18 | [18-ui-verification-and-testing.md](18-ui-verification-and-testing.md) | Prove the UI refresh works live and closes the StackEdit gap | Phase 15 + 16 + 17 (AI-1/AI-3) |
+| 18 | [18-ui-verification-and-testing.md](18-ui-verification-and-testing.md) | Prove the UI refresh works live, includes the clean visual rebrand, and closes the StackEdit gap | Phase 15 + 16 + 17 (AI-1/AI-3) + 20 |
 | 19 | [19-incremental-stack-upgrade-for-astryx.md](19-incremental-stack-upgrade-for-astryx.md) | Incrementally land Next 15.5.20, then React 19.2.7, then StyleX 0.18.3 — Astryx's actual minimum requirements | None (executes Phase 12's stack-upgrade item); unblocks Phase 14 |
+| 20 | [20-clean-visual-rebrand.md](20-clean-visual-rebrand.md) | Replace the legacy Dillinger palette, typography, shell, component styling, and Markdown presentation with an owned visual system | Phase 14 + 15; blocks Phase 18 visual acceptance |
 
 ## Status
 
@@ -107,7 +119,7 @@ closing one out.
   and PDF export are **optional** features layered on top of a working
   editor; they must not block the "app is running on Lambda" milestone.
 
-## Phase 13-18: UI refresh and product direction
+## Phase 13-20: UI refresh, product direction, and clean visual rebrand
 
 With the app live on Lambda, Phase 13 opens a second initiative: a UI
 refresh built on the [Astryx](https://github.com/facebook/astryx) design
@@ -119,11 +131,24 @@ a follow-on MCP server) replacing what today is only marketing copy on
 for the full evaluation and recorded decisions, including the explicit
 call to scope this as a multi-document manager (StackEdit-class), not a
 full notes-management-app pivot — that's deferred as a separately-scoped
-v2. None of Phases 14-18 touch `infra/`, the Lambda packaging, or the
-multi-tenancy/gateway model from Phases 1-12.
+v2. A 2026-07-19 decision corrects Phase 13's original visual assumption:
+the current plum/charcoal Dillinger theme is replaced, not preserved. The
+requirements and extraction map are in
+[20-clean-visual-rebrand.md](20-clean-visual-rebrand.md). None of Phases
+14-20 change the Lambda packaging or multi-tenancy/gateway model from
+Phases 1-12, apart from using the existing CI path to verify deployments.
 
-- [ ] **UI refresh live** — Phase 15 complete; Phase 16-18 unstarted.
-      Phase 13 decisions recorded (2026-07-12). **Phase 19 complete**
+In short: Phase 13 defined product and UX requirements; Phase 14 proved the
+Astryx foundation; Phase 15 migrated components and added editor UX; Phase 16
+owns folders/tags/search; Phase 17 owns AI-native behavior; Phase 18 owns
+end-to-end live acceptance; Phase 19 supplied Astryx's required application
+stack; and Phase 20 now owns the complete visual replacement that was missing
+from the original requirement set.
+
+- [ ] **UI refresh and clean visual rebrand live** — Phase 15 and Phase 19
+      complete; Phases 16-18 and 20 remain open. Phase 13's product/UX
+      decisions were recorded 2026-07-12 and its visual direction was revised
+      2026-07-19 to replace the old Dillinger theme. **Phase 19 complete**
       (2026-07-12): incrementally landed Next 15.5.20 → React 19.2.7 →
       `@stylexjs/stylex@0.18.3`, each step fully verified (typecheck,
       unit, build, lint, E2E — all identical to a captured pre-upgrade
@@ -134,9 +159,10 @@ multi-tenancy/gateway model from Phases 1-12.
       `DropdownMenu`), theming, and dark-mode checks all done and
       verified in a real browser, not just jsdom — see
       `spec/14-astryx-design-system-adoption.md`'s Findings for the full
-      tally and two carry-forward costs recorded for Phase 15
-      (`@stylexjs/unplugin` wiring + import fixups; a custom theme file
-      still needed to match the plum brand). **Phase 15 is unblocked.**
+      tally. Its StyleX wiring/import fixups remain authoritative; its old
+      carry-forward note to build a custom theme matching the plum brand is
+      historical and superseded by Phase 20's owned replacement theme.
+      **Phase 15 is unblocked.**
       **Phase 15 in progress** (2026-07-13): clarification pass done
       (UI-3 scroll-sync confirmed already fully wired end-to-end,
       UI-4 diagram library decided — `mermaid`, pure-JS deps, client-only
@@ -178,14 +204,16 @@ multi-tenancy/gateway model from Phases 1-12.
       network access). Coverage (91.85%/75.34%/92.81%/92.17%) matches
       the true pre-Phase-15 baseline — the 98%/91%/99.5%/98% figure
       documented in `CLAUDE.md` predates Phase 14's own additions and
-      was already stale before this phase started. Separately, not yet done:
-      the Lambda container build and staging deploy for the Phase 19
-      stack upgrade (no Docker in the dev sandbox; deploy workflow is
-      manual-dispatch-only) — needs a CI run before that upgrade reaches
-      the live tenant. Update this line with the tenant URL and date
-      once Phase 18 closes out.
+      was already stale before this phase started. **Visual decision revised
+      2026-07-19:** Phase 15's functionality and primitive migrations remain,
+      but its retained legacy palette and overrides are now explicit Phase 20
+      migration debt. Phase 20 is not started, so the current deployment is
+      not evidence of the requested rebrand. Separately, the Lambda container
+      build and staging deploy for the Phase 19 stack upgrade still needs the
+      CI path before that upgrade reaches `staging`. Update this line with the
+      tenant URL and date once Phases 18 and 20 close out.
 
-## Non-goals for the UI-refresh initiative (Phase 13-18)
+## Non-goals for the UI-refresh initiative (Phase 13-20)
 
 - Full notes-management-app depth (backlinks, graph view, full-text body
   search, daily notes) — deferred to a separately-scoped v2 per Phase 13

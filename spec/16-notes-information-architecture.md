@@ -12,6 +12,14 @@ sidebar UI for this depends on Phase 15's migrated `Sidebar.tsx`/
 `DocumentList.tsx` — sequence data-model tasks first, sidebar-surface
 tasks after Phase 15 lands.
 
+> **Visual-system dependency — 2026-07-19:** the data model and behavior in
+> this phase remain independent of the rebrand, but every new folder, tag,
+> search, empty, selected, and command-palette surface must consume the owned
+> semantic theme defined in
+> [`20-clean-visual-rebrand.md`](20-clean-visual-rebrand.md). Do not add new
+> uses of the legacy `plum`, `bg-sidebar`, `bg-navbar`, or related visual
+> tokens while Phase 20 is pending. Phase 18 verifies the combined result.
+
 ## Working rules
 
 - **No server-side database.** This phase is bound by the same non-goal

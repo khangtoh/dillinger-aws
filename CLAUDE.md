@@ -26,6 +26,21 @@ npm run start    # Start production server
 npm run lint     # Run ESLint
 ```
 
+## Agent Task Completion Reporting
+
+Every agent working in this repository **MUST** read and follow
+[`spec/spec-summary-status.md`](spec/spec-summary-status.md). Before reporting
+any task complete—or ending a session with partial, blocked, or documentation-only
+progress—the final handoff **MUST** contain a section named exactly
+`## Spec Summary/Status`.
+
+That section must use the required `Phase | Scope | Progress | Status` table,
+add the applicable component/deliverable table, derive counts from the current
+working tree, distinguish implementation from visual/live acceptance, and end
+with `Overall`, `Evidence`, and `Change state`. Before handing off, update all
+affected checkboxes, Findings/Results, README status, and the session ledger when
+the canonical procedure requires them.
+
 ## Tech Stack
 
 | Category | Technology | Version |
@@ -137,23 +152,18 @@ const Sidebar = dynamic(() => import('@/components/sidebar/Sidebar'), {
 
 ### Styling with Tailwind
 
-- Use design tokens from `tailwind.config.ts` (colors, spacing, z-index)
+- Follow `spec/20-clean-visual-rebrand.md` for current visual requirements.
+- Existing `plum`/`bg-navbar`/`bg-sidebar` color tokens are frozen migration
+  debt: preserve them only in scoped bug fixes until Phase 20 removes their
+  consumers; do not introduce new uses.
+- New visual work must use the owned semantic Astryx/Tailwind token bridge
+  created by Phase 20, not hard-coded colors or aliases of legacy names.
 - Combine classes with `clsx` and `tailwind-merge` via the `cn()` utility
 - Follow z-index scale: sidebar(1) < page(2) < editor(3) < preview(4) < overlay(5) < navbar(6) < settings(7) < modal(50) < toast(60)
 
-```typescript
-import { cn } from '@/lib/utils'
-
-// Good - uses design tokens
-<div className={cn(
-  "bg-bg-sidebar text-text-primary",
-  "w-sidebar p-gutter",
-  isActive && "bg-bg-highlight"
-)} />
-
-// Avoid - hardcoded values
-<div className="bg-[#2B2F36] w-[270px] p-8" />
-```
+The current code still contains the old token names because the rebrand is a
+planned phase, not completed implementation. Their presence is not design
+authority; Phase 20's prohibited-token check removes them at close-out.
 
 ### Zustand State Management
 
@@ -407,13 +417,21 @@ Current coverage: **91.85% statements, 75.34% branches, 92.81% functions, 92.17%
 | `.env.local.example` | Required environment variables |
 | `app/layout.tsx` | Root layout with providers |
 | `components/editor/EditorContainer.tsx` | Main app shell |
-| `.impeccable.md` | Design system & context |
+| `AGENTS.md` | Repository-wide agent instructions and mandatory completion handoff |
+| `spec/spec-summary-status.md` | Mandatory agent completion-report format and procedure |
+| `spec/20-clean-visual-rebrand.md` | Current visual-system requirements and migration checklist |
 | `vitest.config.ts` | Vitest test runner config |
 | `vitest.setup.ts` | Test environment setup (mocks) |
 | `playwright.config.ts` | E2E test config |
 | `lib/cache.ts` | In-memory LRU cache for API routes |
 
 ## Design Context
+
+**Decision authority (2026-07-19):** the legacy Dillinger plum/charcoal
+visual identity is being replaced, not preserved. The target is the modern
+editorial-workspace system and slate/stone + indigo direction in Phase 20.
+The currently rendered legacy theme is transitional implementation state,
+not the desired design or a pattern to copy.
 
 ### Users
 Developers, technical writers, and content creators who need a distraction-free, cloud-connected markdown editor. They value speed, keyboard-driven workflows, and tools that stay out of the way.
@@ -426,10 +444,10 @@ Developers, technical writers, and content creators who need a distraction-free,
 
 ### Design Principles
 1. **Content is king.** Every UI element exists to serve the writing experience.
-2. **Quiet confidence.** Plum accent (#35D7BB) is the single bright voice in a neutral palette.
+2. **Quiet confidence.** Use the owned slate/stone foundation and indigo/electric-blue accent defined in Phase 20; never reintroduce the legacy plum token or charcoal-bar composition.
 3. **Polished, not decorated.** Quality is in spacing, alignment, transitions, typography — never ornament.
 4. **Progressive disclosure.** Show what's needed, hide what isn't.
 5. **Accessible by default.** WCAG AA minimum. Focus rings, contrast, keyboard nav, reduced-motion.
 
 ### Theme Modes
-Full support for light, dark, and system-preference modes. The plum accent (#35D7BB) remains constant across all themes. See `.impeccable.md` for full design system reference.
+Full support for deliberate light, dark, and system-preference modes through one owned Astryx theme. Dark mode is not a mechanical inversion, and stock `theme-neutral` is not the final identity. See `spec/20-clean-visual-rebrand.md`.

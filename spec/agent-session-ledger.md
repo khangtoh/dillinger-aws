@@ -218,3 +218,90 @@ mid-decision on this when the session closed.
    `spec/15-ui-component-migration.md`'s checkboxes and recent commit
    history on `claude/modern-dillinger-aws` before assuming nothing has
    moved.
+
+---
+
+## Session: 2026-07-19 (visual-direction requirements correction)
+
+### Decision
+
+The user clarified that `claude/modern-dillinger-aws` was intended to
+produce a clean visual break from legacy Dillinger, abandoning the existing
+theme, style, and colors. Phase 13 had recorded the opposite assumption—keep
+the plum accent and current brand—and Phases 14-15 faithfully carried that
+assumption into the implementation. The branch therefore modernized
+components and editor behavior without delivering the intended rebrand.
+
+The preserve-plum/current-brand requirement is now explicitly superseded.
+The product retains its name, behavior, accessibility bar, Astryx foundation,
+and Phase 13 UI/AI/product decisions; only the visual direction is replaced.
+
+### Specification changes
+
+- Added `spec/20-clean-visual-rebrand.md`, the authoritative replacement
+  visual spec. It summarizes Phases 13-19, maps what remains valid, defines
+  the new editorial-workspace direction, prohibits legacy tokens/colors,
+  and provides atomic foundation, shell, surface, accessibility, responsive,
+  screenshot, cleanup, deployment, and definition-of-done tasks.
+- Added dated extraction/supersession notices to Phases 13, 14, and 15 while
+  retaining their original wording and completed findings as historical
+  evidence of why the first migration preserved the old appearance.
+- Revised Phase 18 so Phase 20 is a blocking dependency and detailed visual
+  acceptance is sourced from Phase 20, then re-verified against the live
+  Function URL in Phase 18.
+- Updated `spec/README.md`, `spec/goal-completion-check.md`, and `CLAUDE.md`
+  so future work follows the latest dated decision instead of treating old
+  and replacement visual requirements as simultaneously active.
+
+### Current state and resume point
+
+- Phase 20 is specified but **not started**; none of its checkboxes are marked
+  complete and no UI implementation was changed in this requirements pass.
+- The currently deployed branch tenant still shows the legacy Dillinger
+  visual identity and is not acceptance evidence for the rebrand.
+- Phase 15's behavior and primitive migration remain complete. Phase 18 is
+  blocked on Phases 16, 17, and 20 before final live acceptance.
+
+### Verification
+
+- Documentation-only validation completed with diff and cross-reference checks.
+- No numbered phase checkbox changed during this requirements correction.
+
+---
+
+## Session: 2026-07-19 (canonical spec-status reporting standard)
+
+### Decision
+
+The phase/component status format accepted by the user is now the repository's
+canonical agent handoff format. Every agent must produce a section named
+`Spec Summary/Status` before reporting a task complete or closing after partial,
+blocked, implementation, or documentation progress.
+
+### Specification process changes
+
+- Added `spec-summary-status.md` as the authoritative definition and template.
+- Added the mandatory completion rule to `../AGENTS.md` and `../CLAUDE.md`.
+- Updated `README.md` and `goal-completion-check.md` to route all task and goal
+  reporting through the canonical format.
+- Recorded the decision here so future sessions can distinguish the requirement
+  from an optional presentation preference.
+
+### Spec Summary/Status
+
+| Phase | Scope | Progress | Status |
+|---|---|---:|---|
+| [Process (unphased)](spec-summary-status.md) | Agent spec-status reporting | N/A | Complete; no numbered phase checkbox changed |
+
+| Component or deliverable | Implementation status | Verification or remaining work |
+|---|---|---|
+| Canonical reporting standard | Defined with required tables, status rules, closing fields, and a copyable template | Schema, examples, and whitespace verified |
+| Agent instruction | Mandatory rules added to `AGENTS.md` and `CLAUDE.md` | Repository-root discoverability verified |
+| Spec workflow | Index and completion audit route to the canonical standard | Links and exact table terminology verified |
+| Session evidence | Decision and resume state recorded in this ledger | Complete; final working-tree state remains to be handed off |
+
+**Overall:** The reporting requirement is defined and wired into all agent-facing spec workflow documents; no product phase status changed.
+
+**Evidence:** Documentation diff, link/cross-reference search, and `git diff --check`.
+
+**Change state:** Uncommitted on `claude/modern-dillinger-aws`.

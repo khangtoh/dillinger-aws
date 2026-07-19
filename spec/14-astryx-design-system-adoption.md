@@ -15,6 +15,18 @@ cleared. This phase is **no longer paused**; its clarification-pass and
 spike tasks can resume, including the bundle-size baseline task that was
 previously moot.
 
+> **Decision update — 2026-07-19:** the "matches current plum brand unless
+> told otherwise" dependency above is historical and superseded. The user has
+> now explicitly chosen to replace the legacy Dillinger visual identity.
+> Phase 20 owns the new theme and visual acceptance criteria. This completed
+> phase remains authoritative evidence that Astryx, StyleX, Tailwind, React,
+> and Next.js can coexist and that the selected primitives meet the behavior
+> and accessibility gates. Its plum-matching investigations, overrides, and
+> carry-forward notes are retained as evidence of the old assumption, not as
+> requirements to implement. Do not reopen the completed compatibility spike;
+> consume its technical findings and route visual replacement work to
+> [`20-clean-visual-rebrand.md`](20-clean-visual-rebrand.md).
+
 ## Working rules
 
 - Every task in this phase must be independently completable and
@@ -454,3 +466,19 @@ kept here as the reproduction record. See `spec/19` for the resolution.)
     tax; (2) a custom Astryx theme file is still required from day one to
     match the plum brand, per the clarification pass's earlier finding —
     unchanged by this spike.
+
+## Visual-direction extraction — 2026-07-19
+
+The final Go call remains valid for **Astryx as a technical component
+foundation**. Its old second carry-forward cost—creating a custom theme to
+match the plum brand—is superseded by Phase 20's requirement to create an
+owned theme that replaces the legacy brand.
+
+Evidence extracted into Phase 20 from this spike:
+
+- `theme-neutral` is a working integration baseline, not an acceptable final
+  product identity.
+- Tailwind overrides can compose with Astryx, but the legacy overrides found
+  here are migration debt to delete rather than a theming strategy to extend.
+- The StyleX compiler/import findings and accessibility/browser verification
+  remain reusable implementation constraints for the rebrand.

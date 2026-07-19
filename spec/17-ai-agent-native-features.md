@@ -11,6 +11,13 @@ follow-on). AI-3 depends on Phase 15's command palette (UI-5) existing.
 AI-2 depends on AI-1 being checked off and unchanged for at least one full
 review cycle — do not start AI-2 tasks until AI-1 is done.
 
+> **Visual-system dependency — 2026-07-19:** AI contracts and server behavior
+> remain independent of the rebrand, but every visible AI command, loading,
+> error, confirmation, and result state must consume the owned semantic theme
+> defined in [`20-clean-visual-rebrand.md`](20-clean-visual-rebrand.md). Do not
+> introduce new legacy-theme overrides while Phase 20 is pending. Phase 18
+> verifies the combined result against the live deployment.
+
 ## Working rules
 
 - **AI-1 ships first and is treated as a stability contract**: once

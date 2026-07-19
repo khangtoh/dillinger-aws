@@ -10,13 +10,25 @@ Depends on: None (design/research only). Assumes the Phase 1-12 milestone
 foundation this UI work sits on top of; nothing here touches
 `infra/`, the Lambda packaging, or the microVM/gateway/multi-tenancy model.
 
+> **Visual-direction decision revised 2026-07-19.** This phase originally
+> assumed the legacy plum accent and Dillinger gray shell should be preserved.
+> The user has now explicitly chosen a clean visual break that replaces the
+> old theme, style, colors, typography, and shell treatment. That requirement
+> has been extracted into
+> [`20-clean-visual-rebrand.md`](20-clean-visual-rebrand.md), which supersedes
+> every preserve-plum/current-brand statement in this file. The audit,
+> Astryx decision, UI-1..UI-7, product direction, and AI scope remain
+> authoritative. Historical wording is retained below as evidence of the
+> assumption that caused the first migration to keep the old appearance.
+
 ## How to read this phase
 
 This is a **requirements and evaluation** phase, not an implementation
 phase — same role Phase 2 played for the infra decision. Sections A-E
 below are the five evaluation asks; each ends with findings. The
 **Decisions** section converts findings into concrete, checked-off
-choices that Phases 14-18 implement. Anything that is a genuine
+choices that Phases 14-18 originally implemented, with the revised visual
+direction implemented by Phase 20. Anything that is a genuine
 product/business call (not a technical fact) is called out separately in
 **Open questions for the user** at the end rather than silently decided.
 
@@ -86,6 +98,10 @@ this is a green-field adoption decision, not a migration between two
 systems. The current UI's real assets worth keeping through any refresh
 are: the plum-accent visual identity, the documented z-index scale, and
 the accessibility bar already met.
+
+> **Superseded visual conclusion:** preserving the plum-accent identity is no
+> longer a requirement. The z-index findings and accessibility bar remain;
+> Phase 20 owns replacement of the legacy visual identity.
 
 ---
 
@@ -330,6 +346,12 @@ lost inside "just a UI refresh."
       behind an explicit spike/go-no-go gate (Phase 14), not a big-bang
       rewrite — mirrors how Phase 2 gated the container-image decision
       before Phase 3 executed it.
+- [x] **Visual identity — revised 2026-07-19**: retain Astryx as the
+      component foundation, but replace rather than preserve the legacy
+      Dillinger palette, typography, dark navbar/sidebar shell, and rendered-
+      document styling. Phase 20 is the authoritative requirements and
+      implementation checklist. The earlier "closer-to-plum" theme clause is
+      historical and superseded; it is not an acceptance criterion.
 - [x] **Coexistence, not replacement, of Tailwind**: keep Tailwind for
       layout/spacing utilities per the documented `tailwind-theme.css`
       bridge; Astryx supplies components and tokens, not a full framework
@@ -370,6 +392,18 @@ new command palette (Phase 17), with a full MCP server for external agent
 access scoped as the natural next phase once that contract is stable.
 Phase 18 holds all of the above to the same "prove it, don't just build
 it" bar the Lambda migration used in Phase 8.
+
+### Current visual-direction override — 2026-07-19
+
+The paragraph above is the original Phase 13 direction and explains why
+Phases 14-15 modernized component architecture and behavior while retaining
+the recognizable Dillinger appearance. Its **"preserving ... plum-accent
+identity" clause is superseded**. The current direction is a full visual
+replacement defined in Phase 20: a new owned Astryx theme, semantic tokens,
+Geist typography, a redesigned workspace shell, new Markdown presentation,
+deliberate light/dark palettes, responsive visual baselines, and automated
+rejection of the legacy token names and colors. Phase 18 now depends on that
+work before it can call the UI refresh live.
 
 ## Revision — 2026-07-12: Astryx blocked on React 19, decision needed
 
@@ -440,10 +474,12 @@ letting a scheduled agent guess on genuinely ambiguous items:
   resume Astryx adoption. Phase 12's stack-upgrade item is now the
   active blocking dependency for Phase 14; work on that item to unblock
   the UI refresh.
-- Should the eventual component-layer theme deliberately match the
+- ~~Should the eventual component-layer theme deliberately match the
   current plum (`#35D7BB`) brand, or is a broader rebrand in scope for
-  this UI refresh? (Assumed "match current brand" unless told otherwise
-  — unaffected by which option above is chosen.)
+  this UI refresh?~~ **Resolved 2026-07-19: a broader rebrand is in scope.**
+  The earlier "match current brand" default was incorrect. Replace the old
+  theme and use Phase 20 as the source of truth for visual requirements and
+  acceptance evidence.
 - Is real-time collaborative editing (StackEdit's merge feature) ever in
   scope, given it's structurally in tension with the stateless,
   per-tenant-isolated Lambda architecture (Phase 9/`ARCHITECTURE.md`)? (
