@@ -1,0 +1,64 @@
+{
+  "baseUrl": "https://3tfsfijqedt62hf3vfdfxwunua0rkjgo.lambda-url.ap-southeast-1.on.aws/",
+  "results": [
+    {
+      "variant": "desktop-light",
+      "tokens": {
+        "canvas": "light-dark(#F8FAFC, #0B1220)",
+        "surface": "light-dark(#FFFFFF, #111827)",
+        "accent": "light-dark(#4F46E5, #818CF8)",
+        "bodyFont": "GeistSans, \"GeistSans Fallback\", Arial, sans-serif",
+        "overflow": false
+      },
+      "legacyComputedMatches": [],
+      "screenshot": "desktop-light.png"
+    },
+    {
+      "variant": "desktop-dark",
+      "tokens": {
+        "canvas": "light-dark(#F8FAFC, #0B1220)",
+        "surface": "light-dark(#FFFFFF, #111827)",
+        "accent": "light-dark(#4F46E5, #818CF8)",
+        "bodyFont": "GeistSans, \"GeistSans Fallback\", Arial, sans-serif",
+        "overflow": false
+      },
+      "legacyComputedMatches": [],
+      "screenshot": "desktop-dark.png"
+    },
+    {
+      "variant": "tablet",
+      "tokens": {
+        "canvas": "light-dark(#F8FAFC, #0B1220)",
+        "surface": "light-dark(#FFFFFF, #111827)",
+        "accent": "light-dark(#4F46E5, #818CF8)",
+        "bodyFont": "GeistSans, \"GeistSans Fallback\", Arial, sans-serif",
+        "overflow": false
+      },
+      "legacyComputedMatches": [],
+      "screenshot": "tablet.png"
+    },
+    {
+      "variant": "mobile",
+      "tokens": {
+        "canvas": "light-dark(#F8FAFC, #0B1220)",
+        "surface": "light-dark(#FFFFFF, #111827)",
+        "accent": "light-dark(#4F46E5, #818CF8)",
+        "bodyFont": "GeistSans, \"GeistSans Fallback\", Arial, sans-serif",
+        "overflow": false
+      },
+      "legacyComputedMatches": [],
+      "screenshot": "mobile.png"
+    },
+    {
+      "variant": "fresh-session-persistence",
+      "cookieExpires": 1816080900,
+      "serverRenderedTheme": "dark"
+    },
+    {
+      "variant": "live-not-found",
+      "status": 404
+    }
+  ],
+  "consoleErrors": [],
+  "failedRequests": []
+}

@@ -274,11 +274,11 @@ Shell direction:
       overrides, and temporary migration comments.
 - [x] Run lint, typecheck, unit, E2E, coverage, and production build; record
       exact results and investigate every regression.
-- [ ] Deploy through the branch CI/OIDC path and hand the run URL plus visual
+- [x] Deploy through the branch CI/OIDC path and hand the run URL plus visual
       evidence to Phase 18 for live-product acceptance.
 - [x] Update `CLAUDE.md` and any component-level contributor notes to describe
       the owned theme and forbid reintroduction of legacy styling.
-- [ ] Check this phase complete in `spec/README.md` only after every item
+- [x] Check this phase complete in `spec/README.md` only after every item
       above is checked and a dated Results entry is recorded.
 
 ## Definition of done
@@ -436,3 +436,38 @@ deployment run URL, and the final before/after verdict.)_
   theme as authoritative and forbid legacy token, font, color, and neutral-
   theme fallback reintroduction. Phase progress is 42/44: only branch CI/OIDC
   deployment proof and the dependent final index closure remain open.
+
+### 2026-07-20 — branch deployment and live visual acceptance
+
+- Commit `c6941cf8c7f4ae9569efe245c8d55fe7721525c4` deployed through the
+  branch CI/OIDC workflow to dedicated tenant
+  `branch-claude-modern-dillinger-aws` in `ap-southeast-1`. Workflow run
+  [29725965083](https://github.com/khangtoh/dillinger-aws/actions/runs/29725965083)
+  passed its security job, SAM deploy, HTTP smoke test, deployment-artifact
+  publication, and tenant-registry update. The artifact records HTTP 200 and
+  Function URL
+  `https://3tfsfijqedt62hf3vfdfxwunua0rkjgo.lambda-url.ap-southeast-1.on.aws/`.
+- Four production-app scenarios from the focused Phase 20 suite passed against
+  that URL: complete light/dark shell and overlay families with serious/
+  critical axe checks, keyboard-only traversal, reactive/persistent system
+  and dark modes with server-rendered no-flash markup, and 320px action
+  retention/no overflow/reduced motion. The synthetic loading/error scenario
+  remains correctly local-only behind `PHASE20_VISUAL_TEST=1`; its local run
+  is already part of the recorded 5/5 acceptance result.
+- `python3 artifacts/phase20/verify_live.py --base-url <Function URL>` passes
+  six live result groups. It verifies owned root tokens, Geist, Astryx theme
+  identity, Monaco, toolbar and command-palette behavior, folder/tag
+  presentation, light/dark classes, desktop/tablet/mobile overflow, absence of
+  sampled legacy computed colors, one-year theme-cookie persistence into a
+  fresh server-rendered dark session, live branded 404 behavior, and zero
+  console errors or failed requests.
+- [`artifacts/phase20/live/`](../artifacts/phase20/live/) contains four live
+  viewport screenshots and the machine-readable manifest. Together with the
+  canonical 126-image local matrix, it is handed to Phase 18 as the `after`
+  baseline. Live verdict: the slate/indigo surfaces, Geist typography,
+  workspace composition, owned components, and editorial Markdown treatment
+  cannot be mistaken for the legacy charcoal/mint Dillinger interface.
+- Phase 18 records the CI deployment and completed live visual/theming slice;
+  its broader folders/tags, AI, latency, full golden-path, coverage, and
+  StackEdit-parity work remains independently open. Phase 20 is complete at
+  44/44 and the canonical phase index now records that closure.

@@ -63,3 +63,26 @@ with `PHASE20_VISUAL_TEST=1`; production deployments do not enable that flag.
 The final matrix was regenerated on 2026-07-20 after lint, typecheck, unit /
 coverage, production build, 43 repository E2E tests, and five focused visual /
 accessibility scenarios passed. A final human spot-check covered the default
+workspace, light/dark modes, mobile navigation, content routes, and exceptional
+states and confirmed a clean visual break from the legacy Dillinger UI.
+
+## Live branch deployment
+
+[`live/`](live/) is the compact live-product handoff to Phase 18. It contains
+desktop light/dark, tablet, and mobile screenshots from the branch tenant plus
+[`verification-results.json`](live/verification-results.json). The manifest
+records the owned token values, Geist font, dark/light class behavior, absence
+of sampled legacy computed colors, no horizontal overflow, a persistent
+server-rendered dark theme in a fresh session, the branded live 404, and zero
+console errors or failed network requests.
+
+Regenerate the live evidence with:
+
+```sh
+python3 artifacts/phase20/verify_live.py --base-url <tenant-url>
+```
+
+The synthetic loading and application-error hooks remain local-only by design:
+they are compiled behind `PHASE20_VISUAL_TEST=1` and are covered by the five
+focused local browser scenarios. Production verification exercises only real
+routable states.

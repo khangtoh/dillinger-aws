@@ -55,27 +55,27 @@ URL already exists per Phase 8/9.
 
 ## Visual and theming verification
 
-- [ ] Confirm every Phase 20 implementation, cleanup, and visual-acceptance
+- [x] Confirm every Phase 20 implementation, cleanup, and visual-acceptance
       checkbox is complete and its Results log contains the token inventory,
       contrast results, screenshot locations, test results, and branch deploy
       URL; do not infer completion from this phase's live checks.
-- [ ] Use Phase 20's desktop/tablet/mobile screenshots as the `after`
+- [x] Use Phase 20's desktop/tablet/mobile screenshots as the `after`
       visual-regression baselines. Treat Phase 15's plum-theme screenshots as
       labeled `before` evidence only.
-- [ ] Against the live deployment, verify the owned Dillinger Astryx theme
+- [x] Against the live deployment, verify the owned Dillinger Astryx theme
       renders consistently in both modes, no component falls back to
       `theme-neutral`, and the prohibited legacy tokens/colors do not appear
       in computed application-chrome styles.
-- [ ] Verify the theme selector added in Phase 15 persists across a full
+- [x] Verify the theme selector added in Phase 15 persists across a full
       page reload and across a fresh browser session against the live
       Function URL (not just localhost).
-- [ ] Record a live before/after verdict that the new palette, typography,
+- [x] Record a live before/after verdict that the new palette, typography,
       application shell, component treatment, and Markdown presentation
       cannot be mistaken for the legacy Dillinger UI.
 
 ## Live deployment verification
 
-- [ ] Deploy the UI-refresh branch to the `staging` tenant (or a
+- [x] Deploy the UI-refresh branch to the `staging` tenant (or a
       dedicated UI-refresh tenant if the user prefers not to touch
       `staging` — record which was used) via the existing CI/OIDC path
       (Phase 7), not a manual credential-based deploy.
@@ -117,3 +117,35 @@ URL already exists per Phase 8/9.
 ## Results log
 
 _(append dated entries here, matching Phase 8's results-log format)_
+
+### 2026-07-20 — Phase 20 live visual-acceptance handoff
+
+- Phase 20 is complete at 44/44. Its Results log contains the final palette,
+  contrast matrix, 123-file legacy scan, unit/coverage/build/browser results,
+  126-image route/state matrix, branch workflow, tenant URL, and live evidence.
+- CI/OIDC run
+  [29725965083](https://github.com/khangtoh/dillinger-aws/actions/runs/29725965083)
+  deployed commit `c6941cf8c7f4ae9569efe245c8d55fe7721525c4` to dedicated branch
+  tenant `branch-claude-modern-dillinger-aws` in `ap-southeast-1`; its
+  deployment artifact and smoke test record HTTP 200 at
+  `https://3tfsfijqedt62hf3vfdfxwunua0rkjgo.lambda-url.ap-southeast-1.on.aws/`.
+  The dedicated branch tenant is the workflow-selected isolation path, so the
+  shared `staging` tenant was not changed.
+- Phase 20's canonical 126-image desktop/tablet/mobile matrix is now the
+  visual-regression `after` baseline; Phase 15's plum/charcoal captures remain
+  labeled historical `before` evidence. Four additional live viewport images
+  and their manifest are in [`artifacts/phase20/live/`](../artifacts/phase20/live/).
+- Live browser checks pass for owned light/dark token values, the `dillinger`
+  Astryx identity, Geist, Monaco, toolbar and command palette, responsive
+  shell composition, no sampled neutral/legacy fallback colors, and the
+  branded 404. Dark selection survives reload and a fresh browser context;
+  the new request is server-rendered dark before hydration. No horizontal
+  overflow, console errors, or failed network requests were observed in the
+  four target viewport captures.
+- Live before/after verdict: the slate/indigo palette, surfaced workspace,
+  Geist typography, component treatment, and editorial Markdown presentation
+  are an unmistakable replacement of the legacy Dillinger style.
+- This closes six Phase 18 visual/deployment tasks, not Phase 18 itself. The
+  full UI-refresh golden path (including folder/tag mutation and real AI),
+  aggregate verification/coverage, component-wide a11y audit, latency,
+  StackEdit-parity walk-through, and close-out metrics remain open.

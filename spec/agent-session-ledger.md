@@ -508,3 +508,44 @@ existing editor/product behavior.
 **Evidence:** lint/typecheck/build/legacy/contrast pass; Vitest 381 passed + 1 skipped with coverage; Playwright 43 + 5 passed; 126-image matrix and representative visual review.
 
 **Change state:** Uncommitted on `claude/modern-dillinger-aws`.
+
+---
+
+## Session: 2026-07-20 (Phase 20 deployment and completion)
+
+### Decision and work completed
+
+Phase 20's locally accepted rebrand was deployed and independently verified on
+the dedicated branch tenant. The result is now handed to Phase 18 without
+claiming completion of Phase 18's separate functional/AI/performance scope.
+
+- CI/OIDC run 29725965083 deployed implementation commit `c6941cf` and passed
+  the security, SAM deployment, HTTP 200 smoke, artifact, and registry steps.
+- Live Function URL:
+  `https://3tfsfijqedt62hf3vfdfxwunua0rkjgo.lambda-url.ap-southeast-1.on.aws/`.
+- Four focused production-app browser scenarios pass live; the reusable Python
+  verifier passes six result groups and records four viewport screenshots,
+  fresh-session dark SSR, owned computed tokens, no legacy computed matches,
+  no overflow, live 404, and zero console/network failures.
+- Phase 20's last two tasks, Results log, artifact guide, phase index, and the
+  Phase 18 handoff are updated from the observed deployment evidence.
+
+### Spec Summary/Status
+
+| Phase | Scope | Progress | Status |
+|---|---|---:|---|
+| [20](20-clean-visual-rebrand.md) | Clean visual rebrand | 44/44 | ✅ Complete, deployed, and live-verified |
+| [18](18-ui-verification-and-testing.md) | Live UI verification | 6/17 | 🟡 Phase 20 visual/deployment slice accepted; broader functional, AI, performance, and parity work remains |
+
+| Component or surface | Functional status | Clean-rebrand/live status |
+|---|---|---|
+| CI/OIDC deployment | Security, SAM, smoke, artifact, and tenant-registry steps pass | Dedicated branch Function URL serves the rebrand |
+| Theme and tokens | Light/dark/system, cookie, SSR, Monaco reaction, and command paths pass live | Owned values/Geist/Astryx identity present; sampled legacy values absent |
+| Shell and responsive workspace | Monaco, toolbar, palette, folder/tag presentation, and 404 render live | Desktop light/dark, tablet, mobile, and 320px checks pass without overflow |
+| Visual evidence | Canonical 126-image local matrix remains the full regression baseline | Four live screenshots and manifest handed to Phase 18; clean-break verdict recorded |
+
+**Overall:** Phase 20 is complete at 44/44 and live on the dedicated branch tenant. Phase 18 is partial at 6/17 because its non-visual initiative checks remain open.
+
+**Evidence:** CI/OIDC run 29725965083; HTTP 200 deployment artifact; live focused browser scenarios; six-group live verifier; 126 canonical plus four live screenshots; zero live console/network failures.
+
+**Change state:** Implementation commit `c6941cf` is pushed; completion documentation and live evidence are pending the closure commit on `claude/modern-dillinger-aws`.
