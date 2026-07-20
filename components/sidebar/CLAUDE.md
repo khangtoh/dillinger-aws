@@ -19,3 +19,7 @@
 | #1784 | 2:04 PM | 🔄 | Added React Performance Hooks to Sidebar Component | ~271 |
 | #1763 | 2:02 PM | 🟣 | Sidebar Component with Cloud Integration and Document Management | ~528 |
 </claude-mem-context>
+
+## Phase 20 visual system
+
+Keep the document library, folder/tag metadata, provider actions, and destructive controls on the owned surface hierarchy and semantic state tokens. Preserve the responsive overlay, labelled sections, selection semantics, and keyboard navigation.

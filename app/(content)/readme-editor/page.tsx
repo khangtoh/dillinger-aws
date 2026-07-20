@@ -93,7 +93,7 @@ export default function ReadmeEditorPage() {
       />
 
       <h1 className="text-4xl font-bold mb-4">README Editor</h1>
-      <p className="text-text-muted text-lg mb-4 max-w-2xl">
+      <p className="text-content-muted text-lg mb-4 max-w-2xl">
         Write and preview your README.md online with live, side-by-side
         rendering. Dillinger speaks GitHub-flavored Markdown — badges, tables,
         code blocks, and task lists all render the way they will on GitHub. Free,
@@ -101,7 +101,7 @@ export default function ReadmeEditorPage() {
       </p>
       <Link
         href="/"
-        className="inline-block text-plum hover:underline text-sm font-medium mb-12"
+        className="inline-block text-accent hover:underline text-sm font-medium mb-12"
       >
         Open the Editor to start your README
       </Link>
@@ -109,7 +109,7 @@ export default function ReadmeEditorPage() {
       <div className="space-y-12">
         <section>
           <h2 className="text-2xl font-bold mb-3">Write and edit README.md with live preview</h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-content-muted mb-4">
             Your README is the front door to your project. It is the first thing
             a developer reads when they land on your repository, and a clear,
             well-formatted one is the difference between a project people adopt
@@ -118,7 +118,7 @@ export default function ReadmeEditorPage() {
             appear on the right, and adjust until it reads exactly the way you
             want.
           </p>
-          <p className="text-text-muted mb-4">
+          <p className="text-content-muted mb-4">
             Because the preview is live, you never have to commit, refresh, and
             squint at a half-broken table. Headings, lists, links, and images
             update as you type, so the structure of your document is always
@@ -128,7 +128,7 @@ export default function ReadmeEditorPage() {
 
         <section>
           <h2 className="text-2xl font-bold mb-3">GitHub-flavored Markdown, rendered faithfully</h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-content-muted mb-4">
             GitHub uses an extended dialect of Markdown known as GitHub-flavored
             Markdown (GFM). It adds tables, task lists, fenced code blocks with
             syntax highlighting, strikethrough, and automatic linking of bare
@@ -136,7 +136,7 @@ export default function ReadmeEditorPage() {
             so the preview you see is a close match for what visitors will see on
             your repository page.
           </p>
-          <p className="text-text-muted mb-4">
+          <p className="text-content-muted mb-4">
             That fidelity matters most for the elements that are easy to get
             wrong in plain text — especially tables, where a single misplaced
             pipe can break the layout. Seeing the rendered result immediately
@@ -146,7 +146,7 @@ export default function ReadmeEditorPage() {
 
         <section>
           <h2 className="text-2xl font-bold mb-3">Badges, tables, and code blocks</h2>
-          <p className="text-text-muted mb-6">
+          <p className="text-content-muted mb-6">
             A strong README leans on a handful of recurring building blocks. Here
             are the ones you will reach for most, with copy-ready Markdown you can
             drop into Dillinger.
@@ -155,8 +155,8 @@ export default function ReadmeEditorPage() {
             {SNIPPETS.map((snippet) => (
               <div key={snippet.title}>
                 <h3 className="text-xl font-semibold mb-2">{snippet.title}</h3>
-                <p className="text-text-muted mb-4">{snippet.description}</p>
-                <pre className="bg-bg-highlight text-icon-default rounded-lg p-4 text-sm font-mono overflow-x-auto">
+                <p className="text-content-muted mb-4">{snippet.description}</p>
+                <pre className="bg-surface-subtle text-icon-muted rounded-panel p-4 text-sm font-mono overflow-x-auto">
                   <code>{snippet.markdown.replace(/\\n/g, "\n")}</code>
                 </pre>
               </div>
@@ -166,7 +166,7 @@ export default function ReadmeEditorPage() {
 
         <section>
           <h2 className="text-2xl font-bold mb-3">Sync and export to GitHub</h2>
-          <p className="text-text-muted mb-4">
+          <p className="text-content-muted mb-4">
             When your README is ready, you do not have to copy and paste it
             anywhere. Connect your GitHub account and Dillinger can open an
             existing README.md from any of your repositories, let you edit it with
@@ -174,9 +174,9 @@ export default function ReadmeEditorPage() {
             polish documentation without leaving your browser or wrestling with a
             terminal.
           </p>
-          <p className="text-text-muted mb-4">
+          <p className="text-content-muted mb-4">
             Prefer to keep things manual? Export a clean{" "}
-            <code className="bg-bg-highlight px-1 rounded">README.md</code> file
+            <code className="bg-surface-subtle px-1 rounded-control">README.md</code> file
             and commit it yourself, or export to HTML or PDF when you need to
             share the documentation outside of GitHub. Your content is never
             locked in.
@@ -184,9 +184,9 @@ export default function ReadmeEditorPage() {
         </section>
       </div>
 
-      <div className="mt-16 pt-8 border-t border-border-light">
+      <div className="mt-16 pt-8 border-t border-border-subtle">
         <h2 className="text-2xl font-bold mb-3">Start your README now</h2>
-        <p className="text-text-muted mb-6">
+        <p className="text-content-muted mb-6">
           Open Dillinger, write in GitHub-flavored Markdown, and preview your
           README.md live before you ship it. New to Markdown? The guide covers
           every syntax element you will need.
@@ -194,13 +194,13 @@ export default function ReadmeEditorPage() {
         <div className="flex gap-4">
           <Link
             href="/"
-            className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+            className="inline-block bg-accent text-on-accent px-6 py-3 rounded-control font-medium hover:opacity-90 transition-opacity"
           >
             Open the Editor
           </Link>
           <Link
             href="/guide"
-            className="inline-block border border-border-light px-6 py-3 rounded font-medium hover:bg-border-light/20 transition-colors"
+            className="inline-block border border-border-subtle px-6 py-3 rounded-control font-medium hover:bg-surface-subtle transition-colors"
           >
             Read the Markdown Guide
           </Link>

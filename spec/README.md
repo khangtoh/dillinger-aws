@@ -76,7 +76,7 @@ boxes in the phase file; keep both in sync when checking boxes.
 | 17 | [17-ai-agent-native-features.md](17-ai-agent-native-features.md) | Real AI-native product features: document API contract, in-editor AI actions, follow-on MCP server | ⬜ 0/23 | Phase 13; AI-3 needs Phase 15's command palette |
 | 18 | [18-ui-verification-and-testing.md](18-ui-verification-and-testing.md) | Prove the UI refresh works live, includes the clean visual rebrand, and closes the StackEdit gap | ⛔ 0/17 | Phase 15 + 16 + 17 (AI-1/AI-3) + 20 |
 | 19 | [19-incremental-stack-upgrade-for-astryx.md](19-incremental-stack-upgrade-for-astryx.md) | Incrementally land Next 15.5.20, then React 19.2.7, then StyleX 0.18.3 — Astryx's actual minimum requirements | 🟡 35/43 | None (executes Phase 12's stack-upgrade item); unblocks Phase 14 |
-| 20 | [20-clean-visual-rebrand.md](20-clean-visual-rebrand.md) | Replace the legacy Dillinger palette, typography, shell, component styling, and Markdown presentation with an owned visual system | 🟡 6/44 | Phase 14 + 15; blocks Phase 18 visual acceptance |
+| 20 | [20-clean-visual-rebrand.md](20-clean-visual-rebrand.md) | Replace the legacy Dillinger palette, typography, shell, component styling, and Markdown presentation with an owned visual system | 🟡 42/44 | Local implementation and full acceptance evidence complete; branch CI/OIDC deployment proof and final index closure remain; blocks Phase 18 visual acceptance |
 
 ## Status
 
@@ -212,11 +212,16 @@ from the original requirement set.
       was already stale before this phase started. **Visual decision revised
       2026-07-19:** Phase 15's functionality and primitive migrations remain,
       but its retained legacy palette and overrides are now explicit Phase 20
-      migration debt. Phase 20 is not started, so the current deployment is
-      not evidence of the requested rebrand. Separately, the Lambda container
-      build and staging deploy for the Phase 19 stack upgrade still needs the
-      CI path before that upgrade reaches `staging`. Update this line with the
-      tenant URL and date once Phases 18 and 20 close out.
+      migration debt. **Phase 20 local acceptance complete (2026-07-20),
+      42/44:** the owned theme, shell, overlays, Markdown presentation, all
+      content/exceptional routes, responsive modes, accessibility, motion,
+      and legacy cleanup are implemented. Lint/typecheck/build and 381 unit
+      tests pass; 43 existing E2E plus five focused Phase 20 scenarios pass;
+      the canonical matrix contains 126 screenshots across 39 IDs. Only the
+      branch CI/OIDC deployment proof and dependent final index closure remain.
+      The next push also supplies the outstanding live evidence for the Phase
+      19 stack on `staging`; the current live URL is not yet claimed as Phase
+      20 evidence until that run and the deployed UI are verified.
 
 ## Non-goals for the UI-refresh initiative (Phase 13-20)
 

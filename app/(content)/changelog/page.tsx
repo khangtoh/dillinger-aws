@@ -84,7 +84,7 @@ export default function ChangelogPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
       <h1 className="text-4xl font-bold mb-4">Changelog</h1>
-      <p className="text-text-muted text-lg mb-12 max-w-2xl">
+      <p className="text-content-muted text-lg mb-12 max-w-2xl">
         What is new in Dillinger. All notable changes, features, and fixes.
       </p>
 
@@ -92,17 +92,17 @@ export default function ChangelogPage() {
         {RELEASES.map((release) => (
           <section
             key={release.version}
-            className="border-b border-border-light pb-12 last:border-0"
+            className="border-b border-border-subtle pb-12 last:border-0"
           >
             <div className="flex items-baseline gap-3 mb-1">
               <h2 className="text-2xl font-bold">v{release.version}</h2>
-              <span className="text-text-muted text-sm">{release.date}</span>
+              <span className="text-content-muted text-sm">{release.date}</span>
             </div>
-            <p className="text-text-muted mb-4">{release.title}</p>
+            <p className="text-content-muted mb-4">{release.title}</p>
             <ul className="space-y-2">
               {release.changes.map((change) => (
-                <li key={change} className="flex items-start gap-2 text-text-muted">
-                  <span className="text-plum mt-0.5 shrink-0">-</span>
+                <li key={change} className="flex items-start gap-2 text-content-muted">
+                  <span className="text-accent mt-0.5 shrink-0">-</span>
                   <span>{change}</span>
                 </li>
               ))}
@@ -111,14 +111,14 @@ export default function ChangelogPage() {
         ))}
       </div>
 
-      <div className="mt-12 pt-8 border-t border-border-light text-center">
-        <p className="text-text-muted mb-4">
+      <div className="mt-12 pt-8 border-t border-border-subtle text-center">
+        <p className="text-content-muted mb-4">
           Dillinger is open source and actively maintained.
         </p>
         <div className="flex gap-4 justify-center">
           <Link
             href="/"
-            className="inline-block bg-plum text-bg-sidebar px-6 py-3 rounded font-medium hover:opacity-90 transition-opacity"
+            className="inline-block bg-accent text-on-accent px-6 py-3 rounded-control font-medium hover:opacity-90 transition-opacity"
           >
             Open the Editor
           </Link>
@@ -126,7 +126,7 @@ export default function ChangelogPage() {
             href="https://github.com/joemccann/dillinger"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block border border-border-light px-6 py-3 rounded font-medium hover:bg-border-light/20 transition-colors"
+            className="inline-block border border-border-subtle px-6 py-3 rounded-control font-medium hover:bg-surface-subtle transition-colors"
           >
             View on GitHub
           </a>

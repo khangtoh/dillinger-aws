@@ -21,12 +21,16 @@ const docA = {
   title: "First.md",
   body: "# First",
   createdAt: "2026-01-01T00:00:00.000Z",
+  folderId: null,
+  tags: [],
 };
 const docB = {
   id: "doc-b",
   title: "Second.md",
   body: "# Second",
   createdAt: "2026-01-01T00:00:00.000Z",
+  folderId: null,
+  tags: [],
 };
 
 function resetStore() {

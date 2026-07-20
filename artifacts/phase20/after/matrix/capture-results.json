@@ -1,0 +1,676 @@
+{
+  "captured": 126,
+  "matrix_ids": [
+    "E01",
+    "E02",
+    "E03",
+    "E04",
+    "E05",
+    "E06",
+    "E07",
+    "E08",
+    "E09",
+    "E10",
+    "E11",
+    "E12",
+    "E13",
+    "E14",
+    "E15",
+    "E16",
+    "E17",
+    "E18",
+    "E19",
+    "E20",
+    "R01",
+    "R02",
+    "R03",
+    "R04",
+    "R05",
+    "R06",
+    "R07",
+    "R08",
+    "R09",
+    "R10",
+    "R11",
+    "R12",
+    "R13",
+    "R14",
+    "R15",
+    "R16",
+    "R17",
+    "R18",
+    "R19"
+  ],
+  "results": [
+    {
+      "id": "E01",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E01",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E01",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "E01",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E02",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E02",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E02",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "E02",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E03",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E03",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E03",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "E03",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E04",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E04",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E04",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "E04",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E05",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E05",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E05",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E06",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E06",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E06",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "E06",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E07",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E07",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E07",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E08",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E08",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E08",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E09",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E09",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E09",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E10",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E10",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E10",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E11",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E11",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E11",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E13",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E13",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E13",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E14",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E14",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E14",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "E14",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E15",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E15",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E15",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "E15",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E16",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E16",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E16",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "E16",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E17",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E17",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E17",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E18",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E18",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E18",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "E18",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E20",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E20",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E20",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E12",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "E12",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "E12",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "E12",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "E19",
+      "variant": "320px",
+      "status": "captured"
+    },
+    {
+      "id": "R01",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R01",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R01",
+      "variant": "tablet",
+      "status": "captured"
+    },
+    {
+      "id": "R01",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R02",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R02",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R02",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R03",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R03",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R03",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R04",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R04",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R04",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R05",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R05",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R05",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R06",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R06",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R06",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R07",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R07",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R07",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R08",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R08",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R08",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R09",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R09",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R09",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R10",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R10",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R10",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R11",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R11",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R11",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R12",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R12",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R12",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R13",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R13",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R13",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R14",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R14",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R14",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R15",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R15",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R15",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R16",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R16",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R16",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R17",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R17",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R17",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R18",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R18",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R18",
+      "variant": "mobile",
+      "status": "captured"
+    },
+    {
+      "id": "R19",
+      "variant": "desktop-light",
+      "status": "captured"
+    },
+    {
+      "id": "R19",
+      "variant": "desktop-dark",
+      "status": "captured"
+    },
+    {
+      "id": "R19",
+      "variant": "mobile",
+      "status": "captured"
+    }
+  ]
+}

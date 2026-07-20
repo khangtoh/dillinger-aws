@@ -99,16 +99,16 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
           header={<DialogHeader title="Connect to Bitbucket" onOpenChange={handleOpenChange} />}
           content={
             <LayoutContent>
-              <div className="text-center">
-                <GitBranch size={48} className="mx-auto text-text-primary mb-4" aria-hidden="true" />
-                <p className="text-text-secondary mb-6">
+              <div className="rounded-panel border border-border-subtle bg-surface-subtle px-6 py-8 text-center">
+                <GitBranch size={48} className="mx-auto mb-4 rounded-panel bg-accent-soft p-3 text-accent" aria-hidden="true" />
+                <p className="text-content-muted mb-6">
                   Connect your Bitbucket account to import and save markdown files.
                 </p>
                 <Button
                   label="Connect Bitbucket"
                   variant="primary"
                   onClick={bitbucket.connect}
-                  className="bg-plum text-bg-sidebar hover:opacity-90"
+                  className="bg-accent text-on-accent hover:opacity-90"
                 />
               </div>
             </LayoutContent>
@@ -150,7 +150,7 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
           <div className="space-y-3 mb-4">
             {/* Workspace selector */}
             <div className="relative">
-              <label htmlFor="workspace" className="block text-sm text-text-muted mb-1">
+              <label htmlFor="workspace" className="block text-sm text-content-muted mb-1">
                 Workspace
               </label>
               <div className="relative">
@@ -158,23 +158,23 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
                   id="workspace"
                   value={bitbucket.selectedWorkspace || ""}
                   onChange={(e) => bitbucket.selectWorkspace(e.target.value)}
-                  className="w-full bg-bg-highlight text-text-invert px-3 py-2 rounded
-                             border border-border-settings appearance-none
-                             focus:border-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                  className="w-full bg-surface-subtle text-content-strong px-3 py-2 rounded-control
+                             border border-border-control appearance-none
+                             focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   <option value="">Select workspace</option>
                   {bitbucket.workspaces.map((ws) => (
                     <option key={ws.slug} value={ws.slug}>{ws.name}</option>
                   ))}
                 </select>
-                <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+                <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-content-muted pointer-events-none" />
               </div>
             </div>
 
             {/* Repo selector */}
             {bitbucket.selectedWorkspace && (
               <div className="relative">
-                <label htmlFor="repo" className="block text-sm text-text-muted mb-1">
+                <label htmlFor="repo" className="block text-sm text-content-muted mb-1">
                   Repository
                 </label>
                 <div className="relative">
@@ -182,16 +182,16 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
                     id="repo"
                     value={bitbucket.selectedRepo || ""}
                     onChange={(e) => bitbucket.selectRepo(e.target.value)}
-                    className="w-full bg-bg-highlight text-text-invert px-3 py-2 rounded
-                               border border-border-settings appearance-none
-                               focus:border-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                    className="w-full bg-surface-subtle text-content-strong px-3 py-2 rounded-control
+                               border border-border-control appearance-none
+                               focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     <option value="">Select repository</option>
                     {bitbucket.repos.map((repo) => (
                       <option key={repo.slug} value={repo.slug}>{repo.name}</option>
                     ))}
                   </select>
-                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-content-muted pointer-events-none" />
                 </div>
               </div>
             )}
@@ -199,7 +199,7 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
             {/* Branch selector */}
             {bitbucket.selectedRepo && (
               <div className="relative">
-                <label htmlFor="branch" className="block text-sm text-text-muted mb-1">
+                <label htmlFor="branch" className="block text-sm text-content-muted mb-1">
                   Branch
                 </label>
                 <div className="relative">
@@ -207,16 +207,16 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
                     id="branch"
                     value={bitbucket.selectedBranch || ""}
                     onChange={(e) => bitbucket.selectBranch(e.target.value)}
-                    className="w-full bg-bg-highlight text-text-invert px-3 py-2 rounded
-                               border border-border-settings appearance-none
-                               focus:border-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                    className="w-full bg-surface-subtle text-content-strong px-3 py-2 rounded-control
+                               border border-border-control appearance-none
+                               focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     <option value="">Select branch</option>
                     {bitbucket.branches.map((branch) => (
                       <option key={branch.name} value={branch.name}>{branch.name}</option>
                     ))}
                   </select>
-                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-content-muted pointer-events-none" />
                 </div>
               </div>
             )}
@@ -224,9 +224,9 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
 
           {/* Save mode inputs */}
           {mode === "save" && bitbucket.selectedBranch && (
-            <div className="space-y-3 mb-4 p-3 bg-bg-highlight rounded">
+            <div className="space-y-3 mb-4 p-3 bg-surface-subtle rounded-control">
               <div>
-                <label htmlFor="bitbucket-filename" className="block text-sm text-text-muted mb-1">
+                <label htmlFor="bitbucket-filename" className="block text-sm text-content-muted mb-1">
                   File name
                 </label>
                 <input
@@ -235,13 +235,13 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
                   value={formState.newFileName}
                   onChange={(e) => setFormState((prev) => ({ ...prev, newFileName: e.target.value }))}
                   placeholder="document.md"
-                  className="w-full bg-bg-navbar text-text-invert px-3 py-2 rounded
-                             border border-border-settings
-                             focus:border-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                  className="w-full bg-surface text-content-strong px-3 py-2 rounded-control
+                             border border-border-control
+                             focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 />
               </div>
               <div>
-                <label htmlFor="commit-message" className="block text-sm text-text-muted mb-1">
+                <label htmlFor="commit-message" className="block text-sm text-content-muted mb-1">
                   Commit message
                 </label>
                 <input
@@ -250,9 +250,9 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
                   value={formState.commitMessage}
                   onChange={(e) => setFormState((prev) => ({ ...prev, commitMessage: e.target.value }))}
                   placeholder="Update document"
-                  className="w-full bg-bg-navbar text-text-invert px-3 py-2 rounded
-                             border border-border-settings
-                             focus:border-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                  className="w-full bg-surface text-content-strong px-3 py-2 rounded-control
+                             border border-border-control
+                             focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 />
               </div>
             </div>
@@ -262,7 +262,7 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
           {bitbucket.selectedBranch && (
             <>
               {bitbucket.files.length === 0 ? (
-                <p className="text-text-muted text-center py-4">
+                <p className="text-content-muted text-center py-4">
                   No files found
                 </p>
               ) : (
@@ -271,15 +271,15 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
                     <button
                       key={item.path}
                       onClick={() => handleItemClick(item)}
-                      className={`w-full text-left px-3 py-2 rounded text-text-primary
-                                 hover:bg-bg-highlight flex items-center gap-2
-                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum
-                                 ${formState.selectedFilePath === item.path ? "bg-bg-highlight" : ""}`}
+                      className={`w-full text-left px-3 py-2 rounded-control text-content-strong
+                                 hover:bg-surface-subtle flex items-center gap-2
+                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent
+                                 ${formState.selectedFilePath === item.path ? "bg-surface-subtle" : ""}`}
                     >
                       {item.isFolder ? (
-                        <Folder size={16} className="text-text-muted" aria-hidden="true" />
+                        <Folder size={16} className="text-content-muted" aria-hidden="true" />
                       ) : (
-                        <FileText size={16} className="text-text-muted" aria-hidden="true" />
+                        <FileText size={16} className="text-content-muted" aria-hidden="true" />
                       )}
                       <span>{item.name}</span>
                     </button>
@@ -298,7 +298,7 @@ export function BitbucketModal({ isOpen, onClose, mode }: BitbucketModalProps) {
                 icon={<Save size={18} />}
                 variant="primary"
                 onClick={handleSave}
-                className="w-full bg-plum text-bg-sidebar hover:opacity-90"
+                className="w-full bg-accent text-on-accent hover:opacity-90"
               />
             </LayoutFooter>
           )

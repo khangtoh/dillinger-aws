@@ -11,3 +11,7 @@
 | #1786 | 2:05 PM | 🟣 | XSS Protection Added to Markdown Preview with DOMPurify | ~485 |
 | #1766 | 2:02 PM | 🔵 | MarkdownPreview Component Implementation with Memoized Rendering | ~455 |
 </claude-mem-context>
+
+## Phase 20 visual system
+
+The default Markdown preview is part of the owned editorial theme: prose, headings, links, code, tables, blockquotes, tasks, KaTeX, Mermaid, and TOC output must use semantic document tokens in both modes. Preserve sanitization and line-aware scroll sync.

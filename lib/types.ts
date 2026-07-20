@@ -3,6 +3,10 @@ export interface Document {
   title: string;
   body: string;
   createdAt: string;
+  // Single-level local folder membership; null = unfiled. Independent of
+  // github.path, which round-trips a repo file path and is not a folder.
+  folderId: string | null;
+  tags: string[];
   github?: {
     sha: string;
     path: string;
@@ -10,6 +14,12 @@ export interface Document {
     owner: string;
     branch: string;
   };
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+  createdAt: string;
 }
 
 export type ThemeMode = "light" | "dark" | "system";
@@ -86,7 +96,7 @@ Link to any page with [inline links](https://dillinger.io) or use [reference-sty
 
 Images use a similar syntax:
 
-![Placeholder](https://placehold.co/600x200/2B2F36/35D7BB?text=Your+Image+Here)
+![Placeholder](https://placehold.co/600x200/0F172A/818CF8?text=Your+Image+Here)
 
 [dillinger]: https://dillinger.io
 

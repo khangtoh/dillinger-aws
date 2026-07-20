@@ -9,56 +9,57 @@ export default function ContentLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-dvh flex flex-col bg-bg-primary text-text-primary">
-      <header className="h-14 bg-bg-navbar flex items-center px-6">
-        <Link
-          href="/"
-          className="text-plum font-bold text-xl tracking-wide hover:opacity-80 transition-opacity"
-        >
-          DILLINGER
-        </Link>
-        <nav className="ml-auto flex items-center gap-6 text-sm text-text-invert">
-          <Link href="/features" className="hover:text-plum transition-colors">
-            Features
+    <div className="flex min-h-dvh flex-col bg-canvas text-content-strong">
+      <header className="sticky top-0 z-navbar border-b border-border-subtle bg-surface/95 px-4 backdrop-blur sm:px-6">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-6">
+          <Link href="/" className="group flex min-w-0 items-center gap-3 rounded-control">
+            <span className="grid size-9 shrink-0 place-items-center rounded-panel bg-accent text-base font-semibold text-on-accent shadow-low transition-transform group-hover:-translate-y-0.5" aria-hidden="true">
+              D
+            </span>
+            <span className="leading-tight">
+              <span className="block text-base font-semibold tracking-tight text-content-strong">Dillinger</span>
+              <span className="hidden text-[10px] font-medium uppercase tracking-[0.14em] text-content-muted sm:block">Editorial workspace</span>
+            </span>
           </Link>
-          <Link href="/ai" className="hover:text-plum transition-colors">
-            AI
-          </Link>
-          <Link href="/integrations" className="hover:text-plum transition-colors">
-            Integrations
-          </Link>
-          <Link href="/guide" className="hover:text-plum transition-colors">
-            Guide
-          </Link>
-          <Link href="/compare" className="hover:text-plum transition-colors hidden sm:block">
-            Compare
-          </Link>
+          <nav className="ml-auto hidden items-center gap-5 text-sm font-medium text-content-muted md:flex" aria-label="Content navigation">
+            {[
+              ["Features", "/features"],
+              ["AI", "/ai"],
+              ["Integrations", "/integrations"],
+              ["Guide", "/guide"],
+              ["Compare", "/compare"],
+            ].map(([label, href]) => (
+              <Link key={href} href={href} className="rounded-control transition-colors hover:text-accent">
+                {label}
+              </Link>
+            ))}
+          </nav>
           <Link
             href="/"
-            className="bg-plum text-bg-sidebar px-4 py-1.5 rounded font-medium hover:opacity-90 transition-opacity"
+            className="ml-auto inline-flex min-h-10 items-center rounded-control bg-accent px-3.5 text-sm font-semibold text-on-accent shadow-low transition-transform hover:-translate-y-0.5 md:ml-0"
           >
-            Open Editor
+            Open editor
           </Link>
-        </nav>
+        </div>
       </header>
 
       <main className="flex-1">{children}</main>
 
-      <footer className="bg-bg-navbar text-text-muted text-sm py-8 px-6">
+      <footer className="border-t border-border-subtle bg-surface px-6 py-8 text-sm text-content-muted">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <span>Dillinger — The last Markdown editor you will ever need.</span>
           <div className="flex gap-6">
-            <Link href="/privacy" className="hover:text-text-invert transition-colors">
+            <Link href="/privacy" className="hover:text-content-strong transition-colors">
               Privacy
             </Link>
-            <Link href="/changelog" className="hover:text-text-invert transition-colors">
+            <Link href="/changelog" className="hover:text-content-strong transition-colors">
               Changelog
             </Link>
             <a
               href="https://github.com/joemccann/dillinger"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-text-invert transition-colors"
+              className="hover:text-content-strong transition-colors"
             >
               GitHub
             </a>

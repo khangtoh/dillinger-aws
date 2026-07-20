@@ -49,25 +49,25 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
           <DialogHeader title="Keyboard Shortcuts" onOpenChange={handleOpenChange} />
         }
         content={
-          <LayoutContent>
+          <LayoutContent tabIndex={0} role="region" label="Keyboard shortcut reference">
             <div className="space-y-4">
               {SHORTCUT_GROUPS.map((group) => (
-                <div key={group.title}>
-                  <h3 className="text-xs uppercase tracking-wider text-text-muted mb-2">
+                <section key={group.title} aria-labelledby={`shortcut-${group.title.toLowerCase()}`}>
+                  <h3 id={`shortcut-${group.title.toLowerCase()}`} className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-content-muted">
                     {group.title}
                   </h3>
-                  <div className="space-y-2">
+                  <div className="divide-y divide-border-subtle overflow-hidden rounded-panel border border-border-subtle bg-surface">
                     {group.shortcuts.map((shortcut) => (
                       <div
                         key={shortcut.action}
-                        className="flex items-center justify-between text-sm"
+                        className="flex min-h-11 items-center justify-between gap-4 px-3 py-2 text-sm"
                       >
-                        <span className="text-text-muted">{shortcut.action}</span>
-                        <div className="flex items-center gap-1">
+                        <span className="text-content-strong">{shortcut.action}</span>
+                        <div className="flex shrink-0 items-center gap-1">
                           {shortcut.keys.map((key, i) => (
                             <kbd
                               key={`${shortcut.action}-${i}`}
-                              className="bg-bg-highlight text-text-invert px-2.5 py-0.5 rounded text-xs font-mono min-w-[24px] text-center"
+                              className="min-w-7 rounded-control border border-border-control bg-surface-subtle px-2 py-1 text-center font-mono text-[11px] font-medium text-content-strong shadow-low"
                             >
                               {key}
                             </kbd>
@@ -76,7 +76,7 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
                       </div>
                     ))}
                   </div>
-                </div>
+                </section>
               ))}
             </div>
           </LayoutContent>

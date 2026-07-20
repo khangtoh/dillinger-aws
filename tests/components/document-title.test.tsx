@@ -33,6 +33,8 @@ function createDocument(overrides: Partial<Document> = {}): Document {
     title: "My Document.md",
     body: "# Hello",
     createdAt: new Date().toISOString(),
+    folderId: null,
+    tags: [],
     ...overrides,
   };
 }

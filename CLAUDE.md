@@ -45,9 +45,9 @@ the canonical procedure requires them.
 
 | Category | Technology | Version |
 |----------|------------|---------|
-| Framework | Next.js (App Router) | 14.2.35 |
+| Framework | Next.js (App Router) | 15.5.20 |
 | Language | TypeScript (strict) | 5.x |
-| UI | React | 18.x |
+| UI | React | 19.2.7 |
 | Styling | Tailwind CSS | 3.4.1 |
 | State | Zustand | 5.0.10 |
 | Editor | Monaco Editor | 4.7.0 |
@@ -153,17 +153,17 @@ const Sidebar = dynamic(() => import('@/components/sidebar/Sidebar'), {
 ### Styling with Tailwind
 
 - Follow `spec/20-clean-visual-rebrand.md` for current visual requirements.
-- Existing `plum`/`bg-navbar`/`bg-sidebar` color tokens are frozen migration
-  debt: preserve them only in scoped bug fixes until Phase 20 removes their
-  consumers; do not introduce new uses.
-- New visual work must use the owned semantic Astryx/Tailwind token bridge
-  created by Phase 20, not hard-coded colors or aliases of legacy names.
+- `lib/theme/tokens.ts` is the visual source of truth; the owned Dillinger
+  Astryx theme and Tailwind semantic bridge must resolve from it.
+- Use semantic classes such as `bg-canvas`, `bg-surface`,
+  `text-content-strong`, `text-content-muted`, `border-border-subtle`, and
+  `ring-focus-ring`. Do not add hard-coded application colors.
+- Never reintroduce `plum`, `bg-navbar`, `bg-sidebar`, `neutralTheme`, Source
+  Sans Pro, Georgia, Ubuntu Mono, or the prohibited legacy colors. Run
+  `npm run check:legacy-theme`; it is also enforced by `prebuild`.
 - Combine classes with `clsx` and `tailwind-merge` via the `cn()` utility
 - Follow z-index scale: sidebar(1) < page(2) < editor(3) < preview(4) < overlay(5) < navbar(6) < settings(7) < modal(50) < toast(60)
 
-The current code still contains the old token names because the rebrand is a
-planned phase, not completed implementation. Their presence is not design
-authority; Phase 20's prohibited-token check removes them at close-out.
 
 ### Zustand State Management
 

@@ -53,7 +53,7 @@ describe("renderHtmlDocument", () => {
   it("includes CSS when styled is true", () => {
     const result = renderHtmlDocument({ html: "", styled: true });
     expect(result).toContain("<style>");
-    expect(result).toContain("font-family: Georgia");
+    expect(result).toContain("font-family: Geist");
   });
 
   it("has no <style> tag when styled is false or omitted", () => {

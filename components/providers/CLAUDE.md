@@ -5,3 +5,7 @@
 
 *No recent activity*
 </claude-mem-context>
+
+## Phase 20 visual system
+
+`dillingerTheme` is the sole runtime Astryx visual identity. Theme mode must remain light/dark/system, persist through the `dillinger-theme` cookie and store profile, react to system preference changes, and render without a wrong-theme flash.

@@ -95,7 +95,7 @@ recorded in this file with contrast evidence:
 | Primary surface | `#FFFFFF` | `#111827` |
 | Raised surface | `#F1F5F9` | `#182235` |
 | Strong text | `#0F172A` | `#F8FAFC` |
-| Muted text | `#64748B` | `#94A3B8` |
+| Muted text | `#5D6C82` | `#94A3B8` |
 | Subtle border | `#E2E8F0` | `#273449` |
 | Accent | `#4F46E5` | `#818CF8` |
 | On-accent | `#FFFFFF` | `#0B1220` |
@@ -170,113 +170,113 @@ Shell direction:
 
 ## Clarification and baseline
 
-- [ ] Capture current legacy-theme screenshots at 1440×900, 768×1024, and
+- [x] Capture current legacy-theme screenshots at 1440×900, 768×1024, and
       390×844 in light and dark modes; label them `before` evidence, not
       future visual baselines.
-- [ ] Capture open-state screenshots for the sidebar, export menu, command
+- [x] Capture open-state screenshots for the sidebar, export menu, command
       palette, Settings dialog, one cloud-provider dialog, toast, and
       keyboard-shortcuts dialog.
-- [ ] Inventory every legacy token name and prohibited color/font value in
+- [x] Inventory every legacy token name and prohibited color/font value in
       `tailwind.config.ts`, `app/globals.css`, `app/**`, and `components/**`;
       record the removal list in the Results log below.
-- [ ] Inventory every place that mounts `neutralTheme` or applies a Tailwind
+- [x] Inventory every place that mounts `neutralTheme` or applies a Tailwind
       color override to an Astryx component; record it as migration debt.
-- [ ] Build a route/state screenshot matrix covering the editor, content
+- [x] Build a route/state screenshot matrix covering the editor, content
       routes, errors, empty/loading states, mobile navigation, and overlays.
-- [ ] Validate the proposed light and dark palette token pairs with an
+- [x] Validate the proposed light and dark palette token pairs with an
       automated contrast checker; record any adjusted values and the reason.
-- [ ] Confirm the new wordmark treatment and app-shell direction in one
+- [x] Confirm the new wordmark treatment and app-shell direction in one
       desktop and one mobile static prototype before migrating components.
 
 ## Theme and token foundation
 
-- [ ] Create the owned Dillinger Astryx theme module with complete light and
+- [x] Create the owned Dillinger Astryx theme module with complete light and
       dark semantic color tokens.
-- [ ] Add typography, radius, elevation, spacing, focus, and motion tokens to
+- [x] Add typography, radius, elevation, spacing, focus, and motion tokens to
       the same owned theme layer.
-- [ ] Replace `neutralTheme` in `Providers.tsx` with the owned theme while
+- [x] Replace `neutralTheme` in `Providers.tsx` with the owned theme while
       preserving the existing light/dark/system state behavior.
-- [ ] Replace legacy Tailwind color token names with a semantic bridge to the
+- [x] Replace legacy Tailwind color token names with a semantic bridge to the
       owned theme; do not create aliases named `plum`, `bg-navbar`, or
       `bg-sidebar`.
-- [ ] Add the Geist font variables to the owned theme and apply them at the
+- [x] Add the Geist font variables to the owned theme and apply them at the
       root without layout shift.
-- [ ] Replace the body canvas/text literals and global focus styling with
+- [x] Replace the body canvas/text literals and global focus styling with
       owned tokens.
-- [ ] Add unit tests proving all three theme modes select the owned theme and
+- [x] Add unit tests proving all three theme modes select the owned theme and
       that `system` reacts to a media-query change.
-- [ ] Add a build-time check that fails when prohibited legacy token names or
+- [x] Add a build-time check that fails when prohibited legacy token names or
       values are introduced in rendered UI source.
 
 ## Application-shell migration
 
-- [ ] Redesign the Navbar layout, wordmark, action grouping, hover/pressed
+- [x] Redesign the Navbar layout, wordmark, action grouping, hover/pressed
       states, and responsive overflow behavior using only owned tokens.
-- [ ] Redesign the Sidebar surface, section hierarchy, document navigation,
+- [x] Redesign the Sidebar surface, section hierarchy, document navigation,
       provider actions, and primary/destructive actions using only owned
       tokens.
-- [ ] Redesign `DocumentList` selection, hover, metadata, empty, and overflow
+- [x] Redesign `DocumentList` selection, hover, metadata, empty, and overflow
       states; incorporate Phase 16 folder/tag states if that phase has landed.
-- [ ] Redesign `DocumentTitle` and its dirty/saved states as part of the new
+- [x] Redesign `DocumentTitle` and its dirty/saved states as part of the new
       workspace hierarchy.
-- [ ] Redesign the formatting toolbar, including grouping, separators,
+- [x] Redesign the formatting toolbar, including grouping, separators,
       pressed/disabled states, and mobile overflow.
-- [ ] Redesign the editor/preview canvas, divider, pane headers, and resize or
+- [x] Redesign the editor/preview canvas, divider, pane headers, and resize or
       collapse affordances without changing Monaco/scroll-sync behavior.
-- [ ] Redesign zen mode and drag/drop overlays using the same theme rather
+- [x] Redesign zen mode and drag/drop overlays using the same theme rather
       than a separate visual treatment.
-- [ ] Verify the shell at all three target viewport sizes before proceeding
+- [x] Verify the shell at all three target viewport sizes before proceeding
       to overlays; record screenshots in the Results log.
 
 ## Documents, overlays, and secondary surfaces
 
-- [ ] Replace all legacy `.preview-html` colors, fonts, borders, radii, and
+- [x] Replace all legacy `.preview-html` colors, fonts, borders, radii, and
       spacing with owned document-presentation tokens.
-- [ ] Restyle headings, links, code/pre, blockquotes, lists, tables, task
+- [x] Restyle headings, links, code/pre, blockquotes, lists, tables, task
       lists, table of contents, KaTeX, and Mermaid output in both modes.
-- [ ] Redesign the export DropdownMenu and command palette, including empty,
+- [x] Redesign the export DropdownMenu and command palette, including empty,
       filter, selected, keyboard-focus, and grouped-result states.
-- [ ] Redesign Settings, delete confirmation, keyboard shortcuts, and all
+- [x] Redesign Settings, delete confirmation, keyboard shortcuts, and all
       cloud-provider dialogs using shared overlay patterns and owned tokens.
-- [ ] Redesign Toast, Skeleton, loading, empty, error, and offline states.
-- [ ] Audit and migrate `app/error.tsx`, `app/not-found.tsx`, and every
+- [x] Redesign Toast, Skeleton, loading, empty, error, and offline states.
+- [x] Audit and migrate `app/error.tsx`, `app/not-found.tsx`, and every
       `app/(content)` route that exposes legacy or conflicting styling.
-- [ ] Verify every Astryx primitive resolves the owned theme rather than
+- [x] Verify every Astryx primitive resolves the owned theme rather than
       `theme-neutral` defaults using computed-style assertions for at least
       one component from each primitive family.
 
 ## Responsive, accessibility, and motion validation
 
-- [ ] Run keyboard-only checks through Navbar, Sidebar, toolbar, command
+- [x] Run keyboard-only checks through Navbar, Sidebar, toolbar, command
       palette, dialogs, editor/preview toggles, and document navigation.
-- [ ] Run automated axe checks on the editor shell plus every overlay in
+- [x] Run automated axe checks on the editor shell plus every overlay in
       light and dark modes; resolve all serious/critical findings.
-- [ ] Verify text, icons, controls, focus rings, selected states, and danger
+- [x] Verify text, icons, controls, focus rings, selected states, and danger
       states meet WCAG 2.2 AA contrast in both modes.
-- [ ] Verify 200% zoom and 320px-wide rendering without lost actions,
+- [x] Verify 200% zoom and 320px-wide rendering without lost actions,
       clipped dialogs, or horizontal page overflow.
-- [ ] Verify `prefers-reduced-motion` removes non-essential transitions and
+- [x] Verify `prefers-reduced-motion` removes non-essential transitions and
       preserves clear state changes.
-- [ ] Verify light/dark/system persistence across reload and a fresh browser
+- [x] Verify light/dark/system persistence across reload and a fresh browser
       session without a flash of the wrong theme.
 
 ## Visual acceptance and cleanup
 
-- [ ] Add Playwright screenshot coverage for every state in the route/state
+- [x] Add Playwright screenshot coverage for every state in the route/state
       matrix at desktop, tablet, and mobile sizes where the layout differs.
-- [ ] Review before/after pairs and record a clear verdict that the new shell,
+- [x] Review before/after pairs and record a clear verdict that the new shell,
       palette, typography, preview, and components cannot be mistaken for the
       legacy Dillinger UI.
-- [ ] Run the prohibited-token/value check with zero application-source
+- [x] Run the prohibited-token/value check with zero application-source
       matches; historical spec text and labeled before-artifacts are the only
       allowed matches.
-- [ ] Delete unused legacy Tailwind tokens, legacy global CSS, compatibility
+- [x] Delete unused legacy Tailwind tokens, legacy global CSS, compatibility
       overrides, and temporary migration comments.
-- [ ] Run lint, typecheck, unit, E2E, coverage, and production build; record
+- [x] Run lint, typecheck, unit, E2E, coverage, and production build; record
       exact results and investigate every regression.
 - [ ] Deploy through the branch CI/OIDC path and hand the run URL plus visual
       evidence to Phase 18 for live-product acceptance.
-- [ ] Update `CLAUDE.md` and any component-level contributor notes to describe
+- [x] Update `CLAUDE.md` and any component-level contributor notes to describe
       the owned theme and forbid reintroduction of legacy styling.
 - [ ] Check this phase complete in `spec/README.md` only after every item
       above is checked and a dated Results entry is recorded.
@@ -304,3 +304,135 @@ This phase is complete only when all of the following are true:
 _(Append dated evidence here: final token values, inventory/removal counts,
 contrast results, screenshot artifact locations, test/build results, branch
 deployment run URL, and the final before/after verdict.)_
+
+### 2026-07-19 — clarification/baseline evidence
+
+- Captured six deterministic `before` editor screenshots at 1440×900,
+  768×1024, and 390×844 in light/dark system preference, plus seven required
+  open states. Evidence, capture source, and the reusable Playwright script are
+  under [`artifacts/phase20/`](../artifacts/phase20/).
+- Recorded the complete legacy Tailwind color-token inventory, prohibited
+  values/fonts, additional preview literals, and removal order in
+  [`baseline-audit.md`](../artifacts/phase20/baseline-audit.md). Headline debt:
+  `plum` has 127 matches across 32 rendered-source files; `bg-sidebar` has 37
+  across 27; and `bg-navbar` has 13 across 9.
+- Found one runtime `neutralTheme` mount and one neutral-theme CSS import. Ten
+  Astryx-consuming component files also apply legacy Tailwind color overrides;
+  the audit names every file.
+- Added the full editor/content/error/overlay viewport contract in
+  [`route-state-matrix.md`](../artifacts/phase20/route-state-matrix.md).
+- Automated palette validation found the proposed light muted text `#64748B`
+  failed on raised surface `#F1F5F9` at `4.34:1`. The recorded target is now
+  `#627188`, passing at `4.52:1`; all required text, accent, and focus pairs now
+  pass. Subtle borders remain decorative-only; the foundation result below
+  records the separate 3:1 control-border token.
+- Created a clean-break responsive shell prototype and rendered desktop/mobile
+  review images under [`prototype/`](../artifacts/phase20/prototype/). Continuing
+  Phase 20 implementation on 2026-07-19 confirmed this direction.
+- No runtime UI implementation changed in this slice. Local dependency install
+  was unavailable because npm's cache rename failed twice and its constrained
+  retry crashed with allocator corruption; live Playwright/Python checks provide
+  the recorded evidence, but do not substitute for later unit/build validation.
+
+### 2026-07-19 — owned theme/token foundation
+
+- Added the sole runtime Astryx identity in
+  [`lib/theme/dillingerTheme.ts`](../lib/theme/dillingerTheme.ts), driven by
+  the owned light/dark color, typography, spacing, radius, elevation, focus,
+  and motion source in [`tokens.ts`](../lib/theme/tokens.ts). The neutral
+  package supplies only its semantic icon registry; its theme object and CSS
+  are no longer mounted.
+- Replaced every retired Tailwind color name at rendered call sites with the
+  semantic bridge to Astryx variables. `npm run check:legacy-theme` passes
+  across 123 rendered-source files and is a `prebuild` gate; it rejects the
+  three prohibited colors, retired token names/fonts, and `neutralTheme`.
+- Added Vercel's `geist@1.7.2` local-font loader for Geist Sans/Mono, applied
+  both variables at the root, moved Monaco to the mono variable, and replaced
+  body/focus/global preview literals with owned tokens. Styled exports and the
+  Open Graph route also consume the owned palette source.
+- Extended contrast evidence with the emphasized `#64748B` control border:
+  `4.76:1` on the light surface and `3.73:1` on the dark surface. All required
+  text, accent, focus, and control-border pairs pass; subtle borders remain
+  decorative separators only.
+- Added pure mode-selection/class-synchronization coverage in
+  [`tests/lib/theme-mode.test.ts`](../tests/lib/theme-mode.test.ts). The
+  core phase-owned foundation files passed an isolated TypeScript compile
+  before later test-install attempts damaged `node_modules`. The full typecheck
+  reaches unrelated existing LogoBar/Playwright typing issues plus
+  concurrent Phase 16 document-schema test fixtures, with no Phase 20 source
+  errors.
+- The mode suite could not execute in Vitest because npm and Bun repeatedly
+  left transitive package directories empty under this Proot filesystem
+  (`pathe`, `tough-cookie`, and React were observed). Its checkbox therefore
+  remains open; full unit/build verification is not claimed.
+
+### 2026-07-19 — application-shell composition
+
+- Replaced the uppercase legacy top bar with a restrained Dillinger wordmark,
+  surfaced navigation control, compact primary actions, and one owned-theme
+  progressive-disclosure menu for image, toolbar, zen, and shortcut actions.
+- Rebuilt the 288px library sidebar with surfaced section hierarchy, an owned
+  overlay/motion treatment, document counts, folder and tag metadata, selected/
+  empty/overflow states, provider connection states, and separated primary,
+  save, and destructive actions. Existing sidebar, modal, create/save/delete,
+  and document-selection behavior contracts remain wired.
+- Reframed the document title, formatting groups, Monaco editor, and rendered
+  preview as one workspace. Desktop receives labelled split panes and the
+  existing collapse toggle; mobile receives explicit Write/Preview tabs without
+  duplicating controls or changing Monaco/scroll-sync state.
+- Moved Monaco's light/dark Markdown colors onto the owned token source, removed
+  the remaining hard-coded preview surfaces, updated the default placeholder
+  palette, and brought focus mode and drag/drop into the same shell treatment.
+- Dependency-free Bun parsing/bundling passed for the eight changed shell modules
+  and the updated Navbar test. `npm run check:legacy-theme` still passes across
+  123 rendered-source files, and `git diff --check` passes.
+- A usable dependency tree is still absent in this Proot workspace, so Vitest,
+  the production build, and rendered viewport screenshots were not rerun. The
+  three-viewport shell-verification checkbox remains open rather than inferring
+  visual acceptance from source or the earlier static prototype.
+
+### 2026-07-20 — final local acceptance (deployment pending)
+
+- Completed the owned editorial system across the application shell, every
+  overlay/secondary state, the default Markdown presentation, all content
+  routes, loading/empty/offline/error/404 states, and deliberate light, dark,
+  and reactive system modes. Server-rendered dark-cookie markup and reload
+  assertions prove the selected mode does not flash the wrong theme.
+- Adjusted light muted text from the intermediate `#627188` to `#5D6C82`
+  after testing the accent-soft and Astryx keycap composite surfaces. The final
+  automated contrast matrix passes every required pair: muted text is
+  `5.10:1` on canvas, `5.34:1` on surface, `4.87:1` on raised,
+  `4.78:1` on accent-soft, and `4.73:1` on the keycap composite; light/dark
+  focus and control-border pairs also exceed 3:1.
+- `npm run check:legacy-theme` passes across 123 rendered-source files with
+  zero prohibited token/value/font or `neutralTheme` matches. The check is a
+  production `prebuild` gate. Legacy compatibility CSS/tokens and generated
+  migration backups are absent from the final worktree.
+- `npm run lint` and `npm run typecheck` pass with zero warnings/errors.
+  `npx vitest run --coverage --pool=threads --maxWorkers=1` passes 33/33
+  files and 381 tests with one intentional skip (382 total); coverage is
+  91.77% statements, 76.66% branches, 90.93% functions, and 92.12% lines.
+  `npm run build` passes for Next.js 15.5.20 with the legacy gate, type/lint
+  validation, 22 generated pages, and a 119 kB first-load editor route.
+- The complete production-browser regression set passes in two memory-bounded
+  batches: 43/43 existing E2E scenarios and 5/5 Phase 20 scenarios. The focused
+  suite covers owned computed tokens and primitive families, genuine Tab-only
+  navigation, 320px action retention/no overflow, reduced motion, light/dark/
+  live-system persistence, dark Monaco, branded exceptional states, and zero
+  serious/critical axe findings across the shell and overlay families.
+- Regression investigation fixed issues rather than waiving them: Astryx
+  keycap/blockquote contrast, keyboard-shortcut scroll-region focusability,
+  workspace shortcuts swallowed by Monaco, missing Monaco command
+  contributions, dark/system Monaco selection, preview scroll-origin
+  normalization, and post-mount attachment of Monaco scroll/paste/keybinding
+  integrations. All affected legacy tests were updated for the shipped shell.
+- `artifacts/phase20/after/matrix/` contains the canonical 126-image after
+  set across all 39 route/state IDs; `capture-results.json` is its manifest.
+  Human review covered representative light/dark desktop, mobile menu, content,
+  and exceptional states. Verdict: the slate/indigo surfaced workspace, Geist
+  typography, editorial preview, progressive disclosure, and owned overlays
+  are a clean first-glance break from the legacy charcoal/mint Dillinger UI.
+- Root and all affected component `CLAUDE.md` files now identify the owned
+  theme as authoritative and forbid legacy token, font, color, and neutral-
+  theme fallback reintroduction. Phase progress is 42/44: only branch CI/OIDC
+  deployment proof and the dependent final index closure remain open.

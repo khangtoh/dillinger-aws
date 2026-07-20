@@ -33,6 +33,8 @@ function createDocument(overrides: Partial<Document> = {}): Document {
     title: "First Document.md",
     body: "# Hello",
     createdAt: new Date().toISOString(),
+    folderId: null,
+    tags: [],
     ...overrides,
   };
 }
@@ -78,9 +80,9 @@ describe("DocumentList", () => {
     const selectedButton = screen.getByRole("button", { name: /Selected\.md/ });
     const otherButton = screen.getByRole("button", { name: /Other\.md/ });
 
-    expect(selectedButton.className).toContain("bg-bg-highlight");
-    expect(selectedButton.className).toContain("text-text-invert");
-    expect(otherButton.className).not.toContain("text-text-invert");
+    expect(selectedButton.className).toContain("bg-surface-subtle");
+    expect(selectedButton.className).toContain("text-content-strong");
+    expect(otherButton.className.split(/\s+/)).not.toContain("text-content-strong");
   });
 
   it("selects a document when clicked", async () => {

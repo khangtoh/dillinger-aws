@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { tailwindColorBridge } from "./lib/theme/tokens";
 
 const config: Config = {
   content: [
@@ -9,30 +10,23 @@ const config: Config = {
   darkMode: "class",
   theme: {
     extend: {
-      colors: {
-        plum: "#35D7BB",
-        "bg-primary": "#ffffff",
-        "bg-sidebar": "#2B2F36",
-        "bg-navbar": "#373D49",
-        "bg-highlight": "#1D212A",
-        "bg-button-save": "#4A5261",
-        "text-primary": "#373D49",
-        "text-invert": "#ffffff",
-        "text-muted": "#A0AABF",
-        "border-light": "#E8E8E8",
-        "border-settings": "#4F535B",
-        "icon-default": "#D3DAEA",
-        "dropdown-link": "#D0D6E2",
-        switchery: "#4B5363",
-      },
+      colors: tailwindColorBridge,
       fontFamily: {
-        sans: ['"Source Sans Pro"', '"Helvetica Neue"', "Helvetica", "Arial", "sans-serif"],
-        serif: ["Georgia", "Cambria", "serif"],
-        mono: ['"Ubuntu Mono"', "Monaco", "monospace"],
+        sans: ["var(--font-geist-sans)", "Arial", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "Consolas", "monospace"],
+      },
+      borderRadius: {
+        control: "var(--radius-element)",
+        panel: "var(--radius-container)",
+      },
+      boxShadow: {
+        low: "var(--shadow-low)",
+        medium: "var(--shadow-med)",
+        high: "var(--shadow-high)",
       },
       spacing: {
-        sidebar: "270px",
-        gutter: "32px",
+        sidebar: "288px",
+        gutter: "var(--spacing-8)",
       },
       zIndex: {
         sidebar: "1",
@@ -56,14 +50,14 @@ const config: Config = {
         },
       },
       animation: {
-        "in": "slide-in-from-right 0.2s ease-out",
-        "fade-in": "fade-in 0.15s ease-out",
+        "in": "slide-in-from-right var(--duration-medium) var(--ease-standard)",
+        "fade-in": "fade-in var(--duration-fast) var(--ease-standard)",
       },
       transitionTimingFunction: {
-        "out-quart": "cubic-bezier(0.25, 1, 0.5, 1)",
+        "out-quart": "var(--ease-standard)",
       },
       transitionDuration: {
-        "250": "250ms",
+        "250": "var(--duration-medium)",
       },
     },
   },

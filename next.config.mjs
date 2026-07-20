@@ -6,8 +6,11 @@ const rootDir = fileURLToPath(new URL(".", import.meta.url));
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
+  outputFileTracingRoot: rootDir,
   serverExternalPackages: ["@sparticuz/chromium", "puppeteer-core"],
   experimental: {
+    cpus: 1,
+    webpackMemoryOptimizations: true,
     // Optimize barrel file imports for better tree-shaking
     // This transforms imports from lucide-react to direct icon imports
     optimizePackageImports: ["lucide-react"],

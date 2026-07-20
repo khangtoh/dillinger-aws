@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, memo } from "react";
 import dynamic from "next/dynamic";
-import { X, Upload } from "lucide-react";
+import { BookOpen, FilePenLine, GripVertical, Upload, X } from "lucide-react";
 import { Navbar } from "@/components/navbar/Navbar";
 import { LogoBar } from "@/components/ads/LogoBar";
 import { DocumentTitle } from "@/components/editor/DocumentTitle";
@@ -18,7 +18,6 @@ import { EditorSkeleton } from "@/components/ui/Skeleton";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { importDocumentFile } from "@/lib/import";
 
-// Dynamic import Sidebar to prevent SSR issues with GitHub/Dropbox hooks
 const Sidebar = dynamic(
   () => import("@/components/sidebar/Sidebar").then((mod) => mod.Sidebar),
   { ssr: false }
@@ -33,19 +32,19 @@ const DropZoneOverlay = memo(function DropZoneOverlay({
 
   return (
     <div
-      className="absolute inset-0 z-modal bg-bg-primary/90 flex items-center justify-center pointer-events-none"
+      className="absolute inset-0 z-modal flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
       aria-hidden="true"
     >
-      <div className="flex flex-col items-center gap-4 text-center">
-        <div className="size-20 rounded-full bg-plum/20 flex items-center justify-center">
-          <Upload size={40} className="text-plum" />
+      <div className="flex w-full max-w-md flex-col items-center gap-4 rounded-page border border-border-control bg-surface px-6 py-10 text-center shadow-high">
+        <div className="flex size-16 items-center justify-center rounded-panel bg-accent-soft text-accent">
+          <Upload size={30} />
         </div>
         <div>
-          <p className="text-xl font-semibold text-text-invert">
-            Drop your file here
+          <p className="text-lg font-semibold tracking-[-0.02em] text-content-strong">
+            Drop to add to your workspace
           </p>
-          <p className="text-text-muted mt-1">
-            Supports markdown, HTML, and image files
+          <p className="mt-1 text-sm text-content-muted">
+            Markdown, HTML, text, and image files are supported.
           </p>
         </div>
       </div>
@@ -69,8 +68,14 @@ function EditorContent() {
 
   const [isDragging, setIsDragging] = useState(false);
   const [, setDragCounter] = useState(0);
+  const [mobilePane, setMobilePane] = useState<"write" | "preview">("write");
 
-  // Handle file drop
+  useEffect(() => {
+    if (!previewVisible && mobilePane === "preview") {
+      setMobilePane("write");
+    }
+  }, [mobilePane, previewVisible]);
+
   const handleDrop = useCallback(
     async (e: React.DragEvent) => {
       e.preventDefault();
@@ -133,24 +138,19 @@ function EditorContent() {
     e.stopPropagation();
   }, []);
 
-  // Keyboard shortcuts for zen mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd/Ctrl + Shift + Z for zen mode
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "z") {
         e.preventDefault();
         setZenMode(!zenMode);
       }
-      // Cmd/Ctrl + K for the command palette
       if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === "k") {
         e.preventDefault();
         toggleCommandPalette();
       }
-      // Escape to exit zen mode
       if (e.key === "Escape" && zenMode) {
         setZenMode(false);
       }
-      // ? to open keyboard shortcuts
       if (
         e.key === "?" &&
         !(e.target instanceof HTMLInputElement) &&
@@ -161,8 +161,8 @@ function EditorContent() {
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, { capture: true });
+    return () => document.removeEventListener("keydown", handleKeyDown, { capture: true });
   }, [zenMode, setZenMode, toggleShortcuts, toggleCommandPalette]);
 
   useEffect(() => {
@@ -176,16 +176,14 @@ function EditorContent() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isDirty]);
 
-  // Show structural skeleton while hydrating
   if (!currentDocument) {
     return <EditorSkeleton />;
   }
 
-  // Zen mode - fullscreen distraction-free editor
   if (zenMode) {
     return (
       <div
-        className="h-dvh bg-bg-primary flex items-center justify-center relative animate-fade-in"
+        className="relative flex h-dvh items-center justify-center bg-canvas animate-fade-in"
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -193,16 +191,28 @@ function EditorContent() {
       >
         <DropZoneOverlay isDragging={isDragging} />
 
-        <div className="w-full max-w-3xl h-full py-12 px-4 relative">
-          <button
-            onClick={() => setZenMode(false)}
-            className="absolute top-4 right-4 text-text-muted hover:text-text-invert transition-colors rounded
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
-            aria-label="Exit zen mode"
-          >
-            <X size={24} />
-          </button>
-          <div className="h-full border border-border-light rounded-lg overflow-hidden">
+        <div className="flex h-full w-full max-w-5xl flex-col px-3 py-3 sm:px-8 sm:py-6">
+          <header className="mb-3 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-content-muted">
+                Focus mode
+              </p>
+              <h1 className="truncate text-sm font-semibold text-content-strong">
+                {currentDocument.title}
+              </h1>
+            </div>
+            <button
+              onClick={() => setZenMode(false)}
+              className="flex min-h-9 items-center gap-2 rounded-control border border-border-subtle bg-surface px-3 text-xs font-medium text-content-muted shadow-low
+                         transition-colors hover:border-border-control hover:text-content-strong
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+              aria-label="Exit zen mode"
+            >
+              <X size={16} />
+              <span className="hidden sm:inline">Exit focus</span>
+            </button>
+          </header>
+          <div className="min-h-0 flex-1 overflow-hidden rounded-panel border border-border-subtle bg-surface shadow-medium">
             <MonacoEditor />
           </div>
         </div>
@@ -212,7 +222,7 @@ function EditorContent() {
 
   return (
     <div
-      className="h-dvh flex overflow-hidden relative animate-fade-in"
+      className="relative flex h-dvh overflow-hidden bg-canvas text-content-strong animate-fade-in"
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
@@ -220,34 +230,106 @@ function EditorContent() {
     >
       <DropZoneOverlay isDragging={isDragging} />
 
-      {/* Sidebar */}
       <Sidebar />
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex min-w-0 flex-1 flex-col bg-canvas">
         <Navbar />
         <DocumentTitle />
 
-        {/* Editor + Preview */}
-        <div className="flex-1 flex min-h-0">
-          {/* Editor Panel */}
+        {previewVisible && (
           <div
-            className={`${
-              previewVisible ? "w-full sm:w-1/2 shadow-none sm:shadow-[1px_0_0_0_#E8E8E8]" : "w-full"
-            } border-r border-border-light flex flex-col min-h-0`}
+            role="tablist"
+            aria-label="Workspace panes"
+            className="grid grid-cols-2 gap-1 border-b border-border-subtle bg-surface px-3 py-2 sm:hidden"
           >
-            <FormattingToolbar />
-            <div className="flex-1 min-h-0">
-              <MonacoEditor />
-            </div>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mobilePane === "write"}
+              aria-controls="editor-workspace-pane"
+              onClick={() => setMobilePane("write")}
+              className={`rounded-control px-3 py-2 text-xs font-semibold transition-colors ${
+                mobilePane === "write"
+                  ? "bg-accent-soft text-content-accent"
+                  : "text-content-muted hover:bg-surface-subtle hover:text-content-strong"
+              }`}
+            >
+              Write
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mobilePane === "preview"}
+              aria-controls="preview-workspace-pane"
+              onClick={() => setMobilePane("preview")}
+              className={`rounded-control px-3 py-2 text-xs font-semibold transition-colors ${
+                mobilePane === "preview"
+                  ? "bg-accent-soft text-content-accent"
+                  : "text-content-muted hover:bg-surface-subtle hover:text-content-strong"
+              }`}
+            >
+              Preview
+            </button>
           </div>
+        )}
 
-          {/* Preview Panel */}
-          {previewVisible && (
-            <div className="hidden sm:block w-1/2 bg-[#FAFBFC]">
-              <MarkdownPreview />
-            </div>
-          )}
+        <div className="min-h-0 flex-1 p-2 sm:p-3 lg:p-4">
+          <div className="flex h-full min-h-0 overflow-hidden rounded-panel border border-border-subtle bg-surface shadow-low">
+            <section
+              id="editor-workspace-pane"
+              role="tabpanel"
+              aria-label="Markdown editor"
+              className={`min-h-0 min-w-0 flex-col bg-surface ${
+                previewVisible
+                  ? `${mobilePane === "write" ? "flex" : "hidden"} w-full sm:flex sm:w-1/2`
+                  : "flex w-full"
+              }`}
+            >
+              <div className="flex min-h-10 items-center justify-between border-b border-border-subtle bg-surface-subtle px-3">
+                <div className="flex items-center gap-2 text-xs font-semibold text-content-strong">
+                  <FilePenLine aria-hidden="true" size={14} className="text-content-accent" />
+                  Markdown
+                </div>
+                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-content-muted">
+                  Editor
+                </span>
+              </div>
+              <FormattingToolbar />
+              <div className="min-h-0 flex-1">
+                <MonacoEditor />
+              </div>
+            </section>
+
+            {previewVisible && (
+              <section
+                id="preview-workspace-pane"
+                role="tabpanel"
+                aria-label="Rendered preview"
+                className={`relative min-h-0 w-full min-w-0 flex-col border-border-subtle bg-surface sm:w-1/2 sm:border-l ${
+                  mobilePane === "preview" ? "flex" : "hidden sm:flex"
+                }`}
+              >
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-2 top-1/2 z-editor hidden size-4 -translate-y-1/2 items-center justify-center rounded-full border border-border-subtle bg-surface text-content-muted shadow-low sm:flex"
+                >
+                  <GripVertical size={10} />
+                </span>
+                <div className="flex min-h-10 items-center justify-between border-b border-border-subtle bg-surface-subtle px-3">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-content-strong">
+                    <BookOpen aria-hidden="true" size={14} className="text-content-accent" />
+                    Preview
+                  </div>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-content-muted">
+                    Live
+                  </span>
+                </div>
+                <div className="min-h-0 flex-1">
+                  <MarkdownPreview />
+                </div>
+              </section>
+            )}
+          </div>
         </div>
         <LogoBar />
       </main>

@@ -23,6 +23,7 @@ import {
   ImagePlus,
   HelpCircle,
   Type,
+  MoreHorizontal,
 } from "lucide-react";
 
 export function Navbar() {
@@ -49,6 +50,44 @@ export function Navbar() {
     { label: "Styled HTML", icon: FileCode, onClick: () => handleExport("html", { styled: true }) },
     { label: "PDF", icon: FileType, onClick: () => handleExport("pdf") },
   ], [handleExport]);
+
+  const workspaceItems: DropdownMenuOption[] = [
+    {
+      label: "Import file",
+      icon: Upload,
+      onClick: () => importInputRef.current?.click(),
+    },
+    { label: "Export Markdown", icon: FileText, onClick: () => handleExport("markdown") },
+    { label: "Export HTML", icon: FileCode, onClick: () => handleExport("html", { styled: false }) },
+    { label: "Export Styled HTML", icon: FileCode, onClick: () => handleExport("html", { styled: true }) },
+    { label: "Export PDF", icon: FileType, onClick: () => handleExport("pdf") },
+    {
+      label: previewVisible ? "Hide preview" : "Show preview",
+      icon: previewVisible ? EyeOff : Eye,
+      onClick: () => togglePreview(),
+    },
+    { label: "Open settings", icon: Settings, onClick: toggleSettings },
+    {
+      label: "Insert image",
+      icon: ImagePlus,
+      onClick: () => imageInputRef.current?.click(),
+    },
+    {
+      label: toolbarVisible ? "Hide formatting toolbar" : "Show formatting toolbar",
+      icon: Type,
+      onClick: () => toggleToolbar(),
+    },
+    {
+      label: "Enter zen mode",
+      icon: Maximize2,
+      onClick: () => setZenMode(true),
+    },
+    {
+      label: "Keyboard shortcuts",
+      icon: HelpCircle,
+      onClick: toggleShortcuts,
+    },
+  ];
 
   const handleImportSelection = useCallback(async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -92,65 +131,61 @@ export function Navbar() {
   }, [upload, insertMarkdownAtCursor]);
 
   return (
-    <nav className="h-14 bg-bg-navbar flex items-center justify-between px-4 z-navbar">
-      {/* Left side */}
-      <div className="flex items-center gap-4">
+    <nav
+      aria-label="Editor controls"
+      className="relative z-navbar flex min-h-16 items-center justify-between gap-3 border-b border-border-subtle bg-surface px-2.5 sm:px-4"
+    >
+      <div className="flex min-w-0 shrink items-center gap-2.5">
         <button
           onClick={toggleSidebar}
           aria-label="Toggle sidebar"
-          className="text-text-invert hover:text-plum transition-all active:scale-[0.97]
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-navbar rounded"
+          className="flex size-9 shrink-0 items-center justify-center rounded-control border border-transparent bg-surface-subtle text-content-muted transition-colors
+                     hover:border-border-subtle hover:text-content-strong active:bg-accent-soft
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
-          <Menu size={24} />
+          <Menu size={19} />
         </button>
-        <span className="text-plum font-bold text-xl tracking-wide hidden sm:block">
-          DILLINGER
+        <span
+          aria-hidden="true"
+          className="flex size-8 shrink-0 items-center justify-center rounded-control bg-accent text-sm font-semibold text-on-accent shadow-low max-[240px]:hidden"
+        >
+          D
+        </span>
+        <span className="hidden min-w-0 sm:block">
+          <span className="block truncate text-[15px] font-semibold tracking-[-0.02em] text-content-strong">
+            Dillinger
+          </span>
+          <span className="hidden text-[10px] font-medium uppercase tracking-[0.16em] text-content-muted lg:block">
+            Writing workspace
+          </span>
         </span>
       </div>
 
-      {/* Right side */}
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
         <Button
           label="Import file"
           icon={<Upload size={18} />}
           variant="ghost"
           onClick={() => importInputRef.current?.click()}
+          isIconOnly
           tooltip="Import file"
-          className="text-text-invert hover:text-plum"
-        >
-          <span className="hidden sm:inline">Import</span>
-        </Button>
+          className="text-content-muted hover:text-content-strong max-[240px]:hidden"
+        />
 
-        <Button
-          label="Insert image"
-          icon={<ImagePlus size={18} />}
-          variant="ghost"
-          onClick={() => imageInputRef.current?.click()}
-          tooltip="Insert image"
-          className="text-text-invert hover:text-plum"
-        >
-          <span className="hidden sm:inline">Image</span>
-        </Button>
-
-        {/* Export dropdown — migrated to Astryx's DropdownMenu
-            (components/astryx/DropdownMenu), proven in Phase 14's spike.
-            Replaces the hand-rolled useState/useEffect/ref
-            dismissible-panel pattern; open state, Escape, click-outside,
-            and focus-return are all handled internally by the
-            component's usePopover/useListFocus. */}
         <DropdownMenu
           items={exportItems}
+          menuLabel="Export as"
           hasChevron={false}
           button={{
-            label: "Export as",
+            label: "Export document",
             icon: <Download size={18} />,
             variant: "ghost",
             "aria-label": "Export document",
-            className: "text-text-invert hover:text-plum",
+            className: "text-content-muted hover:text-content-strong max-[240px]:hidden",
+            isIconOnly: true,
           }}
         />
 
-        {/* Preview toggle */}
         <ToggleButton
           label={previewVisible ? "Hide preview" : "Show preview"}
           icon={<EyeOff size={20} />}
@@ -159,32 +194,9 @@ export function Navbar() {
           onPressedChange={() => togglePreview()}
           isIconOnly
           tooltip={previewVisible ? "Hide preview" : "Show preview"}
-          className="text-text-invert hover:text-plum"
+          className="text-content-muted hover:text-content-strong max-[240px]:hidden"
         />
 
-        {/* Formatting toolbar toggle */}
-        <ToggleButton
-          label={toolbarVisible ? "Hide formatting toolbar" : "Show formatting toolbar"}
-          icon={<Type size={20} />}
-          isPressed={toolbarVisible}
-          onPressedChange={() => toggleToolbar()}
-          isIconOnly
-          tooltip={toolbarVisible ? "Hide formatting toolbar" : "Show formatting toolbar"}
-          className="text-text-invert hover:text-plum"
-        />
-
-        {/* Zen mode */}
-        <Button
-          label="Enter zen mode"
-          icon={<Maximize2 size={20} />}
-          variant="ghost"
-          isIconOnly
-          onClick={() => setZenMode(true)}
-          tooltip="Zen mode (⌘⇧Z)"
-          className="text-text-invert hover:text-plum"
-        />
-
-        {/* Settings */}
         <Button
           label="Open settings"
           icon={<Settings size={20} />}
@@ -192,17 +204,20 @@ export function Navbar() {
           isIconOnly
           onClick={toggleSettings}
           tooltip="Settings"
-          className="text-text-invert hover:text-plum"
+          className="text-content-muted hover:text-content-strong max-[240px]:hidden"
         />
 
-        <Button
-          label="Keyboard shortcuts"
-          icon={<HelpCircle size={20} />}
-          variant="ghost"
-          isIconOnly
-          onClick={toggleShortcuts}
-          tooltip="Keyboard shortcuts (?)"
-          className="text-text-invert hover:text-plum"
+        <DropdownMenu
+          items={workspaceItems}
+          hasChevron={false}
+          button={{
+            label: "More editor actions",
+            icon: <MoreHorizontal size={20} />,
+            variant: "ghost",
+            "aria-label": "More editor actions",
+            className: "text-content-muted hover:text-content-strong",
+            isIconOnly: true,
+          }}
         />
       </div>
 

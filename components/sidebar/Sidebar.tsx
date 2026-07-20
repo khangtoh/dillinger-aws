@@ -29,6 +29,7 @@ import {
   CloudDownload,
   CloudUpload,
   FileText,
+  X,
 } from "lucide-react";
 
 type ModalMode = "import" | "save";
@@ -112,30 +113,60 @@ export function Sidebar() {
   return (
     <>
       <div
-        className={`fixed inset-0 bg-black/50 z-sidebar sm:hidden transition-opacity duration-250
-                    ${sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-        style={{ transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)" }}
+        className={`fixed inset-0 z-settings bg-overlay backdrop-blur-[1px] transition-opacity duration-250 ease-out-quart sm:hidden
+                    ${sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
         onClick={toggleSidebar}
         aria-hidden="true"
       />
       <aside
-        className={`fixed sm:relative w-sidebar shrink-0 bg-bg-sidebar h-dvh flex flex-col z-sidebar
-                    transition-all duration-250
-                    ${sidebarOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0 sm:-ml-[270px]"}`}
-        style={{ transitionTimingFunction: "cubic-bezier(0.25, 1, 0.5, 1)" }}
+        aria-label="Document library"
+        aria-hidden={!sidebarOpen}
+        inert={!sidebarOpen}
+        className={`fixed z-modal flex h-dvh w-sidebar shrink-0 flex-col border-r border-border-subtle bg-surface shadow-high
+                    transition-all duration-250 ease-out-quart sm:relative sm:z-sidebar sm:shadow-none
+                    ${sidebarOpen ? "translate-x-0" : "-translate-x-full sm:-ml-sidebar sm:translate-x-0"}`}
       >
-        <div className="pt-4" />
-
-        {/* Navigation */}
-        <nav className="flex-1 overflow-auto px-4">
-          <CollapsibleSection
-            label="Services"
-            panelId="services-panel"
-            icon={<Plug size={14} />}
-            isOpen={ui.servicesOpen}
-            onToggle={() => dispatch({ type: "toggle", section: "servicesOpen" })}
+        <header className="flex min-h-16 items-center gap-3 border-b border-border-subtle px-4">
+          <span
+            aria-hidden="true"
+            className="flex size-9 items-center justify-center rounded-control bg-accent text-sm font-semibold text-on-accent shadow-low"
           >
-            <CloudServicesList />
+            D
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-content-muted">
+              Workspace
+            </p>
+            <h2 className="truncate text-[15px] font-semibold tracking-[-0.01em] text-content-strong">
+              Library
+            </h2>
+          </div>
+          <button
+            onClick={toggleSidebar}
+            aria-label="Close sidebar"
+            className="flex size-8 items-center justify-center rounded-control text-content-muted transition-colors hover:bg-surface-subtle hover:text-content-strong
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring sm:hidden"
+          >
+            <X size={17} />
+          </button>
+        </header>
+
+        <div className="flex items-center justify-between px-4 pb-2 pt-4">
+          <p className="text-xs font-medium text-content-strong">Your workspace</p>
+          <span className="rounded-full bg-surface-subtle px-2 py-0.5 text-[10px] font-medium text-content-muted">
+            {documents.length} {documents.length === 1 ? "document" : "documents"}
+          </span>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-3 pb-4">
+          <CollapsibleSection
+            label="Documents"
+            panelId="documents-panel"
+            icon={<FileText size={14} />}
+            isOpen={ui.documentsOpen}
+            onToggle={() => dispatch({ type: "toggle", section: "documentsOpen" })}
+          >
+            <DocumentList />
           </CollapsibleSection>
 
           <CloudServiceMenu
@@ -157,51 +188,55 @@ export function Sidebar() {
           />
 
           <CollapsibleSection
-            label="Documents"
-            panelId="documents-panel"
-            icon={<FileText size={14} />}
-            isOpen={ui.documentsOpen}
-            onToggle={() => dispatch({ type: "toggle", section: "documentsOpen" })}
+            label="Services"
+            panelId="services-panel"
+            icon={<Plug size={14} />}
+            isOpen={ui.servicesOpen}
+            onToggle={() => dispatch({ type: "toggle", section: "servicesOpen" })}
           >
-            <DocumentList />
+            <CloudServicesList />
           </CollapsibleSection>
         </nav>
 
-        {/* Actions */}
-        <div className="p-4 space-y-3 border-t border-border-settings">
+        <div className="border-t border-border-subtle bg-surface px-3 py-3">
           <button
             onClick={createDocument}
-            className="w-full bg-plum text-bg-sidebar py-2 px-4 rounded font-medium
-                       hover:opacity-90 active:scale-[0.97] transition-all flex items-center justify-center gap-2
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-bg-sidebar"
+            className="flex min-h-10 w-full items-center justify-center gap-2 rounded-control bg-accent px-4 py-2 text-sm font-semibold text-on-accent shadow-low
+                       transition-all hover:opacity-90 active:scale-[0.98]
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
-            <Plus size={18} />
+            <Plus size={17} />
             New Document
           </button>
-          <button
-            onClick={handleSave}
-            className="w-full bg-bg-button-save text-text-invert py-2 px-4 rounded font-medium
-                       hover:opacity-90 active:scale-[0.97] transition-all flex items-center justify-center gap-2
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum focus-visible:ring-offset-2 focus-visible:ring-offset-bg-sidebar"
-          >
-            <Save size={18} />
-            Save Session
-          </button>
-          <button
-            onClick={handleDeleteClick}
-            disabled={documents.length <= 1}
-            className={`w-full bg-red-600 text-text-invert py-2 px-4 rounded font-medium
-                       flex items-center justify-center gap-2
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-sidebar
-                       ${documents.length <= 1 ? "opacity-60 cursor-not-allowed" : "hover:opacity-90 active:scale-[0.97] transition-all"}`}
-          >
-            <Trash2 size={18} />
-            Delete Document
-          </button>
+          <div className="mt-2 flex gap-2">
+            <button
+              onClick={handleSave}
+              className="flex min-h-9 flex-1 items-center justify-center gap-2 rounded-control border border-border-subtle bg-surface px-3 py-2 text-xs font-medium text-content-strong
+                         transition-colors hover:border-border-control hover:bg-surface-subtle
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
+            >
+              <Save size={15} />
+              Save Session
+            </button>
+            <button
+              onClick={handleDeleteClick}
+              disabled={documents.length <= 1}
+              aria-label="Delete Document"
+              title="Delete document"
+              className={`flex size-9 shrink-0 items-center justify-center rounded-control border border-border-subtle text-danger
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring
+                         ${
+                           documents.length <= 1
+                             ? "cursor-not-allowed bg-surface text-content-disabled"
+                             : "bg-surface transition-colors hover:border-danger hover:bg-danger-soft"
+                         }`}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* Modals */}
       <GitHubModal
         isOpen={ui.activeModal?.target === "github"}
         onClose={closeModal}
@@ -253,10 +288,10 @@ function CollapsibleSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mb-3">
+    <section className="mb-2 rounded-panel border border-border-subtle bg-surface px-1.5 py-1 shadow-low">
       <Collapsible
         trigger={
-          <span className="flex items-center gap-2 text-text-muted text-xs uppercase tracking-wider">
+          <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-content-muted">
             {icon}
             {label}
           </span>
@@ -264,18 +299,13 @@ function CollapsibleSection({
         isOpen={isOpen}
         onOpenChange={() => onToggle()}
       >
-        {/* Astryx's Collapsible always renders its content wrapper (toggling
-            display:none), so mounting this div only while open — rather than
-            passing it unconditionally as children — keeps the #panelId node
-            itself absent from the DOM when collapsed, matching this app's
-            existing E2E assertions (`toHaveCount(0)`, not just hidden). */}
         {isOpen && (
-          <div id={panelId} className="ml-2 space-y-1 mt-1">
+          <div id={panelId} className="mt-1.5 space-y-1 border-t border-border-subtle px-0.5 pb-1 pt-2">
             {children}
           </div>
         )}
       </Collapsible>
-    </div>
+    </section>
   );
 }
 
@@ -308,8 +338,9 @@ function CloudServiceMenu({
         <button
           key={service.target}
           onClick={() => onSelect(service.target)}
-          className="w-full flex items-center gap-2 py-2 px-2 text-dropdown-link hover:text-text-invert text-sm rounded hover:bg-bg-highlight
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+          className="flex w-full items-center gap-2 rounded-control px-2.5 py-2 text-sm text-content-muted transition-colors
+                     hover:bg-surface-subtle hover:text-content-strong
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
           {service.icon}
           <span>{service.label}</span>
@@ -381,17 +412,17 @@ const ServiceButton = memo(function ServiceButton({
   onDisconnect: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between py-2 px-2 text-sm">
-      <div className="flex items-center gap-2 text-dropdown-link">
+    <div className="flex items-center justify-between gap-2 rounded-control px-2 py-2 text-sm hover:bg-surface-subtle">
+      <div className="flex min-w-0 items-center gap-2 text-content-muted">
         {icon}
-        <span>{label}</span>
+        <span className="truncate">{label}</span>
       </div>
       {connected ? (
         <button
           onClick={onDisconnect}
           aria-label={`Unlink ${label}`}
-          className="text-xs text-red-400 hover:text-red-300 rounded px-1
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+          className="rounded-full bg-danger-soft px-2 py-1 text-[10px] font-medium text-danger
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
           Unlink
         </button>
@@ -399,8 +430,8 @@ const ServiceButton = memo(function ServiceButton({
         <button
           onClick={onConnect}
           aria-label={`Link ${label}`}
-          className="text-xs text-plum hover:opacity-80 rounded px-1
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+          className="rounded-full bg-accent-soft px-2 py-1 text-[10px] font-medium text-content-accent
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
           Link
         </button>

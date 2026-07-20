@@ -133,6 +133,8 @@ export type DropdownMenuButtonProps = Omit<ButtonProps, 'onClick'>;
 
 interface DropdownMenuBaseProps extends BaseProps {
   button?: DropdownMenuButtonProps;
+  /** Accessible name for the popup menu when it differs from the trigger. */
+  menuLabel?: string;
   isMenuOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
   menuWidth?: number | string;
@@ -193,6 +195,7 @@ export function DropdownMenu({
   isMenuOpen: controlledIsOpen,
   onOpenChange,
   menuWidth,
+  menuLabel,
   onClick,
   hasChevron = true,
   placement = 'below',
@@ -443,7 +446,7 @@ export function DropdownMenu({
           // Give the menu an accessible name from its trigger's label, so
           // screen readers announce e.g. "Actions menu" rather than an unnamed
           // menu (menus-13).
-          aria-label={button.label}
+          aria-label={menuLabel ?? button.label}
           onKeyDown={listKeyDown}
           {...mergeProps(
             themeProps('dropdown-menu'),
@@ -452,7 +455,7 @@ export function DropdownMenu({
             style,
           )}>
           <DropdownMenuContext value={contextValue}>
-            {menuContent}
+            {isOpen ? menuContent : null}
           </DropdownMenuContext>
         </div>,
         {

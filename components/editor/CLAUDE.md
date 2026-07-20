@@ -17,3 +17,7 @@
 | #1799 | 2:09 PM | 🟣 | DocumentTitle Component with Inline Editing | ~437 |
 | #1767 | 2:02 PM | 🔵 | Next.js EditorContainer Component with Phase 1 Core Editor Implementation | ~467 |
 </claude-mem-context>
+
+## Phase 20 visual system
+
+Keep the editor shell, toolbar, title, pane headers, focus mode, and Monaco light/dark themes on the semantic tokens in `lib/theme/tokens.ts`; preserve keyboard, paste, scroll-sync, and responsive-pane behavior when changing presentation.

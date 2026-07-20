@@ -305,3 +305,206 @@ blocked, implementation, or documentation progress.
 **Evidence:** Documentation diff, link/cross-reference search, and `git diff --check`.
 
 **Change state:** Uncommitted on `claude/modern-dillinger-aws`.
+
+---
+
+## Session: 2026-07-19 (Phase 20 clarification baseline)
+
+### Decision and work completed
+
+Phase 20 execution began with the dependency-safe clarification/baseline slice.
+The legacy deployment is now captured as historical evidence, all theme debt is
+inventoried, the final screenshot contract is explicit, and the proposed
+palette has automated contrast evidence. A responsive static shell prototype
+is ready for user confirmation before component migration begins.
+
+### Current state and resume point
+
+- Six of seven clarification tasks are complete; Phase 20 is 6/44 overall.
+- The remaining clarification task is explicit approval of the desktop/mobile
+  static shell direction under `artifacts/phase20/prototype/`.
+- Runtime implementation has not started. Begin the owned theme/token
+  foundation only after the prototype direction is confirmed.
+- Project dependencies could not be installed in this environment: npm hit two
+  cache rename failures and then allocator corruption. Evidence capture used
+  the system Python Playwright client against the live branch tenant.
+
+### Spec Summary/Status
+
+| Phase | Scope | Progress | Status |
+|---|---|---:|---|
+| [20](20-clean-visual-rebrand.md) | Clean visual rebrand | 6/44 | Partial; baseline/audit complete, prototype approval and implementation pending |
+
+| Component or surface | Functional status | Clean-rebrand status |
+|---|---|---|
+| Legacy editor shell | Existing behavior unchanged; deterministic live captures completed | Documented as `before` evidence only |
+| Theme/token foundation | Existing neutral theme and Tailwind behavior inventoried | Not started; full removal map recorded |
+| Desktop/mobile shell | Static responsive prototype rendered | Ready for explicit direction approval |
+| Routes and overlays | Existing states enumerated and open states captured | Complete `after` screenshot matrix defined |
+
+**Overall:** Phase 20 is partial at 6/44; clarification evidence is complete except prototype approval, and no runtime rebrand has been implemented.
+
+**Evidence:** `artifacts/phase20/` screenshots, audit, route/state matrix, passing adjusted contrast checker, and Python syntax check.
+
+**Change state:** Uncommitted on `claude/modern-dillinger-aws`.
+
+---
+
+## Session: 2026-07-19 (Phase 20 owned theme/token foundation)
+
+### Decision and work completed
+
+Continuing Phase 20 confirmed the desktop/mobile prototype direction and moved
+the runtime off the legacy Dillinger visual identity. One owned semantic source
+now drives a custom Astryx theme and Tailwind utilities; Vercel's self-hosted
+Geist package supplies the root Sans/Mono variables. Global canvas, focus,
+preview, styled-export, and Open Graph colors now use the replacement palette.
+
+All rendered legacy utility consumers were mechanically migrated to semantic
+names rather than compatibility aliases. A prebuild prevention script makes the
+removal enforceable. It passes across 123 application-source files.
+
+### Current state and resume point
+
+- Phase 20 is 14/44. Clarification is complete and seven of eight foundation
+  tasks are checked.
+- Resume at the unchecked foundation unit-test task: the node-only suite exists,
+  but Vitest could not start because repeated npm/Bun installs left transitive
+  package directories empty under Proot. Re-run it in a healthy dependency
+  tree before checking the task.
+- After the mode suite passes, proceed to structural application-shell redesign;
+  current call sites use the owned palette but are not yet accepted as the new
+  Navbar/Sidebar/editor composition.
+- Concurrent Phase 16 folder/tag/search files appeared during this session and
+  were preserved untouched; their schema-related typecheck findings are not
+  Phase 20 regressions.
+
+### Spec Summary/Status
+
+| Phase | Scope | Progress | Status |
+|---|---|---:|---|
+| [20](20-clean-visual-rebrand.md) | Clean visual rebrand | 14/44 | 🟡 Foundation implemented; unit execution and structural surface migration remain |
+
+| Component or surface | Functional status | Clean-rebrand status |
+|---|---|---|
+| Owned theme and tokens | Custom Astryx theme, semantic Tailwind bridge, light/dark values, and build-time prevention implemented | Foundation code complete; Vitest execution remains open |
+| Theme modes | Existing persisted light/dark/system behavior routes through one helper and owned theme | Pure unit coverage added; runner could not start in the damaged dependency tree |
+| Global/document defaults | Root Geist variables, canvas/text/focus, preview, styled export, and Open Graph palette migrated | Token migration landed; full document/route visual acceptance remains open |
+| Application shell | Existing behaviors and Astryx primitives preserved; legacy utility names removed | Structural Navbar/Sidebar/editor redesign has not started |
+
+**Overall:** Phase 20 is partial at 14/44; the owned visual foundation is implemented, while test-run proof and the visible shell/surface redesign remain the immediate dependencies.
+
+**Evidence:** the core Phase 20 foundation passed an isolated TypeScript compile before later install attempts damaged `node_modules`; the final dependency-free Bun parse/bundle passed for seven Phase 20 entry modules; `npm run check:legacy-theme` passed across 123 files; palette/control-border contrast checker and `git diff --check` passed; repository-wide typecheck reported only unrelated existing/concurrent errors.
+
+**Change state:** Uncommitted on `claude/modern-dillinger-aws`.
+
+---
+
+## Session: 2026-07-19 (Phase 20 application-shell composition)
+
+### Decision and work completed
+
+Phase 20 continued past the unavailable foundation test runner instead of
+treating the dependency-tree defect as a stop condition. The approved
+modern-editorial prototype is now represented in the application source:
+the shell composition changed, rather than only recoloring legacy elements.
+
+- The Navbar now uses a restrained Dillinger wordmark, compact primary
+  controls, and progressive disclosure for secondary editor actions.
+- The Sidebar and DocumentList now form a surfaced 288px library with owned
+  provider/action states, selection, metadata, empty/overflow treatment, and
+  available Phase 16 folder/tag state.
+- DocumentTitle, the grouped/mobile-overflow formatting strip, labelled
+  editor/preview panes, a mobile Write/Preview switcher, focus mode, and
+  drag/drop are one coherent workspace treatment.
+- Monaco and preview surfaces now resolve from owned tokens; the default
+  document no longer renders the retired placeholder palette.
+
+### Current state and resume point
+
+- Phase 20 is 21/44. Seven application-shell implementation tasks are checked;
+  the three-viewport rendered verification task remains open.
+- Resume with a healthy dependency tree, render the shell at 1440×900,
+  768×1024, and 390×844 in light/dark modes, fix any layout findings, and
+  only then check the viewport task.
+- The foundation theme-mode test remains implemented but unexecuted. After
+  shell viewport proof, continue through document presentation, overlays,
+  secondary states, route consistency, accessibility, and visual acceptance.
+- Concurrent Phase 16 schema/store/search work remains present and was not
+  reverted; the shell consumes its folder/tag state without claiming Phase 16
+  UI completion.
+
+### Spec Summary/Status
+
+| Phase | Scope | Progress | Status |
+|---|---|---:|---|
+| [20](20-clean-visual-rebrand.md) | Clean visual rebrand | 21/44 | 🟡 Foundation and structural application shell implemented; rendered acceptance and remaining surfaces/tests remain |
+
+| Component or surface | Functional status | Clean-rebrand status |
+|---|---|---|
+| Navbar and title | Existing sidebar, import/export, preview, settings, and rename/status behaviors remain wired; updated Navbar test parses | New wordmark, hierarchy, action grouping, owned states, and compact responsive controls implemented; rendered viewport proof remains |
+| Sidebar and documents | Create/save/delete, provider modals, selection, folder/tag metadata, empty and overflow states are wired | New library surface, section hierarchy, provider badges, selection, and action hierarchy implemented; browser regression remains |
+| Formatting toolbar | All nine insertion actions and dismiss behavior remain wired | Grouping, separators, owned hover/focus treatment, and horizontal mobile access implemented |
+| Editor and preview | Monaco, scroll-sync, preview collapse, file drop, and zen keyboard behavior remain wired; mobile pane tabs added | Labelled framed panes, owned divider/surfaces, mobile recomposition, focus mode, and drop treatment implemented; three-viewport screenshots remain |
+| Theme modes | Owned light/dark/system path and unit suite remain present | Unit execution is still open because the dependency tree is unavailable |
+
+**Overall:** Phase 20 is partial at 21/44; the clean-break shell is implemented in source, with rendered viewport proof and the remaining document/overlay/accessibility/live-acceptance work still required.
+
+**Evidence:** dependency-free Bun parse/bundle passed for eight shell modules plus the Navbar test; `npm run check:legacy-theme` passed across 123 rendered-source files; `git diff --check` passed. Full unit/build/browser runs remain unavailable because `node_modules` is absent after the documented Proot install failures.
+
+**Change state:** Uncommitted on `claude/modern-dillinger-aws`.
+
+---
+
+## Session: 2026-07-20 (Phase 20 final local acceptance)
+
+### Decision and work completed
+
+The full clean visual rebrand is implemented and locally accepted. The branch
+now presents an owned slate/indigo editorial workspace rather than the legacy
+charcoal/mint Dillinger composition, while retaining Astryx primitives and the
+existing editor/product behavior.
+
+- Completed the preview, overlay, secondary-state, content-route, error/404,
+  responsive, accessibility, motion, theme persistence, and cleanup work.
+- Added the owned mode-selection tests, prohibited-theme prebuild gate,
+  computed-style and axe browser assertions, 320px/keyboard/system-mode
+  scenarios, full route/state capture runner, contrast audit, and 126-image
+  evidence matrix.
+- Regression review fixed contrast and scroll-region findings, Monaco shortcut
+  capture/contribution/theme/lifecycle issues, and preview scroll-origin
+  normalization; legacy browser assertions now traverse the rebranded shell.
+- Updated root and component contributor notes to make the owned token/theme
+  layer authoritative and forbid legacy styling.
+
+### Verification and resume point
+
+- Green: lint; typecheck; 123-file legacy-theme gate; contrast audit;
+  production build; 33/33 Vitest files (381 passed, one intentional skip,
+  91.77% statement / 92.12% line coverage); 43/43 repository E2E; 5/5 Phase
+  20 E2E; 126 screenshots across 39 IDs; representative human visual review.
+- Phase 20 is 42/44. Only branch CI/OIDC deployment proof and the dependent
+  phase-index completion checkbox remain.
+- Next: commit/push the verified worktree, monitor the branch deployment,
+  verify the live Function URL, then record the run/URL in Phases 20 and 18,
+  close Phase 20 at 44/44, update the index/ledger, and push the closure commit.
+
+### Spec Summary/Status
+
+| Phase | Scope | Progress | Status |
+|---|---|---:|---|
+| [20](20-clean-visual-rebrand.md) | Clean visual rebrand | 42/44 | 🟡 Local implementation and acceptance complete; branch CI/OIDC deployment proof and final index closure remain |
+| [18](18-ui-verification-and-testing.md) | Live UI verification | 0/17 | ⛔ Still blocked on the Phase 20 live handoff plus its existing Phase 16/17 dependencies |
+
+| Component or surface | Functional status | Clean-rebrand status |
+|---|---|---|
+| Theme and tokens | Owned light/dark/system theme, SSR cookie, live media reaction, semantic bridge, and legacy gate pass | Complete locally; contrast matrix passes |
+| Shell and document | Editor, preview, scroll-sync, paste, shortcuts, responsive pane controls, import/export, and document workflows pass | Complete locally across shell, preview, focus, drop, mobile, and document states |
+| Overlays and routes | Menus, command palette, dialogs, provider states, toasts, content routes, 404/error/loading/offline states pass | Complete locally across owned overlay and route treatments |
+| Accessibility and evidence | Keyboard, reduced motion, 320px, theme persistence, and axe scenarios pass | 126-image matrix and before/after verdict complete; live deployment evidence pending |
+
+**Overall:** Phase 20 is locally accepted at 42/44; CI/OIDC deployment and live verification are the only remaining phase requirements.
+
+**Evidence:** lint/typecheck/build/legacy/contrast pass; Vitest 381 passed + 1 skipped with coverage; Playwright 43 + 5 passed; 126-image matrix and representative visual review.
+
+**Change state:** Uncommitted on `claude/modern-dillinger-aws`.

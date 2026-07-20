@@ -116,7 +116,11 @@ export function MarkdownPreview() {
         }
       }
 
-      container.scrollTop = target.offsetTop;
+      // offsetTop is relative to the preview's offset parent, not its
+      // scroll origin. Normalize against the first mapped block so line 1
+      // remains at scrollTop 0 and later line anchors move proportionally.
+      const scrollOrigin = lineAnchors[0].offsetTop;
+      container.scrollTop = Math.max(0, target.offsetTop - scrollOrigin);
       return;
     }
 
@@ -129,11 +133,9 @@ export function MarkdownPreview() {
       <div
         id="preview"
         data-testid="preview-pane"
-        className={`h-full flex items-center justify-center ${
-          enableNightMode ? 'bg-[#1e1e1e]' : 'bg-transparent'
-        }`}
+        className="flex h-full items-center justify-center bg-surface px-6"
       >
-        <p className="text-text-muted text-sm">Start typing to see a preview</p>
+        <p className="text-content-muted text-sm">Start typing to see a preview</p>
       </div>
     );
   }
@@ -143,8 +145,8 @@ export function MarkdownPreview() {
       ref={containerRef}
       id="preview"
       data-testid="preview-pane"
-      className={`preview-html h-full overflow-auto p-6 ${
-        enableNightMode ? 'dark bg-[#1e1e1e]' : 'bg-transparent'
+      className={`preview-html h-full overflow-auto bg-surface px-5 py-6 sm:px-7 lg:px-9 ${
+        enableNightMode ? "dark" : ""
       }`}
       dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />

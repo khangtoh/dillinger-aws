@@ -88,16 +88,16 @@ export function OneDriveModal({ isOpen, onClose, mode }: OneDriveModalProps) {
           header={<DialogHeader title="Connect to OneDrive" onOpenChange={handleOpenChange} />}
           content={
             <LayoutContent>
-              <div className="text-center">
-                <CloudCog size={48} className="mx-auto text-text-primary mb-4" aria-hidden="true" />
-                <p className="text-text-secondary mb-6">
+              <div className="rounded-panel border border-border-subtle bg-surface-subtle px-6 py-8 text-center">
+                <CloudCog size={48} className="mx-auto mb-4 rounded-panel bg-accent-soft p-3 text-accent" aria-hidden="true" />
+                <p className="text-content-muted mb-6">
                   Connect your OneDrive account to import and save markdown files.
                 </p>
                 <Button
                   label="Connect OneDrive"
                   variant="primary"
                   onClick={oneDrive.connect}
-                  className="bg-plum text-bg-sidebar hover:opacity-90"
+                  className="bg-accent text-on-accent hover:opacity-90"
                 />
               </div>
             </LayoutContent>
@@ -136,8 +136,8 @@ export function OneDriveModal({ isOpen, onClose, mode }: OneDriveModalProps) {
         content={
           <LayoutContent>
           {mode === "save" && (
-            <div className="mb-4 p-3 bg-bg-highlight rounded">
-              <label htmlFor="onedrive-filename" className="block text-sm text-text-muted mb-1">
+            <div className="mb-4 p-3 bg-surface-subtle rounded-control">
+              <label htmlFor="onedrive-filename" className="block text-sm text-content-muted mb-1">
                 File name
               </label>
               <input
@@ -146,15 +146,15 @@ export function OneDriveModal({ isOpen, onClose, mode }: OneDriveModalProps) {
                 value={newFileName}
                 onChange={(e) => setNewFileName(e.target.value)}
                 placeholder="document.md"
-                className="w-full bg-bg-navbar text-text-invert px-3 py-2 rounded
-                           border border-border-settings
-                           focus:border-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum"
+                className="w-full bg-surface text-content-strong px-3 py-2 rounded-control
+                           border border-border-control
+                           focus:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               />
             </div>
           )}
 
           {oneDrive.files.length === 0 ? (
-            <p className="text-text-muted text-center py-4">
+            <p className="text-content-muted text-center py-4">
               No files found
             </p>
           ) : (
@@ -163,15 +163,15 @@ export function OneDriveModal({ isOpen, onClose, mode }: OneDriveModalProps) {
                 <button
                   key={item.id}
                   onClick={() => handleItemClick(item)}
-                  className={`w-full text-left px-3 py-2 rounded text-text-primary
-                             hover:bg-bg-highlight flex items-center gap-2
-                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum
-                             ${selectedFileId === item.id ? "bg-bg-highlight" : ""}`}
+                  className={`w-full text-left px-3 py-2 rounded-control text-content-strong
+                             hover:bg-surface-subtle flex items-center gap-2
+                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent
+                             ${selectedFileId === item.id ? "bg-surface-subtle" : ""}`}
                 >
                   {item.isFolder ? (
-                    <Folder size={16} className="text-text-muted" aria-hidden="true" />
+                    <Folder size={16} className="text-content-muted" aria-hidden="true" />
                   ) : (
-                    <FileText size={16} className="text-text-muted" aria-hidden="true" />
+                    <FileText size={16} className="text-content-muted" aria-hidden="true" />
                   )}
                   <span>{item.name}</span>
                 </button>
@@ -188,7 +188,7 @@ export function OneDriveModal({ isOpen, onClose, mode }: OneDriveModalProps) {
                 icon={<Save size={18} />}
                 variant="primary"
                 onClick={handleSave}
-                className="w-full bg-plum text-bg-sidebar hover:opacity-90"
+                className="w-full bg-accent text-on-accent hover:opacity-90"
               />
             </LayoutFooter>
           )

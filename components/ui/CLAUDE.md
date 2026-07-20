@@ -11,3 +11,7 @@
 | #1814 | 2:15 PM | 🟣 | Added Accessibility Attributes to Toast Notification Component | ~434 |
 | #1800 | 2:09 PM | 🔵 | Custom Toast Notification System Implementation | ~483 |
 </claude-mem-context>
+
+## Phase 20 visual system
+
+Shared Toast, Skeleton, shortcut, loading, empty, error, and offline UI must use the owned radius, elevation, motion, and semantic color tokens. Preserve live-region/dialog semantics, visible focus, and reduced-motion behavior.

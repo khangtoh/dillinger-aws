@@ -1,6 +1,6 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 // jsdom's global Blob lacks .stream(), which the native Response
 // constructor (also global in this test env) requires - use Node's Blob.
@@ -35,6 +35,8 @@ function resetStore() {
         title: "Test Document",
         body: "# Hello World",
         createdAt: new Date().toISOString(),
+        folderId: null,
+        tags: [],
       },
       editorInstance: null,
       settings: { ...initialState.settings },
@@ -60,11 +62,11 @@ describe("Navbar", () => {
     render(<Navbar />);
 
     expect(screen.getByRole("button", { name: "Toggle sidebar" })).toBeInTheDocument();
-    expect(screen.getByText("DILLINGER")).toBeInTheDocument();
+    expect(screen.getByText("Dillinger")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Export document" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /preview/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Open settings" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Enter zen mode" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "More editor actions" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Import file" })).toBeInTheDocument();
   });
 
@@ -126,7 +128,8 @@ describe("Navbar", () => {
 
     await user.click(screen.getByRole("button", { name: "Export document" }));
 
-    const items = screen.getAllByRole("menuitem", { hidden: true });
+    const exportMenu = screen.getByRole("menu", { name: "Export as", hidden: true });
+    const items = within(exportMenu).getAllByRole("menuitem", { hidden: true });
 
     expect(items).toHaveLength(4);
     expect(items[0]).toHaveTextContent("Markdown");
@@ -153,7 +156,10 @@ describe("Navbar", () => {
 
     expect(useStore.getState().zenMode).toBe(false);
 
-    await user.click(screen.getByRole("button", { name: "Enter zen mode" }));
+    await user.click(screen.getByRole("button", { name: "More editor actions" }));
+    await user.click(
+      screen.getByRole("menuitem", { name: "Enter zen mode", hidden: true })
+    );
 
     expect(useStore.getState().zenMode).toBe(true);
   });
@@ -211,7 +217,10 @@ describe("Navbar", () => {
     const imageInput = screen.getByTestId("image-import-input");
     const clickSpy = vi.spyOn(imageInput, "click");
 
-    await user.click(screen.getByRole("button", { name: "Insert image" }));
+    await user.click(screen.getByRole("button", { name: "More editor actions" }));
+    await user.click(
+      screen.getByRole("menuitem", { name: "Insert image", hidden: true })
+    );
 
     expect(clickSpy).toHaveBeenCalled();
   });

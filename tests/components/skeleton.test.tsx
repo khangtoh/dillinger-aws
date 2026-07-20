@@ -4,24 +4,25 @@ import { render, screen } from "@testing-library/react";
 import { EditorSkeleton } from "@/components/ui/Skeleton";
 
 describe("Skeleton", () => {
-  it("renders with default pulse animation and highlight background", () => {
+  it("renders with the owned pulse, radius, and semantic track treatment", () => {
     render(<EditorSkeleton />);
 
     const skeletonElements = document.querySelectorAll(".animate-pulse");
     expect(skeletonElements.length).toBeGreaterThan(0);
 
     skeletonElements.forEach((el) => {
-      expect(el.classList.contains("rounded")).toBe(true);
+      expect(el.classList.contains("rounded-control")).toBe(true);
+      expect(el.classList.contains("bg-control-track")).toBe(true);
     });
   });
 
-  it("accepts custom className on skeleton elements", () => {
+  it("retains the custom sizing classes used by the branded layout", () => {
     render(<EditorSkeleton />);
 
-    const wideSkeletons = document.querySelectorAll(".h-8.w-32");
+    const wideSkeletons = document.querySelectorAll(".h-4.w-32");
     expect(wideSkeletons.length).toBeGreaterThan(0);
 
-    const narrowSkeletons = document.querySelectorAll(".h-6.w-24");
+    const narrowSkeletons = document.querySelectorAll(".h-2\\.5.w-24");
     expect(narrowSkeletons.length).toBeGreaterThan(0);
   });
 

@@ -114,7 +114,7 @@ describe("SettingsModal", () => {
     openSettings();
     render(<SettingsModal />);
 
-    const select = screen.getByLabelText("Tab Size");
+    const select = screen.getByLabelText("Tab size");
     await user.selectOptions(select, "8");
     expect(useStore.getState().settings.tabSize).toBe(8);
 
@@ -206,7 +206,7 @@ describe("SettingsModal", () => {
     expect(screen.getByRole("switch", { name: "Scroll Sync" })).toHaveAttribute("aria-checked", "true");
     expect(screen.getByRole("switch", { name: "Word Count" })).toHaveAttribute("aria-checked", "false");
     expect(screen.getByRole("switch", { name: "Character Count" })).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByLabelText("Tab Size")).toHaveValue("8");
+    expect(screen.getByLabelText("Tab size")).toHaveValue("8");
     expect(screen.getByLabelText("Keybindings")).toHaveValue("vim");
   });
 });

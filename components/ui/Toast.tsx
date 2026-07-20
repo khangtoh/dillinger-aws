@@ -49,7 +49,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={{ notify }}>
       {children}
       <div
-        className="fixed bottom-4 right-4 z-toast flex flex-col gap-2 pb-[env(safe-area-inset-bottom)] pr-[env(safe-area-inset-right)]"
+        className="fixed bottom-3 left-3 right-3 z-toast flex flex-col gap-2 pb-[env(safe-area-inset-bottom)] sm:bottom-4 sm:left-auto sm:right-4 sm:w-full sm:max-w-sm sm:pr-[env(safe-area-inset-right)]"
         role="status"
         aria-live="polite"
         aria-label="Notifications"

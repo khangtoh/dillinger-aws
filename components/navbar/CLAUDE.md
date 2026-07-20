@@ -5,3 +5,7 @@
 
 *No recent activity*
 </claude-mem-context>
+
+## Phase 20 visual system
+
+The Navbar is the owned Dillinger writing-workspace shell. Keep primary actions visible through 320px, place secondary actions in the labelled More menu, and use only semantic surface/content/accent/focus tokens.

@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import { Source_Sans_3 } from "next/font/google";
+import { cookies } from "next/headers";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { Providers } from "@/components/providers/Providers";
+import type { ThemeMode } from "@/lib/types";
 import "./globals.css";
-
-const sourceSans = Source_Sans_3({
-  subsets: ["latin"],
-  variable: "--font-source-sans",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -58,15 +56,20 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+function parseThemeMode(value: string | undefined): ThemeMode {
+  return value === "light" || value === "dark" || value === "system" ? value : "system";
+}
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const initialTheme = parseThemeMode((await cookies()).get("dillinger-theme")?.value);
   return (
-    <html lang="en">
-      <body className={`${sourceSans.variable} font-sans`}>
-        <Providers>
+    <html lang="en" data-theme={initialTheme === "system" ? undefined : initialTheme} suppressHydrationWarning>
+      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
+        <Providers initialTheme={initialTheme}>
           {children}
         </Providers>
         <script

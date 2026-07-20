@@ -61,6 +61,8 @@ function resetStore() {
         title: "Test Doc",
         body: "# Hello",
         createdAt: new Date().toISOString(),
+        folderId: null,
+        tags: [],
       },
       editorInstance: null,
       settings: { ...initialState.settings },
@@ -609,7 +611,7 @@ describe("GitHubModal", () => {
 
       // The check icon should be present for the selected file
       const fileButton = screen.getByText("README.md").closest("button");
-      expect(fileButton?.className).toContain("bg-bg-highlight");
+      expect(fileButton?.className).toContain("bg-surface-subtle");
     });
   });
 });

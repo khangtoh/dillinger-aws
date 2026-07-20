@@ -52,6 +52,10 @@ test("imports markdown/html files, preserves prior documents, inserts images, an
   await expect(page.locator("#preview h1")).toHaveText("Imported", {
     timeout: 15_000,
   });
+
+  // The rebranded workspace starts with the document library collapsed
+  // for returning users; open it before asserting the preserved library.
+  await page.getByRole("button", { name: "Toggle sidebar" }).click();
   await expect(
     page.getByRole("button", { name: /Playwright Smoke\.md/ })
   ).toBeVisible();

@@ -1,11 +1,17 @@
 "use client";
 
-import { useRef, useCallback, useEffect, useMemo } from "react";
-import Editor, { OnMount, OnChange } from "@monaco-editor/react";
-import type * as Monaco from "monaco-editor";
+import { useRef, useCallback, useEffect, useMemo, useState } from "react";
+import Editor, { loader, OnMount, OnChange } from "@monaco-editor/react";
+import * as Monaco from "monaco-editor/esm/vs/editor/editor.main.js";
+import "monaco-editor/esm/vs/basic-languages/markdown/markdown.contribution";
 import { useStore } from "@/stores/store";
 import { countDocumentStats } from "@/lib/document";
 import { useImageUpload } from "@/hooks/useImageUpload";
+import { astryxColorTokens } from "@/lib/theme/tokens";
+
+// Keep Monaco inside the owned application bundle. The default loader reaches
+// for a public CDN, which violates the production CSP and can flash unthemed UI.
+loader.config({ monaco: Monaco });
 
 export function MonacoEditor() {
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -13,6 +19,9 @@ export function MonacoEditor() {
   const keybindingStatusRef = useRef<HTMLDivElement>(null);
   const currentDocument = useStore((state) => state.currentDocument);
   const enableNightMode = useStore((state) => state.settings.enableNightMode);
+  const themeMode = useStore((state) => state.settings.theme);
+  const [systemPrefersDark, setSystemPrefersDark] = useState(false);
+  const [editorReady, setEditorReady] = useState(false);
   const enableAutoSave = useStore((state) => state.settings.enableAutoSave);
   const tabSize = useStore((state) => state.settings.tabSize);
   const keybindings = useStore((state) => state.settings.keybindings);
@@ -25,6 +34,25 @@ export function MonacoEditor() {
   const setEditorTopLine = useStore((state) => state.setEditorTopLine);
   const setEditorInstance = useStore((state) => state.setEditorInstance);
   const { uploadFromClipboard } = useImageUpload();
+
+  useEffect(() => {
+    if (themeMode !== "system") {
+      setSystemPrefersDark(false);
+      return;
+    }
+
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const update = (event: MediaQueryListEvent | MediaQueryList) => {
+      setSystemPrefersDark(event.matches);
+    };
+
+    update(media);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, [themeMode]);
+
+  const useDarkEditor =
+    enableNightMode || themeMode === "dark" || systemPrefersDark;
 
   const keybindingLabel =
     keybindings === "vim"
@@ -39,41 +67,49 @@ export function MonacoEditor() {
   const handleMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     setEditorInstance(editor);
+    setEditorReady(true);
 
-    monaco.editor.defineTheme("dillinger-light", {
+    const light = 0;
+    const dark = 1;
+    const monacoToken = (
+      name: keyof typeof astryxColorTokens,
+      mode: typeof light | typeof dark
+    ) => astryxColorTokens[name][mode].replace("#", "");
+
+    monaco.editor.defineTheme("dillinger-workspace-light", {
       base: "vs",
       inherit: true,
       rules: [
-        { token: "keyword.md", foreground: "373D49", fontStyle: "bold" },
-        { token: "string.link.md", foreground: "373D49" },
-        { token: "variable.md", foreground: "373D49" },
-        { token: "markup.heading", foreground: "373D49", fontStyle: "bold" },
-        { token: "comment.md", foreground: "236e24" },
+        { token: "keyword.md", foreground: monacoToken("--color-text-primary", light), fontStyle: "bold" },
+        { token: "string.link.md", foreground: monacoToken("--color-text-accent", light) },
+        { token: "variable.md", foreground: monacoToken("--color-text-primary", light) },
+        { token: "markup.heading", foreground: monacoToken("--color-text-primary", light), fontStyle: "bold" },
+        { token: "comment.md", foreground: monacoToken("--color-success", light) },
       ],
       colors: {
-        "editor.background": "#FFFFFF",
-        "editor.foreground": "#000000",
+        "editor.background": astryxColorTokens["--color-background-surface"][light],
+        "editor.foreground": astryxColorTokens["--color-text-primary"][light],
       },
     });
 
-    monaco.editor.defineTheme("dillinger-dark", {
+    monaco.editor.defineTheme("dillinger-workspace-dark", {
       base: "vs-dark",
       inherit: true,
       rules: [
-        { token: "keyword.md", foreground: "D3DAEA", fontStyle: "bold" },
-        { token: "string.link.md", foreground: "A0AABF" },
-        { token: "variable.md", foreground: "D3DAEA" },
-        { token: "markup.heading", foreground: "D3DAEA", fontStyle: "bold" },
-        { token: "comment.md", foreground: "6A9955" },
+        { token: "keyword.md", foreground: monacoToken("--color-text-primary", dark), fontStyle: "bold" },
+        { token: "string.link.md", foreground: monacoToken("--color-text-accent", dark) },
+        { token: "variable.md", foreground: monacoToken("--color-text-primary", dark) },
+        { token: "markup.heading", foreground: monacoToken("--color-text-primary", dark), fontStyle: "bold" },
+        { token: "comment.md", foreground: monacoToken("--color-success", dark) },
       ],
       colors: {
-        "editor.background": "#1D212A",
-        "editor.foreground": "#D3DAEA",
+        "editor.background": astryxColorTokens["--color-background-surface"][dark],
+        "editor.foreground": astryxColorTokens["--color-text-primary"][dark],
       },
     });
 
     editor.updateOptions({
-      theme: enableNightMode ? "dillinger-dark" : "dillinger-light",
+      theme: useDarkEditor ? "dillinger-workspace-dark" : "dillinger-workspace-light",
     });
 
     editor.focus();
@@ -120,7 +156,7 @@ export function MonacoEditor() {
         statusNode.textContent = "";
       }
     };
-  }, [keybindings]);
+  }, [editorReady, keybindings]);
 
   // Set up scroll sync listener (recreates when settings change)
   useEffect(() => {
@@ -138,7 +174,7 @@ export function MonacoEditor() {
     });
 
     return () => disposable.dispose();
-  }, [enableScrollSync, setEditorScrollPercent, setEditorTopLine]);
+  }, [editorReady, enableScrollSync, setEditorScrollPercent, setEditorTopLine]);
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -170,7 +206,7 @@ export function MonacoEditor() {
 
     domNode.addEventListener("paste", handlePaste);
     return () => domNode.removeEventListener("paste", handlePaste);
-  }, [uploadFromClipboard]);
+  }, [editorReady, uploadFromClipboard]);
 
   const handleChange: OnChange = useCallback(
     (value: string | undefined) => {
@@ -194,7 +230,7 @@ export function MonacoEditor() {
   const editorOptions = useMemo(
     () => ({
       fontSize: 14,
-      fontFamily: '"Ubuntu Mono", Monaco, monospace',
+      fontFamily: 'var(--font-geist-mono), Consolas, monospace',
       lineHeight: 24,
       wordWrap: "on" as const,
       minimap: { enabled: false },
@@ -222,7 +258,7 @@ export function MonacoEditor() {
 
   if (!currentDocument) {
     return (
-      <div className="flex items-center justify-center h-full bg-bg-primary text-text-muted">
+      <div className="flex items-center justify-center h-full bg-canvas text-content-muted">
         No document selected
       </div>
     );
@@ -234,14 +270,14 @@ export function MonacoEditor() {
         <Editor
           height="100%"
           language="markdown"
-          theme={enableNightMode ? "dillinger-dark" : "dillinger-light"}
+          theme={useDarkEditor ? "dillinger-workspace-dark" : "dillinger-workspace-light"}
           value={currentDocument.body}
           onChange={handleChange}
           onMount={handleMount}
           options={editorOptions}
         />
       </div>
-      <div className="flex min-h-10 items-center justify-between border-t border-border-light/60 bg-bg-primary px-4 py-2 text-xs text-text-muted">
+      <div className="flex min-h-10 items-center justify-between border-t border-border-subtle bg-canvas px-4 py-2 text-xs text-content-muted">
         <div className="flex items-center gap-3">
           {enableWordsCount && (
             <span data-testid="word-count">{stats.wordCount} words</span>
@@ -257,7 +293,7 @@ export function MonacoEditor() {
           <span data-testid="keybinding-mode">{keybindingLabel}</span>
           <div
             ref={keybindingStatusRef}
-            className="min-h-4 min-w-12 text-right text-plum"
+            className="min-h-4 min-w-12 text-right text-accent"
           />
         </div>
       </div>

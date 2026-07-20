@@ -23,3 +23,7 @@
 | #1797 | 2:09 PM | 🔵 | GitHubModal Component Implementation Details | ~596 |
 | #1768 | 2:02 PM | 🟣 | GitHub Modal Component with Multi-step Navigation and Import/Save Modes | ~635 |
 </claude-mem-context>
+
+## Phase 20 visual system
+
+All dialogs use the shared Astryx overlay treatment and owned semantic tokens. Preserve dialog/alertdialog roles, focus management, Escape/backdrop behavior, and provider state flows; never add neutral-theme fallbacks or hard-coded legacy colors.

@@ -304,8 +304,9 @@ test.describe("Zen mode", () => {
   }) => {
     await page.goto("/");
 
-    // Click the zen mode button in the navbar
-    await page.getByRole("button", { name: "Enter zen mode" }).click();
+    // Zen mode is grouped with the owned shell's secondary actions.
+    await page.getByRole("button", { name: "More editor actions" }).click();
+    await page.getByRole("menuitem", { name: "Enter zen mode" }).click();
 
     // Zen mode should be active
     await expect(
@@ -582,7 +583,12 @@ test.describe("Editor/preview scroll sync", () => {
     const box = await editorPane.boundingBox();
     if (!box) throw new Error("editor pane not found");
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.wheel(0, 2000);
+    // Monaco deliberately consumes large wheel deltas in bounded steps.
+    // Use several real wheel gestures so the visible top line crosses a
+    // markdown block anchor and exercises the line-aware preview mapping.
+    for (let index = 0; index < 8; index += 1) {
+      await page.mouse.wheel(0, 800);
+    }
 
     await expect(async () => {
       const after = await preview.evaluate((el) => el.scrollTop);
