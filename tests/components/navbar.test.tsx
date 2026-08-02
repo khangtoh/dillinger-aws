@@ -212,12 +212,11 @@ describe("Navbar", () => {
 
   describe("handleExport", () => {
     function mockFetchSuccess(contentType = "application/octet-stream", filename?: string) {
-      const blob = new Blob(["content"], { type: contentType });
       const headers = new Headers({ "Content-Type": contentType });
       if (filename) {
         headers.set("Content-Disposition", `attachment; filename="${filename}"`);
       }
-      const response = new Response(blob, { status: 200, headers });
+      const response = new Response("content", { status: 200, headers });
       vi.spyOn(globalThis, "fetch").mockResolvedValue(response);
       return response;
     }
