@@ -27,10 +27,10 @@ Parameters:
     Default: 14
   MaxTenantConcurrency:
     Type: Number
-    Default: 2
-    MinValue: 1
+    Default: 0
+    MinValue: 0
     MaxValue: 10
-    Description: Caps concurrent Lambda environments per tenant to bound abuse and cost.
+    Description: Set above 0 only after the account concurrency quota exceeds Lambda's 10-concurrency unreserved minimum.
   AlarmTopicArn:
     Type: String
     Default: ""
@@ -38,6 +38,7 @@ Parameters:
 
 Conditions:
   HasAlarmTopic: !Not [!Equals [!Ref AlarmTopicArn, ""]]
+  HasReservedConcurrency: !Not [!Equals [!Ref MaxTenantConcurrency, 0]]
 
 Resources:
   DillingerFunction:
@@ -52,7 +53,7 @@ Resources:
       # ~13s against the old 15s timeout. See spec/06-execution-pdf-export.md.
       MemorySize: 2048
       Timeout: 30
-      ReservedConcurrentExecutions: !Ref MaxTenantConcurrency
+      ReservedConcurrentExecutions: !If [HasReservedConcurrency, !Ref MaxTenantConcurrency, !Ref "AWS::NoValue"]
       Architectures:
         - x86_64
       Environment:
@@ -137,6 +138,7 @@ Resources:
 
   DillingerConcurrencyAlarm:
     Type: AWS::CloudWatch::Alarm
+    Condition: HasReservedConcurrency
     Properties:
       AlarmDescription: !Sub "${TenantId} tenant Lambda reached its concurrency cap"
       Namespace: AWS/Lambda
