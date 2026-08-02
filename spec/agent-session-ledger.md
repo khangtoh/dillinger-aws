@@ -549,3 +549,13 @@ claiming completion of Phase 18's separate functional/AI/performance scope.
 **Evidence:** CI/OIDC run 29725965083; HTTP 200 deployment artifact; live focused browser scenarios; six-group live verifier; 126 canonical plus four live screenshots; zero live console/network failures.
 
 **Change state:** Implementation commit `c6941cf` is pushed; completion documentation and live evidence are pending the closure commit on `claude/modern-dillinger-aws`.
+
+---
+
+## Session: 2026-08-02 (dual CI provider selection)
+
+- Added a versioned `infra/ci-provider.json` selector. `github` remains the default; switching it to `buildkite` activates Buildkite and gates all GitHub Actions test/deploy/lifecycle jobs off.
+- Added Buildkite bootstrap and active pipeline definitions, including the same test, audit, SBOM, manual staging-deploy, smoke-test, deployment-artifact, and tenant-registry write-back path.
+- Added a Buildkite OIDC trust-policy template constrained to one organization, one pipeline, and `main`; the external Buildkite organization identifiers, OIDC provider, role, and checkout write credential remain administrator setup steps documented in `.buildkite/README.md`.
+- Verified selector behavior, shell syntax, YAML/JSON parsing, and whitespace. No deployment or AWS mutation was run.
+- Added `docs/buildkite.md`, a user-facing prerequisite, AWS OIDC, activation, verification, scope, and rollback guide; linked it from the root README and Buildkite implementation notes.

@@ -38,7 +38,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  provider:
+    runs-on: ubuntu-latest
+    outputs:
+      active: ${{ steps.provider.outputs.active }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read active CI provider
+        id: provider
+        run: scripts/ci-provider.sh github-output
+
   lifecycle:
+    needs: provider
+    if: needs.provider.outputs.active == 'true'
     runs-on: ubuntu-latest
     # The OIDC trust policy pins sub to this repo's "staging" environment
     # (see infra/bootstrap/ci-trust-policy.template.json) - every job that

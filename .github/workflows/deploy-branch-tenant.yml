@@ -57,7 +57,21 @@ env:
   AWS_REGION: ${{ vars.AWS_REGION }}
 
 jobs:
+  provider:
+    runs-on: ubuntu-latest
+    outputs:
+      active: ${{ steps.provider.outputs.active }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read active CI provider
+        id: provider
+        run: scripts/ci-provider.sh github-output
+
   security:
+    needs: provider
+    if: needs.provider.outputs.active == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -94,7 +108,8 @@ jobs:
           if-no-files-found: error
 
   deploy:
-    needs: security
+    needs: [provider, security]
+    if: needs.provider.outputs.active == 'true'
     runs-on: ubuntu-latest
     environment: staging
     concurrency:

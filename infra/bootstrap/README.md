@@ -13,6 +13,9 @@ AccessDenied-driven least-privilege refinement (history in
 `spec/01-aws-account-onboarding.md`) — recreating it by hand in a new
 account would mean rediscovering all of that.
 
+> **Optional Buildkite CI:** the account can also trust a separate Buildkite OIDC role. The provider setup and activation runbook is in [`.buildkite/README.md`](../../.buildkite/README.md); its IAM trust template is `buildkite-ci-trust-policy.template.json`.
+
+
 ## Stand up a new account
 
 ```bash

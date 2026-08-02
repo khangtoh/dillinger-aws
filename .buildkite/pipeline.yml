@@ -1,0 +1,7 @@
+# This bootstrap pipeline is intentionally harmless when GitHub Actions is
+# selected. It uploads the real jobs only when infra/ci-provider.json selects
+# Buildkite, so the repository has exactly one active CI/deployment provider.
+steps:
+  - label: ":traffic_light: Select CI provider"
+    key: select-ci-provider
+    command: scripts/ci-provider.sh upload-buildkite-pipeline

@@ -1,4 +1,6 @@
 # CI/CD: how the deploy pipeline is set up and why
+> **Provider selection:** this document describes the GitHub Actions path. `infra/ci-provider.json` selects the one active provider; see [`.buildkite/README.md`](../../.buildkite/README.md) for the Buildkite path and migration prerequisites.
+
 
 `deploy-lambda.yml` rebuilds and redeploys the fixed **staging** tenant
 (main only) on demand. `deploy-branch-tenant.yml` (added 2026-07-12)

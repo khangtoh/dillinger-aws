@@ -1,0 +1,24 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::__ACCOUNT__:oidc-provider/agent.buildkite.com"
+      },
+      "Action": ["sts:TagSession", "sts:AssumeRoleWithWebIdentity"],
+      "Condition": {
+        "StringLike": {
+          "agent.buildkite.com:sub": "organization:__BUILDKITE_ORGANIZATION_SLUG__:pipeline:__BUILDKITE_PIPELINE_SLUG__:ref:refs/heads/main:*"
+        },
+        "StringEquals": {
+          "agent.buildkite.com:aud": "sts.amazonaws.com",
+          "aws:RequestTag/organization_slug": "__BUILDKITE_ORGANIZATION_SLUG__",
+          "aws:RequestTag/organization_id": "__BUILDKITE_ORGANIZATION_ID__",
+          "aws:RequestTag/pipeline_slug": "__BUILDKITE_PIPELINE_SLUG__",
+          "aws:RequestTag/build_branch": "main"
+        }
+      }
+    }
+  ]
+}
