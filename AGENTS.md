@@ -1,5 +1,17 @@
 # Repository Agent Instructions
 
+This repository is **TopForm**, forked from `dillinger-aws`. Phases 1-20
+under `spec/` are inherited Dillinger history; TopForm work starts at
+Phase 21.
+
+## Product context
+
+For product work, read product/AGENTS.md, product/PRODUCT.md, and
+product/STATE.md before making changes. Follow linked product records as
+needed and update product context after material decisions or results.
+ProductOS (`product/`) owns product intent, outcomes, and decisions;
+specloop (`spec/`) owns the phased task checklists and the work order.
+
 ## Mandatory spec completion handoff
 
 All coding, documentation, review, and scheduled agents working in this

@@ -26,6 +26,21 @@ npm run start    # Start production server
 npm run lint     # Run ESLint
 ```
 
+## TopForm Fork and Product Context
+
+This repository is now **TopForm**, forked from `dillinger-aws` on
+2026-09-26. The rest of this file describes the Dillinger codebase TopForm
+inherited; its engineering conventions still apply until a TopForm decision
+replaces them.
+
+- For product work, read `product/AGENTS.md`, `product/PRODUCT.md`, and
+  `product/STATE.md` (ProductOS) before making changes, and update product
+  context after material decisions or results. Never invent product facts;
+  unknowns stay `Unknown` until the owner supplies them.
+- Engineering work runs through specloop: `spec/BACKLOG.md` sets the order,
+  and TopForm phases start at 21. Phases 1-20 are inherited Dillinger
+  history. Use the `/spec-*` commands in `.claude/commands/`.
+
 ## Agent Task Completion Reporting
 
 Every agent working in this repository **MUST** read and follow

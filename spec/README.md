@@ -1,11 +1,35 @@
-# Dillinger on AWS Lambda — Spec Index
+# TopForm — Spec Index
 
-Goal: run [Dillinger](https://github.com/joemccann/dillinger) (a Next.js 14
-markdown editor, currently deployed to Vercel with no Docker involved today)
-on **AWS Lambda**, packaged as a container image so it executes inside
-Lambda's Firecracker microVM runtime
-(see https://aws.amazon.com/lambda/lambda-microvms/), instead of any
-Docker-host/ECS/EC2-style deployment.
+Goal: build **TopForm**, a new product forked on 2026-09-26 from the
+`dillinger-aws` codebase (branch `claude/modern-dillinger-aws` →
+`claude/topform-repo-setup-d0q5t3`), steered through
+[ProductOS](../product/README.md) and executed through specloop phases.
+What TopForm is — its promise, users, and core job — is owner-supplied and
+still recorded as unknown in [`product/PRODUCT.md`](../product/PRODUCT.md);
+Phase 21 establishes it before any product build phase is written.
+
+**Two layers, one repo.** `product/` (ProductOS) owns *why and what*:
+product contract, outcomes, steering, decisions, evidence, and the product
+state handoff. `spec/` (specloop) owns *how and whether it's done*: numbered
+phases of atomic checkbox tasks, the BACKLOG work order, and the mandatory
+`Spec Summary/Status` handoff. A ProductOS outcome or feature that needs
+engineering work is decomposed into a spec phase here; the phase links back
+to its ProductOS record, and results flow back into ProductOS evidence and
+`product/STATE.md`.
+
+**Inherited phases.** Phases 1-20 are the Dillinger-on-AWS history this
+fork inherits. They stay in place because the code, infrastructure, and
+workflows they describe are still in this tree and many files link to them.
+They are not TopForm's plan: their open boxes are carried as inherited
+backlog below the TopForm phases, and Phase 21 decides which inherited
+surfaces TopForm keeps, replaces, or removes. TopForm phases start at 21.
+
+### TopForm acceptance
+
+- [ ] **TopForm foundation ready** — Phase 21 and Phase 22 complete:
+      the product contract is owner-confirmed in `product/PRODUCT.md`, a
+      first outcome is accepted, the private `khangtoh/topform` repository
+      exists with this history on `main`, and CI is green there.
 
 ## How this spec set works
 
@@ -22,8 +46,8 @@ Docker-host/ECS/EC2-style deployment.
 - A scheduled agent picks up the next unchecked box, does it, verifies it,
   updates its checkbox and required Results/status records, produces the
   mandatory `Spec Summary/Status` handoff, commits, and moves on — repeating until
-  `spec/08-testing.md` is fully checked and a live Function URL is recorded
-  below.
+  the TopForm acceptance checkbox above has recorded evidence. Work BACKLOG
+  order: TopForm phases (21+) come before inherited open work.
 
 **Architecture deep dive:** [`ARCHITECTURE.md`](../ARCHITECTURE.md) —
 how the Docker image becomes a Firecracker microVM, cold-start anatomy
@@ -77,8 +101,10 @@ boxes in the phase file; keep both in sync when checking boxes.
 | 18 | [18-ui-verification-and-testing.md](18-ui-verification-and-testing.md) | Prove the UI refresh works live, includes the clean visual rebrand, and closes the StackEdit gap | 🟡 6/17 | Phase 20 visual/deployment acceptance complete; Phase 16 + 17 (AI-1/AI-3) and the remaining functional/performance close-out stay open |
 | 19 | [19-incremental-stack-upgrade-for-astryx.md](19-incremental-stack-upgrade-for-astryx.md) | Incrementally land Next 15.5.20, then React 19.2.7, then StyleX 0.18.3 — Astryx's actual minimum requirements | 🟡 35/43 | None (executes Phase 12's stack-upgrade item); unblocks Phase 14 |
 | 20 | [20-clean-visual-rebrand.md](20-clean-visual-rebrand.md) | Replace the legacy Dillinger palette, typography, shell, component styling, and Markdown presentation with an owned visual system | ✅ 44/44 | **Complete and live 2026-07-20** on the dedicated branch tenant; Phase 18 visual/deployment handoff recorded |
+| 21 | [21-topform-product-foundation.md](21-topform-product-foundation.md) | **TopForm:** adopt ProductOS, capture the product contract, pick the first outcome, and decide the fate of inherited Dillinger surfaces | 🟡 5/11 | Owner product description (TopForm promise, users, core job) |
+| 22 | [22-topform-repository-bootstrap.md](22-topform-repository-bootstrap.md) | **TopForm:** stand up the private `khangtoh/topform` repo, specloop tooling, identity, CI, and non-colliding deploy targets | 🟡 2/10 | Owner creates the `khangtoh/topform` repository (session integration cannot) |
 
-## Status
+## Inherited status (Dillinger on AWS, Phases 1-12)
 
 - [x] **Dillinger is live on AWS Lambda** — Function URL:
   `https://iepu7ka2gyaxnyhhnldynzgxgy0yonzr.lambda-url.ap-southeast-1.on.aws/`
@@ -116,7 +142,7 @@ boxes in the phase file; keep both in sync when checking boxes.
   bugs found and fixed during first real multi-region use (gateway is
   always us-east-1; tenants elsewhere).
 
-## Non-goals for v1
+## Inherited non-goals (Dillinger on AWS v1)
 
 - No self-hosted database — Dillinger already keeps state client-side
   (Zustand + localStorage), so none is needed on AWS either.

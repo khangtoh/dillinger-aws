@@ -572,3 +572,36 @@ claiming completion of Phase 18's separate functional/AI/performance scope.
 **Evidence:** `specloop check` → structure valid, 20 phases, 259/454 tasks checked.
 
 **Change state:** Spec/config-only commit on `claude/modern-dillinger-aws`; no application code, infra, or deployment changes. The untracked `lib/search.ts` and `tests/lib/search.test.ts` predate this session and were left out of it.
+
+---
+
+## Session: 2026-09-26 (branch `claude/topform-repo-setup-d0q5t3`)
+
+### Scope of this session
+
+The owner directed a new product, **TopForm**, forked from this branch
+(full fork with history, private repo `khangtoh/topform`). The session set
+up ProductOS and specloop for it. See `product/steering/STR-001-create-topform.md`.
+
+### What got done
+
+1. Copied the ProductOS 0.1.0 bare template into `product/` and filled only
+   known facts: name, owner, adoption date, fork provenance, inherited
+   capabilities, and authority. Wrote STR-001, OUT-001 (proposed), DEC-001,
+   and CYC-20260926-01.
+2. Ran `specloop upgrade --apply` (0.6.0) to install `.claude/` skills and
+   `/spec-*` commands, and changed `.gitignore` so they are committed.
+3. Added `spec/21-topform-product-foundation.md` and
+   `spec/22-topform-repository-bootstrap.md`, ranked first in BACKLOG. Gave
+   `spec/README.md` a TopForm header, acceptance checkbox, and inherited
+   labels (DEC-001: Phases 1-20 stay in place as inherited history).
+4. Connected `AGENTS.md`, `CLAUDE.md`, and `README.md` to the product context.
+
+### Blocked / left open
+
+- Creating `khangtoh/topform` failed. The GitHub integration returned
+  `403 Resource not accessible by integration`. The owner must create the
+  repository. Everything is committed on this branch, ready to push there.
+- The product description (promise, users, core job) has not been supplied.
+  `product/PRODUCT.md` keeps those fields `Unknown`.
+- Nothing is running or scheduled. No deploys were made.

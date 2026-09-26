@@ -48,8 +48,11 @@ __pycache__/
 # Orchestrator runtime output (Phase 11) - not source, regenerated each run
 infra/orchestrator/state/*.json
 
-# Claude Code agent tooling (isolated worktrees for background sub-agents)
-.claude/
+# Claude Code agent tooling (isolated worktrees for background sub-agents).
+# The specloop skills and /spec-* commands are committed (see spec/22).
+.claude/*
+!.claude/commands/
+!.claude/skills/
 
 # Local AWS account/credential context (Phase 1) - never commit account IDs
 # or credential material
