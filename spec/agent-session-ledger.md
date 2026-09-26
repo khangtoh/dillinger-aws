@@ -559,3 +559,16 @@ claiming completion of Phase 18's separate functional/AI/performance scope.
 - Added a Buildkite OIDC trust-policy template constrained to one organization, one pipeline, and `main`; the external Buildkite organization identifiers, OIDC provider, role, and checkout write credential remain administrator setup steps documented in `.buildkite/README.md`.
 - Verified selector behavior, shell syntax, YAML/JSON parsing, and whitespace. No deployment or AWS mutation was run.
 - Added `docs/buildkite.md`, a user-facing prerequisite, AWS OIDC, activation, verification, scope, and rollback guide; linked it from the root README and Buildkite implementation notes.
+
+---
+
+## Session: 2026-09-26 (specloop adoption)
+
+- Adopted `@khangtoh/specloop` with `specloop upgrade --apply`: added `.specloop.json`, a generated `spec/BACKLOG.md` (numeric order; reorder with `specloop prio-spec <NN> <pos>`), and the optional `spec/specloop-run-state.md`. Existing process files and `AGENTS.md` were kept unchanged.
+- Fixed what `specloop check` flagged: added missing `Goal:`/`Depends on:` lines to Phases 1, 2, 9, 10 and 11; reworded Phase 15 prose containing an inline "```mermaid fence", which the older parser read as a code-fence opener and so hid 9 of its 36 boxes.
+- Phase 11 is a folder of sub-specs, which specloop 0.5.0 couldn't read. Added grouped-phase support upstream (specloop 0.6.0: `NN-slug/README.md` + sub-specs, aggregate progress, `specloop layout`, `specloop group <NN>`). The Phase 11 index row now shows the aggregate ✅ 19/19 (README 2/2 plus 11a–11d 17/17) instead of the README-only 2/2.
+- `specloop layout` recommends grouping Phase 12 (129 tasks, 9 sections) and Phase 19 (43 tasks, 4 steps). Not applied here — it's a decision for the phase owners.
+
+**Evidence:** `specloop check` → structure valid, 20 phases, 259/454 tasks checked.
+
+**Change state:** Spec/config-only commit on `claude/modern-dillinger-aws`; no application code, infra, or deployment changes. The untracked `lib/search.ts` and `tests/lib/search.test.ts` predate this session and were left out of it.

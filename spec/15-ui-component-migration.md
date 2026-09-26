@@ -493,7 +493,7 @@ new shell, then delete the compatibility overrides.
       Guidelines). **Done**, with one deliberate, documented exception to
       the DOMPurify rule. `lib/markdown.ts` gained `applyMermaidFenceRule`
       (mirroring the existing `applyLegacyRendererRules` pattern): a
-      ```mermaid fence now renders as `<div class="mermaid-diagram"
+      `mermaid` code fence now renders as `<div class="mermaid-diagram"
       data-line-start=".." data-line-end="..">ESCAPED_SOURCE</div>`
       instead of a normal `<pre><code>` block — the escaped source stays
       inert text until the client hydrates it. `MarkdownPreview.tsx`

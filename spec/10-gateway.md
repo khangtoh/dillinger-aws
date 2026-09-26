@@ -1,5 +1,7 @@
 # Phase 10 — Single Entry Gateway for Multiple Single-Tenant Instances
 
+Goal: serve every single-tenant instance behind one entry point.
+
 Requirement (added by user): serve all single-tenant instances
 (`spec/09-multi-tenancy.md`) behind **one entry point**, instead of
 handing each user a random `*.lambda-url.<region>.on.aws` address with no

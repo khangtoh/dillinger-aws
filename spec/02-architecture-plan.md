@@ -4,6 +4,8 @@ Goal: decide, on paper, exactly how Dillinger's Next.js 14 app maps onto
 AWS Lambda before writing any infra code. No AWS credentials needed for
 this phase.
 
+Depends on: None (design only).
+
 ## Source app facts (researched from joemccann/dillinger)
 
 - Next.js 14 App Router app, TypeScript, builds with `npm run build`,

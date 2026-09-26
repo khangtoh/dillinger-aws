@@ -3,6 +3,8 @@
 Goal: this environment has working AWS credentials that can create/manage
 Lambda, ECR, IAM, and CloudWatch Logs resources.
 
+Depends on: None.
+
 > **Security review update (2026-07-12):** Phase 7 OIDC is live, so the
 > historical static-key decision below is superseded. New account
 > bootstraps no longer create an IAM user by default. Human access should

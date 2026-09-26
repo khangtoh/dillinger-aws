@@ -1,5 +1,10 @@
 # Phase 9 — Multi-User / Multi-Instance Support
 
+Goal: run Dillinger for multiple users, each on an isolated single-tenant
+instance.
+
+Depends on: Phase 4 (single-instance AWS infra and deploy).
+
 Requirement (added by user): the architecture should enable running
 Dillinger for multiple users, not just a single personal deployment.
 

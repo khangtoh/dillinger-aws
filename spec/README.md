@@ -67,7 +67,7 @@ boxes in the phase file; keep both in sync when checking boxes.
 | 8 | [08-testing.md](08-testing.md) | Verify the deployment actually works | 🟡 10/12 | Phase 4 |
 | 9 | [09-multi-tenancy.md](09-multi-tenancy.md) | Multi-user: isolated single-tenant instance per user | 🟡 8/14 | Phase 4 |
 | 10 | [10-gateway.md](10-gateway.md) | Single entry gateway routing to each tenant | 🟡 8/12 | Phase 9 |
-| 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | ✅ 2/2 | Phase 9 + 10 |
+| 11 | [11-deployment-orchestrator/README.md](11-deployment-orchestrator/README.md) | Credential-isolated validate → resolve → check → sync pipeline | ✅ 19/19 | Phase 9 + 10 |
 | 12 | [12-security-hardening.md](12-security-hardening.md) | Close repository, AWS, credential, and operational security findings | 🟡 14/129 | Phase 7 + 8 + 10 + 11 |
 | 13 | [13-ui-refresh-requirements.md](13-ui-refresh-requirements.md) | UI-refresh requirements and evaluations: current UI audit, Astryx evaluation, StackEdit gap analysis, product-direction decision, AI-native scope (design only) | ✅ 7/7 | None (builds on the live Phase 1-12 milestone) |
 | 14 | [14-astryx-design-system-adoption.md](14-astryx-design-system-adoption.md) | Spike Astryx alongside Tailwind; explicit go/no-go gate | ✅ 22/22 | Phase 13 (unblocked 2026-07-12 — Phase 19 landed Next 15.5.20/React 19.2.7/StyleX 0.18.3, dry-run install confirmed clean). **Complete, Go call recorded 2026-07-13.** |

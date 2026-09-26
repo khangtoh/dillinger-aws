@@ -1,5 +1,10 @@
 # Phase 11 — Credential-Isolated Deployment Orchestrator
 
+Goal: a credential-isolated validate → resolve → check → sync pipeline that
+safely makes deployed tenants match committed config on every run.
+
+Depends on: Phase 9 + 10 (tenants and the gateway exist to be synced).
+
 ## Why this exists
 
 Every phase so far (4, 9, 10) assumed a human runs `provision-tenant.sh`
