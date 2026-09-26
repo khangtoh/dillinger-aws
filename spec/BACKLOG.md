@@ -6,8 +6,8 @@ phase's checkboxes — reprioritize with `specloop prio-spec <NN> <pos>`.
 
 ## Phases (priority order)
 
-- 21 TopForm Product Foundation (ProductOS)
-- 22 TopForm Repository Bootstrap
+- 21 Topform Product Foundation (ProductOS)
+- 22 Topform Repository Bootstrap
 - 01 AWS Account Onboarding
 - 02 Architecture Plan
 - 03 Containerize Dillinger for Lambda

@@ -8,8 +8,8 @@ Record the actual app and loop capabilities here. The template supplies no integ
 
 | Capability | System / reference | Status | Owner / next action |
 | --- | --- | --- | --- |
-| App code and verification commands | Repo root. `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run test:e2e`, `npm run verify`, `npm run check:legacy-theme`. Spec structure: `specloop check` | Inherited from Dillinger and working. It still builds Dillinger, not TopForm | Agents run these before every push |
-| Environments and release workflow | `.github/workflows/` (deploy-lambda, deploy-branch-tenant, tenant-lifecycle) or Buildkite (`scripts/ci-provider.sh`, `docs/buildkite.md`). AWS Lambda per-tenant stacks and CloudFront gateway under `infra/` | Inherited and **not configured for TopForm**: OIDC trust names `khangtoh/dillinger-aws`, and stack and tag names say `dillinger` | `spec/22` retargets them before any TopForm deploy |
+| App code and verification commands | Repo root. `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run test:e2e`, `npm run verify`, `npm run check:legacy-theme`. Spec structure: `specloop check` | Inherited from Dillinger and working. It still builds Dillinger, not Topform | Agents run these before every push |
+| Environments and release workflow | `.github/workflows/` (deploy-lambda, deploy-branch-tenant, tenant-lifecycle) or Buildkite (`scripts/ci-provider.sh`, `docs/buildkite.md`). AWS Lambda per-tenant stacks and CloudFront gateway under `infra/` | Inherited and **not configured for Topform**: OIDC trust names `khangtoh/dillinger-aws`, and stack and tag names say `dillinger` | `spec/22` retargets them before any Topform deploy |
 | User feedback and observation sources | Unknown | Unknown | Verify available sources |
 | Product metrics and queries | Unknown | Unknown | Define from the selected outcome |
 | Quality evaluations, including AI where applicable | Unknown | Unknown | Link verified methods |
@@ -23,7 +23,7 @@ No authority is inherited from this template. Record existing project/session au
 
 | Actor / role | Allowed action and environment | Limits / expiry | Source | Stop / revocation condition |
 | --- | --- | --- | --- | --- |
-| Agent sessions (Claude Code) | Edit, commit, and push to the session's assigned branch. Read attached repositories | GitHub integration cannot create repositories (HTTP 403 on 2026-09-26). No AWS deploy authority for TopForm yet | Session instructions and [STR-001](../steering/STR-001-create-topform.md) | End of session, or owner direction |
+| Agent sessions (Claude Code) | Edit, commit, and push to the session's assigned branch. Read attached repositories | GitHub integration cannot create repositories (HTTP 403 on 2026-09-26); it can push to attached repositories, including `khangtoh/TopForm`. No AWS deploy authority for Topform yet | Session instructions and [STR-001](../steering/STR-001-create-topform.md) | End of session, or owner direction |
 | khangtoh (owner) | Everything: repository creation, secrets, AWS, product direction | None recorded | Repository owner | Not applicable |
 
 Unknown scope blocks only the action requiring it. Continue other authorized work. Keep credentials outside this folder and store references only.

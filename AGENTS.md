@@ -1,7 +1,7 @@
 # Repository Agent Instructions
 
-This repository is **TopForm**, forked from `dillinger-aws`. Phases 1-20
-under `spec/` are inherited Dillinger history; TopForm work starts at
+This repository is **Topform**, forked from `dillinger-aws`. Phases 1-20
+under `spec/` are inherited Dillinger history; Topform work starts at
 Phase 21.
 
 ## Product context

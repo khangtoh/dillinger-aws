@@ -8,7 +8,7 @@ This is the canonical priority order. No outcomes or delivery commitments are su
 
 | Rank | Outcome / record | State | Next step |
 | --- | --- | --- | --- |
-| 1 | [OUT-001](outcomes/OUT-001-confirm-topform-product-contract.md) owner-confirmed product contract | Proposed | Owner supplies the TopForm description (`spec/21`) |
+| 1 | [OUT-001](outcomes/OUT-001-confirm-topform-product-contract.md) owner-confirmed product contract | Proposed | Owner supplies the Topform description (`spec/21`) |
 
 ## Next
 

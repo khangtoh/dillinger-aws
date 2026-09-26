@@ -579,8 +579,8 @@ claiming completion of Phase 18's separate functional/AI/performance scope.
 
 ### Scope of this session
 
-The owner directed a new product, **TopForm**, forked from this branch
-(full fork with history, private repo `khangtoh/topform`). The session set
+The owner directed a new product, **Topform**, forked from this branch
+(full fork with history, private repo `khangtoh/TopForm`). The session set
 up ProductOS and specloop for it. See `product/steering/STR-001-create-topform.md`.
 
 ### What got done
@@ -593,15 +593,24 @@ up ProductOS and specloop for it. See `product/steering/STR-001-create-topform.m
    `/spec-*` commands, and changed `.gitignore` so they are committed.
 3. Added `spec/21-topform-product-foundation.md` and
    `spec/22-topform-repository-bootstrap.md`, ranked first in BACKLOG. Gave
-   `spec/README.md` a TopForm header, acceptance checkbox, and inherited
+   `spec/README.md` a Topform header, acceptance checkbox, and inherited
    labels (DEC-001: Phases 1-20 stay in place as inherited history).
 4. Connected `AGENTS.md`, `CLAUDE.md`, and `README.md` to the product context.
 
 ### Blocked / left open
 
-- Creating `khangtoh/topform` failed. The GitHub integration returned
+- Creating `khangtoh/TopForm` failed. The GitHub integration returned
   `403 Resource not accessible by integration`. The owner must create the
   repository. Everything is committed on this branch, ready to push there.
 - The product description (promise, users, core job) has not been supplied.
   `product/PRODUCT.md` keeps those fields `Unknown`.
 - Nothing is running or scheduled. No deploys were made.
+
+### Update, same session
+
+- The owner supplied the promise and product model (STR-002). They are
+  recorded in `product/PRODUCT.md`, `VISION.md`, and `STRATEGY.md`. Phase 21
+  split its product-contract task: the promise and model are done; target
+  users, core job, and the AppContext definition remain open.
+- The owner created private `khangtoh/TopForm`. The session fetched the
+  full branch history (86 commits) and pushed it as `main`.

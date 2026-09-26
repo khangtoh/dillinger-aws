@@ -2,7 +2,7 @@
 
 The shared product memory where humans and AI steer, build, operate, and evolve this product together.
 
-Product: **TopForm**. Template version: 0.1.0 (from `khangtoh/product-os`). Adoption date: 2026-09-26. Project owner: khangtoh.
+Product: **Topform**. Template version: 0.1.0 (from `khangtoh/product-os`). Adoption date: 2026-09-26. Project owner: khangtoh.
 
 Adopted with the full fork of `dillinger-aws`. Product facts not yet supplied by the owner are marked `Unknown`; see [STATE.md](STATE.md) for the next action.
 

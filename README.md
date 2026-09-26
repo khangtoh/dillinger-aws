@@ -1,13 +1,13 @@
-# TopForm
+# Topform
 
-TopForm is a new product forked on 2026-09-26 from `dillinger-aws`. It is
+Topform is a new product forked on 2026-09-26 from `dillinger-aws`. It is
 run with two methods:
 
 - **[ProductOS](product/README.md)**: product intent, outcomes, decisions,
   and the current product state (`product/`).
 - **[specloop](spec/README.md)**: numbered phase checklists, the
   [BACKLOG](spec/BACKLOG.md) work order, and the `Spec Summary/Status`
-  handoff (`spec/`). TopForm phases start at 21.
+  handoff (`spec/`). Topform phases start at 21.
 
 The product definition is still being written. See
 [`product/STATE.md`](product/STATE.md) for the next action.

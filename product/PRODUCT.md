@@ -2,7 +2,7 @@
 
 > The shared product contract for humans and AI: what we are building, for whom, why it matters, how we choose, and how we learn.
 
-Updated: 2026-09-26 (adoption, [STR-001](steering/STR-001-create-topform.md)).
+Updated: 2026-09-26 (adoption [STR-001](steering/STR-001-create-topform.md); promise and model [STR-002](steering/STR-002-topform-product-model.md)).
 
 ## Purpose and identity
 
@@ -10,15 +10,31 @@ This is the canonical local product definition. Replace unknowns only with suppl
 
 | Field | Current definition |
 | --- | --- |
-| Product name | TopForm |
-| Purpose and one-sentence promise | Unknown — awaiting owner description ([OUT-001](outcomes/OUT-001-confirm-topform-product-contract.md)) |
-| Target users and context | Unknown — awaiting owner description |
-| Core user job and recurring need | Unknown — awaiting owner description |
-| Distinctive value and role of AI, if any | Unknown |
-| Current experience and maturity | Pre-product. The codebase is a full fork of `dillinger-aws` (a Next.js Markdown editor on AWS Lambda). No TopForm-specific behavior exists yet, and which inherited surfaces TopForm keeps is undecided (`spec/21`). |
-| Business model, if applicable | Unknown |
-| Constraints and non-goals | Unknown |
+| Product name | Topform |
+| Purpose and one-sentence promise | **Topform is an open work surface that takes the form of the work you're doing.** Tagline: "an open surface for work." Working wording; the owner qualified it as "probably" the strongest sentence ([STR-002](steering/STR-002-topform-product-model.md)) |
+| Target users and context | Unknown. Not yet supplied by the owner ([OUT-001](outcomes/OUT-001-confirm-topform-product-contract.md)) |
+| Core user job and recurring need | Doing work on a surface that adapts to that work (owner framing). The specific jobs and kinds of work are not yet supplied |
+| Distinctive value and role of AI, if any | The surface takes the form of the work. AI is native to editing ("AI-native editing"); specific AI behaviors are not yet defined. See the product model below |
+| Current experience and maturity | Pre-product. The codebase is a full fork of `dillinger-aws` (a Next.js Markdown editor on AWS Lambda). No Topform-specific behavior exists yet, and which inherited surfaces Topform keeps is undecided (`spec/21`). |
+| Business model, if applicable | Unknown. Not supplied |
+| Constraints and non-goals | The five-pillar product model below is fixed ("the product model stays"). Non-goals are not yet supplied |
 | Source of product direction | Owner khangtoh: [STR-001](steering/STR-001-create-topform.md) |
+
+### Product model (owner-fixed, [STR-002](steering/STR-002-topform-product-model.md))
+
+```
+Topform
+  ├── Markdown as durable state
+  ├── AI-native editing
+  ├── Personalization
+  ├── Private microVM runtime
+  └── AppContext
+        ├── appcontext://product-os
+        ├── appcontext://work-desk
+        └── appcontext://community
+```
+
+The pillar names are the owner's. What each pillar means in behavior, and what an AppContext is, have not been specified yet. Record definitions here as the owner supplies them.
 
 Use [VISION.md](VISION.md) for longer-term ambition and [STRATEGY.md](STRATEGY.md) for current bets. Do not infer product facts from a repository name.
 
